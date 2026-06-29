@@ -132,7 +132,7 @@ export default function LiturgyScreen() {
 
         <Text style={styles.credit}>
           Scripture quotations are from the Holy Bible, New International Version
-          (NIV).
+          (NIV). Photography via Pexels.
         </Text>
       </ScrollView>
 
