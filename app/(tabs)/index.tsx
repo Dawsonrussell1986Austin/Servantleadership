@@ -14,6 +14,7 @@ import { getDailyDevotional } from '../../src/content/devotionals';
 import { LITURGIES } from '../../src/content/liturgies';
 import LiturgyCover from '../../src/components/LiturgyCover';
 import PlayerBar from '../../src/components/PlayerBar';
+import FadeInUp from '../../src/components/FadeInUp';
 import { colors, spacing, type, radius, fonts } from '../../src/theme/theme';
 
 const USER_NAME =
@@ -63,7 +64,7 @@ export default function TodayScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* Greeting */}
-      <View style={styles.greetingWrap}>
+      <FadeInUp style={styles.greetingWrap}>
         <Text style={styles.dateLine}>{dateLine(now)}</Text>
         <Text
           style={styles.greeting}
@@ -76,11 +77,12 @@ export default function TodayScreen() {
         <Text style={styles.subtitle}>
           A few quiet minutes to begin the day well.
         </Text>
-      </View>
+      </FadeInUp>
 
       {/* Today's devotional — the hero */}
-      <Text style={styles.sectionLabel}>TODAY’S DEVOTIONAL</Text>
-      <View style={styles.hero}>
+      <FadeInUp delay={90}>
+        <Text style={styles.sectionLabel}>TODAY’S DEVOTIONAL</Text>
+        <View style={styles.hero}>
         <Pressable
           onPress={() => router.push(`/liturgy/${devotional.id}`)}
           accessibilityRole="button"
@@ -90,8 +92,12 @@ export default function TodayScreen() {
           <LiturgyCover liturgy={devotional} size="md" />
           <View style={styles.heroText}>
             <Text style={styles.heroKind}>DEVOTIONAL</Text>
-            <Text style={styles.heroTitle}>{devotional.title}</Text>
-            <Text style={styles.heroSituation}>{devotional.situation}</Text>
+            <Text style={styles.heroTitle} numberOfLines={2}>
+              {devotional.title}
+            </Text>
+            <Text style={styles.heroSituation} numberOfLines={2}>
+              {devotional.situation}
+            </Text>
             <View style={styles.readRow}>
               <Text style={styles.readLink}>Read</Text>
               <Ionicons name="arrow-forward" size={15} color={colors.ink} />
@@ -101,9 +107,11 @@ export default function TodayScreen() {
 
         <View style={styles.heroDivider} />
         <PlayerBar readingId={devotional.id} />
-      </View>
+        </View>
+      </FadeInUp>
 
       {/* Library carousel */}
+      <FadeInUp delay={170}>
       <View style={styles.carouselHead}>
         <Text style={styles.sectionLabel}>FOR THE MOMENT YOU’RE IN</Text>
         <Pressable onPress={() => router.push('/library')} hitSlop={8}>
@@ -128,11 +136,14 @@ export default function TodayScreen() {
           </Pressable>
         ))}
       </ScrollView>
+      </FadeInUp>
 
-      <Text style={styles.footnote}>
-        Read it slowly, or press play and listen. Let the last line follow you
-        into the day.
-      </Text>
+      <FadeInUp delay={240}>
+        <Text style={styles.footnote}>
+          Read it slowly, or press play and listen. Let the last line follow you
+          into the day.
+        </Text>
+      </FadeInUp>
     </ScrollView>
   );
 }
@@ -174,10 +185,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   greeting: {
-    fontFamily: fonts.sansExtra,
+    fontFamily: fonts.displayExtra,
     fontSize: 28,
     lineHeight: 34,
-    letterSpacing: -0.7,
+    letterSpacing: -0.5,
     color: colors.ink,
   },
   subtitle: {
@@ -222,6 +233,9 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     ...type.heading,
+    fontSize: 18,
+    lineHeight: 22,
+    letterSpacing: -0.2,
     color: colors.ink,
     marginBottom: spacing.xs,
   },

@@ -10,6 +10,7 @@ import { categoryColor } from '../../src/theme/categories';
 import LiturgyView from '../../src/components/LiturgyView';
 import LiturgyCover from '../../src/components/LiturgyCover';
 import PlayerBar from '../../src/components/PlayerBar';
+import FadeInUp from '../../src/components/FadeInUp';
 import { useAudio } from '../../src/audio/AudioProvider';
 import { colors, spacing, type, fonts } from '../../src/theme/theme';
 
@@ -113,19 +114,23 @@ export default function LiturgyScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Floating cover + centered title */}
-        <View style={styles.coverWrap}>
-          <LiturgyCover liturgy={reading} size="lg" />
-        </View>
-        <Text style={[styles.kind, { color: categoryColor(categoryOf(reading.id)) }]}>
-          {reading.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase()}
-        </Text>
-        <Text style={styles.title}>{reading.title}</Text>
-        <Text style={styles.subtitle}>{reading.situation}</Text>
-        <Text style={styles.length}>{lengthLabel(reading)}</Text>
+        <FadeInUp>
+          <View style={styles.coverWrap}>
+            <LiturgyCover liturgy={reading} size="lg" />
+          </View>
+          <Text style={[styles.kind, { color: categoryColor(categoryOf(reading.id)) }]}>
+            {reading.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase()}
+          </Text>
+          <Text style={styles.title}>{reading.title}</Text>
+          <Text style={styles.subtitle}>{reading.situation}</Text>
+          <Text style={styles.length}>{lengthLabel(reading)}</Text>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
+        </FadeInUp>
 
-        <LiturgyView liturgy={reading} fontScale={fontStep} showHeader={false} />
+        <FadeInUp delay={120}>
+          <LiturgyView liturgy={reading} fontScale={fontStep} showHeader={false} />
+        </FadeInUp>
 
         <View style={styles.amenWrap}>
           <Text style={styles.amen}>Amen.</Text>

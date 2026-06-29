@@ -30,9 +30,13 @@ export const colors = {
   white: '#FFFFFF',
 };
 
-// Font family names. The Inter_* families are loaded in app/_layout via
-// @expo-google-fonts/inter; each weight is its own family.
+// Font families (loaded in app/_layout). Bricolage Grotesque is the
+// characterful display face for headings; Inter handles small UI text;
+// Georgia is reserved for the reading itself.
 export const fonts = {
+  display: 'BricolageGrotesque_700Bold',
+  displayExtra: 'BricolageGrotesque_800ExtraBold',
+  displaySemibold: 'BricolageGrotesque_600SemiBold',
   sans: 'Inter_500Medium',
   sansMedium: 'Inter_500Medium',
   sansSemibold: 'Inter_600SemiBold',
@@ -57,10 +61,11 @@ export const radius = {
 };
 
 export const type = {
-  // UI / headings — geometric sans
-  hero: { fontFamily: fonts.sansExtra, fontSize: 32, lineHeight: 38 },
-  title: { fontFamily: fonts.sansBold, fontSize: 24, lineHeight: 30 },
-  heading: { fontFamily: fonts.sansSemibold, fontSize: 19, lineHeight: 25 },
+  // Display / headings — Bricolage Grotesque
+  hero: { fontFamily: fonts.displayExtra, fontSize: 32, lineHeight: 38 },
+  title: { fontFamily: fonts.display, fontSize: 25, lineHeight: 31 },
+  heading: { fontFamily: fonts.displaySemibold, fontSize: 19, lineHeight: 25 },
+  // Small UI text — Inter
   label: { fontFamily: fonts.sansBold, fontSize: 11, letterSpacing: 1.4 },
   caption: { fontFamily: fonts.sansMedium, fontSize: 14, lineHeight: 20 },
 

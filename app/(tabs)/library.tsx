@@ -15,6 +15,7 @@ import { CATEGORIES, Category } from '../../src/content/types';
 import { getLiturgiesByCategory } from '../../src/content/liturgies';
 import SearchBar from '../../src/components/SearchBar';
 import SearchResults from '../../src/components/SearchResults';
+import FadeInUp from '../../src/components/FadeInUp';
 import { colors, spacing, type, radius, fonts } from '../../src/theme/theme';
 import { categoryGradient } from '../../src/theme/categories';
 import { CATEGORY_ICON as ICONS } from '../../src/theme/categoryIcons';
@@ -94,13 +95,14 @@ export default function LibraryScreen() {
             Type a moment above, or browse the shelves.
           </Text>
           <View style={styles.grid}>
-            {CATEGORIES.map((c) => (
-              <CategoryTile
-                key={c.id}
-                category={c}
-                count={getLiturgiesByCategory(c.id).length}
-                onPress={() => router.push(`/category/${c.id}`)}
-              />
+            {CATEGORIES.map((c, i) => (
+              <FadeInUp key={c.id} delay={i * 55} style={styles.tileWrap}>
+                <CategoryTile
+                  category={c}
+                  count={getLiturgiesByCategory(c.id).length}
+                  onPress={() => router.push(`/category/${c.id}`)}
+                />
+              </FadeInUp>
             ))}
           </View>
         </ScrollView>
@@ -124,9 +126,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  tile: {
+  tileWrap: {
     width: '48%',
     marginBottom: spacing.md,
+  },
+  tile: {
+    width: '100%',
     borderRadius: radius.lg,
     shadowColor: '#000',
     shadowOpacity: 0.12,
