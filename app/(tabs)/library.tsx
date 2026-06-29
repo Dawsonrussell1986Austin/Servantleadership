@@ -55,12 +55,14 @@ function CategoryTile({
           <View style={styles.tileTop}>
             <Ionicons
               name={ICONS[category.id] ?? 'book-outline'}
-              size={16}
+              size={14}
               color="rgba(255,255,255,0.95)"
             />
           </View>
           <View>
-            <Text style={styles.tileLabel}>{category.label}</Text>
+            <Text style={styles.tileLabel} numberOfLines={3}>
+              {category.label}
+            </Text>
             <Text style={styles.tileCount}>{count} LITURGIES</Text>
           </View>
         </LinearGradient>
@@ -132,11 +134,11 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: spacing.sm + 2,
   },
   tileWrap: {
-    width: '48%',
-    marginBottom: spacing.lg,
+    width: 102,
   },
   tile: {
     width: '100%',
@@ -157,8 +159,8 @@ const styles = StyleSheet.create({
   tileOverlay: {
     flex: 1,
     borderRadius: radius.md,
-    padding: spacing.md,
-    paddingLeft: spacing.md + 3,
+    padding: spacing.sm + 2,
+    paddingLeft: spacing.sm + 4,
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
@@ -175,15 +177,15 @@ const styles = StyleSheet.create({
   },
   tileCount: {
     fontFamily: fonts.sansBold,
-    fontSize: 10,
-    letterSpacing: 1.1,
+    fontSize: 8,
+    letterSpacing: 0.8,
     color: 'rgba(255,255,255,0.9)',
-    marginTop: 5,
+    marginTop: 3,
   },
   tileLabel: {
     fontFamily: fonts.serif,
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 17,
     fontWeight: '600',
     color: colors.white,
   },
