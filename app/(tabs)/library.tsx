@@ -6,6 +6,7 @@ import {
   Pressable,
   StyleSheet,
   Keyboard,
+  ImageBackground,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -19,6 +20,7 @@ import FadeInUp from '../../src/components/FadeInUp';
 import { colors, spacing, type, radius, fonts } from '../../src/theme/theme';
 import { categoryGradient } from '../../src/theme/categories';
 import { CATEGORY_ICON as ICONS } from '../../src/theme/categoryIcons';
+import { CATEGORY_COVER } from '../../src/content/categoryCovers';
 
 function CategoryTile({
   category,
@@ -29,34 +31,43 @@ function CategoryTile({
   count: number;
   onPress: () => void;
 }) {
+  const grad = categoryGradient(category.id);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${category.label}, ${count} liturgies`}
-      style={({ pressed }) => [styles.tile, pressed && { opacity: 0.88 }]}
+      style={({ pressed }) => [styles.tile, pressed && { opacity: 0.9 }]}
     >
-      <LinearGradient
-        colors={categoryGradient(category.id)}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.tileGrad}
+      <ImageBackground
+        source={CATEGORY_COVER[category.id]}
+        style={styles.tileImg}
+        imageStyle={styles.tileImgRadius}
+        resizeMode="cover"
       >
-        <View style={styles.tileTop}>
-          <Ionicons
-            name={ICONS[category.id] ?? 'book-outline'}
-            size={22}
-            color="rgba(255,255,255,0.95)"
-          />
-          <Text style={styles.tileCount}>{count}</Text>
-        </View>
-        <View>
-          <Text style={styles.tileLabel}>{category.label}</Text>
-          <Text style={styles.tileBlurb} numberOfLines={2}>
-            {category.blurb}
-          </Text>
-        </View>
-      </LinearGradient>
+        <LinearGradient
+          colors={[`${grad[0]}59`, `${grad[1]}D9`, `${grad[1]}F7`]}
+          locations={[0, 0.55, 1]}
+          style={styles.tileOverlay}
+        >
+          {/* book spine highlight */}
+          <View style={styles.spine} />
+          <View style={styles.tileTop}>
+            <Ionicons
+              name={ICONS[category.id] ?? 'book-outline'}
+              size={20}
+              color="rgba(255,255,255,0.95)"
+            />
+            <Text style={styles.tileCount}>{count}</Text>
+          </View>
+          <View>
+            <Text style={styles.tileLabel}>{category.label}</Text>
+            <Text style={styles.tileBlurb} numberOfLines={2}>
+              {category.blurb}
+            </Text>
+          </View>
+        </LinearGradient>
+      </ImageBackground>
     </Pressable>
   );
 }
@@ -128,22 +139,39 @@ const styles = StyleSheet.create({
   },
   tileWrap: {
     width: '48%',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   tile: {
     width: '100%',
-    borderRadius: radius.lg,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
+    borderRadius: radius.md,
+    shadowColor: '#1A1206',
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 6,
   },
-  tileGrad: {
-    height: 158,
-    borderRadius: radius.lg,
+  tileImg: {
+    width: '100%',
+    aspectRatio: 0.76,
+  },
+  tileImgRadius: {
+    borderRadius: radius.md,
+  },
+  tileOverlay: {
+    flex: 1,
+    borderRadius: radius.md,
     padding: spacing.md,
+    paddingLeft: spacing.md + 4,
     justifyContent: 'space-between',
+    overflow: 'hidden',
+  },
+  spine: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    backgroundColor: 'rgba(255,255,255,0.22)',
   },
   tileTop: {
     flexDirection: 'row',
@@ -152,20 +180,21 @@ const styles = StyleSheet.create({
   },
   tileCount: {
     fontFamily: fonts.sansBold,
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.9)',
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.92)',
   },
   tileLabel: {
     fontFamily: fonts.serif,
-    fontSize: 21,
+    fontSize: 22,
+    lineHeight: 26,
     fontWeight: '600',
     color: colors.white,
-    marginBottom: 4,
+    marginBottom: 5,
   },
   tileBlurb: {
     fontFamily: fonts.sansMedium,
     fontSize: 12,
     lineHeight: 16,
-    color: 'rgba(255,255,255,0.82)',
+    color: 'rgba(255,255,255,0.85)',
   },
 });
