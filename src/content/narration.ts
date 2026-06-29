@@ -24,3 +24,19 @@ export function buildNarration(reading: Liturgy): string {
   parts.push(`${LONG_PAUSE}Amen.`);
   return parts.join(' ');
 }
+
+/**
+ * Plain narration for the device's built-in text-to-speech (no SSML). Used as a
+ * fallback when a pre-generated MP3 isn't available.
+ */
+export function buildSpeechText(reading: Liturgy): string {
+  const parts: string[] = [`${reading.title}.`];
+  for (const section of reading.sections) {
+    parts.push(section.body);
+    if (section.type === 'scripture' && section.reference) {
+      parts.push(`${section.reference}.`);
+    }
+  }
+  parts.push('Amen.');
+  return parts.join('\n\n');
+}

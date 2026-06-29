@@ -22,6 +22,7 @@ export default function PlayerBar({ readingId }: { readingId: string }) {
   const isPlaying = isActive && audio.isPlaying;
   const isLoading = isActive && audio.isLoading;
   const unavailable = isActive && audio.unavailable;
+  const isSpeech = isActive && audio.mode === 'speech';
 
   const fraction =
     isActive && audio.durationMillis > 0
@@ -29,7 +30,7 @@ export default function PlayerBar({ readingId }: { readingId: string }) {
       : 0;
 
   const onTrackPress = (e: GestureResponderEvent) => {
-    if (!isActive || !trackWidth) return;
+    if (!isActive || !trackWidth || isSpeech) return; // device speech can't seek
     audio.seekToFraction(e.nativeEvent.locationX / trackWidth);
   };
 
@@ -86,8 +87,11 @@ export default function PlayerBar({ readingId }: { readingId: string }) {
         </Text>
       </View>
 
+      {isSpeech && !unavailable && (
+        <Text style={styles.note}>Read aloud by your device voice.</Text>
+      )}
       {unavailable && (
-        <Text style={styles.note}>Narration for this reading isn’t available yet.</Text>
+        <Text style={styles.note}>Audio isn’t available on this device.</Text>
       )}
     </View>
   );

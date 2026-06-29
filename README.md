@@ -55,8 +55,14 @@ Options (all optional env vars):
 
 On the web build, `public/audio/` is served at `/audio/...`. On native, the
 player streams from `expo.extra.audioBaseUrl` in `app.json` (point this at your
-deployed site). Until the MP3s are generated, the player shows a gentle
-"narration isn't available yet" note and the rest of the app works normally.
+deployed site).
+
+**Device-speech fallback.** If a pre-generated MP3 isn't found for a reading,
+the player automatically falls back to the device's built-in text-to-speech
+(`expo-speech` — the Web Speech API on web, AVSpeechSynthesizer on iOS) and
+reads the liturgy aloud. So "Listen" works immediately, everywhere, with no API
+key; generating the ElevenLabs MP3s simply upgrades the quality. (Seeking is
+disabled in speech mode; progress is estimated from word count.)
 
 ## Tech
 
