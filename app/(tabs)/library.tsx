@@ -18,7 +18,7 @@ import SearchBar from '../../src/components/SearchBar';
 import SearchResults from '../../src/components/SearchResults';
 import FadeInUp from '../../src/components/FadeInUp';
 import { colors, spacing, type, radius, fonts } from '../../src/theme/theme';
-import { categoryGradient } from '../../src/theme/categories';
+import { categoryColor } from '../../src/theme/categories';
 import { CATEGORY_ICON as ICONS } from '../../src/theme/categoryIcons';
 import { CATEGORY_COVER } from '../../src/content/categoryCovers';
 
@@ -31,7 +31,7 @@ function CategoryTile({
   count: number;
   onPress: () => void;
 }) {
-  const grad = categoryGradient(category.id);
+  const accent = categoryColor(category.id);
   return (
     <Pressable
       onPress={onPress}
@@ -46,25 +46,22 @@ function CategoryTile({
         resizeMode="cover"
       >
         <LinearGradient
-          colors={[`${grad[0]}59`, `${grad[1]}D9`, `${grad[1]}F7`]}
-          locations={[0, 0.55, 1]}
+          colors={['rgba(15,12,9,0.12)', 'rgba(15,12,9,0.34)', 'rgba(15,12,9,0.86)']}
+          locations={[0, 0.5, 1]}
           style={styles.tileOverlay}
         >
-          {/* book spine highlight */}
-          <View style={styles.spine} />
+          {/* book spine — a subtle category-colored edge */}
+          <View style={[styles.spine, { backgroundColor: accent }]} />
           <View style={styles.tileTop}>
             <Ionicons
               name={ICONS[category.id] ?? 'book-outline'}
-              size={20}
+              size={16}
               color="rgba(255,255,255,0.95)"
             />
-            <Text style={styles.tileCount}>{count}</Text>
           </View>
           <View>
             <Text style={styles.tileLabel}>{category.label}</Text>
-            <Text style={styles.tileBlurb} numberOfLines={2}>
-              {category.blurb}
-            </Text>
+            <Text style={styles.tileCount}>{count} LITURGIES</Text>
           </View>
         </LinearGradient>
       </ImageBackground>
@@ -152,7 +149,7 @@ const styles = StyleSheet.create({
   },
   tileImg: {
     width: '100%',
-    aspectRatio: 0.76,
+    aspectRatio: 0.72, // matches the reading book covers
   },
   tileImgRadius: {
     borderRadius: radius.md,
@@ -161,7 +158,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: radius.md,
     padding: spacing.md,
-    paddingLeft: spacing.md + 4,
+    paddingLeft: spacing.md + 3,
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
@@ -170,31 +167,24 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    width: 4,
-    backgroundColor: 'rgba(255,255,255,0.22)',
+    width: 3,
   },
   tileTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   tileCount: {
     fontFamily: fonts.sansBold,
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.92)',
+    fontSize: 10,
+    letterSpacing: 1.1,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 5,
   },
   tileLabel: {
     fontFamily: fonts.serif,
-    fontSize: 22,
-    lineHeight: 26,
+    fontSize: 20,
+    lineHeight: 24,
     fontWeight: '600',
     color: colors.white,
-    marginBottom: 5,
-  },
-  tileBlurb: {
-    fontFamily: fonts.sansMedium,
-    fontSize: 12,
-    lineHeight: 16,
-    color: 'rgba(255,255,255,0.85)',
   },
 });
