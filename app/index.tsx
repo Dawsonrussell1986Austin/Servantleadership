@@ -81,7 +81,18 @@ export default function Home() {
     >
       {/* Greeting */}
       <FadeInUp>
-        <Text style={styles.dateLine}>{dateLine(now)}</Text>
+        <View style={styles.topRow}>
+          <Text style={styles.dateLine}>{dateLine(now)}</Text>
+          <Pressable
+            onPress={() => router.push('/settings')}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+            style={({ pressed }) => [styles.gearBtn, pressed && { opacity: 0.5 }]}
+          >
+            <Ionicons name="settings-outline" size={20} color={colors.inkFaint} />
+          </Pressable>
+        </View>
         <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
           {greeting(now)}
         </Text>
@@ -209,12 +220,18 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
+  },
+  gearBtn: { padding: 4, marginRight: -4, marginTop: -4 },
   dateLine: {
     fontFamily: fonts.sansBold,
     fontSize: 12,
     letterSpacing: 1.5,
     color: colors.inkFaint,
-    marginBottom: spacing.sm,
   },
   greeting: {
     fontFamily: fonts.displayExtra,

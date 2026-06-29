@@ -16,6 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.servantleadership.liturgies",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -41,7 +42,14 @@
           "resizeMode": "contain"
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-apple-authentication",
+      [
+        "expo-notifications",
+        {
+          "color": "#9C6B3F"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
