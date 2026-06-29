@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { getReadingById } from '../../src/content';
 import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { lengthLabel } from '../../src/content/lengths';
+import { categoryColor } from '../../src/theme/categories';
 import LiturgyView from '../../src/components/LiturgyView';
 import LiturgyCover from '../../src/components/LiturgyCover';
 import PlayerBar from '../../src/components/PlayerBar';
@@ -115,8 +116,8 @@ export default function LiturgyScreen() {
         <View style={styles.coverWrap}>
           <LiturgyCover liturgy={reading} size="lg" />
         </View>
-        <Text style={styles.kind}>
-          {(reading.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase())}
+        <Text style={[styles.kind, { color: categoryColor(categoryOf(reading.id)) }]}>
+          {reading.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase()}
         </Text>
         <Text style={styles.title}>{reading.title}</Text>
         <Text style={styles.subtitle}>{reading.situation}</Text>

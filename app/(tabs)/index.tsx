@@ -26,6 +26,12 @@ function greeting(d: Date): string {
   return USER_NAME ? `${base}, ${USER_NAME}` : base;
 }
 
+const WEEKDAYS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+function dateLine(d: Date): string {
+  return `${WEEKDAYS[d.getDay()]} · ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+}
+
 // A rotating, category-diverse handful of library liturgies for the carousel.
 function featured(date: Date) {
   const day = Math.floor(date.getTime() / 86400000);
@@ -58,7 +64,15 @@ export default function TodayScreen() {
     >
       {/* Greeting */}
       <View style={styles.greetingWrap}>
-        <Text style={styles.greeting}>{greeting(now)}</Text>
+        <Text style={styles.dateLine}>{dateLine(now)}</Text>
+        <Text
+          style={styles.greeting}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {greeting(now)}
+        </Text>
         <Text style={styles.subtitle}>
           A few quiet minutes to begin the day well.
         </Text>
@@ -75,14 +89,12 @@ export default function TodayScreen() {
         >
           <LiturgyCover liturgy={devotional} size="md" />
           <View style={styles.heroText}>
-            <Text style={styles.heroKind}>
-              DEVOTIONAL · {devotional.minutes} MIN READ
-            </Text>
+            <Text style={styles.heroKind}>DEVOTIONAL</Text>
             <Text style={styles.heroTitle}>{devotional.title}</Text>
             <Text style={styles.heroSituation}>{devotional.situation}</Text>
             <View style={styles.readRow}>
               <Text style={styles.readLink}>Read</Text>
-              <Ionicons name="arrow-forward" size={14} color={colors.accent} />
+              <Ionicons name="arrow-forward" size={15} color={colors.ink} />
             </View>
           </View>
         </Pressable>
@@ -154,10 +166,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.xl,
   },
+  dateLine: {
+    fontFamily: fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 1.5,
+    color: colors.inkFaint,
+    marginBottom: spacing.sm,
+  },
   greeting: {
-    ...type.hero,
+    fontFamily: fonts.sansExtra,
+    fontSize: 28,
+    lineHeight: 34,
+    letterSpacing: -0.7,
     color: colors.ink,
-    fontWeight: '600',
   },
   subtitle: {
     fontFamily: fonts.sansMedium,
@@ -195,7 +216,7 @@ const styles = StyleSheet.create({
   },
   heroKind: {
     ...type.label,
-    color: colors.accent,
+    color: colors.inkFaint,
     fontWeight: '700',
     marginBottom: spacing.sm,
   },
@@ -216,7 +237,7 @@ const styles = StyleSheet.create({
   },
   readLink: {
     ...type.caption,
-    color: colors.accent,
+    color: colors.ink,
     fontWeight: '700',
     marginRight: 4,
   },
@@ -233,7 +254,7 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     ...type.caption,
-    color: colors.accent,
+    color: colors.inkSoft,
     fontWeight: '700',
   },
   carousel: {
