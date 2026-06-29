@@ -49,7 +49,7 @@ export default function CategoryScreen() {
           style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
         >
           <Ionicons name="chevron-back" size={22} color={colors.inkSoft} />
-          <Text style={styles.backText}>Library</Text>
+          <Text style={styles.backText}>Back</Text>
         </Pressable>
 
         <View style={styles.titleRow}>

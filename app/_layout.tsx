@@ -53,7 +53,7 @@ export default function RootLayout() {
             animation: 'fade',
           }}
         >
-          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="index" />
           <Stack.Screen
             name="category/[id]"
             options={{ animation: 'slide_from_right' }}
