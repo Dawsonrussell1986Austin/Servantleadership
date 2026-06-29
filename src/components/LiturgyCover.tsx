@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Liturgy, CATEGORIES } from '../content/types';
+import { Liturgy } from '../content/types';
 import { coverFor } from '../content/covers';
+import { shortCategoryLabel } from '../theme/categories';
 import { colors, fonts, radius } from '../theme/theme';
 
 type Size = 'sm' | 'md' | 'lg';
@@ -36,7 +37,7 @@ export default function LiturgyCover({
 }) {
   const d = DIMS[size];
   const source = coverFor(liturgy.id, liturgy.category, liturgy.kind);
-  const catLabel = CATEGORIES.find((c) => c.id === liturgy.category)?.label ?? '';
+  const catLabel = shortCategoryLabel[liturgy.category] ?? '';
   const showText = size !== 'sm';
 
   return (

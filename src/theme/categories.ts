@@ -32,6 +32,14 @@ export const categoryGradient = (id: CategoryId): [string, string] => {
   }
 };
 
+/** Short, single-word-ish labels for the narrow cover chip. */
+export const shortCategoryLabel: Record<CategoryId, string> = {
+  pressure: 'PRESSURE',
+  people: 'PEOPLE',
+  wins: 'MOMENTS',
+  rhythms: 'RHYTHMS',
+};
+
 export const sectionLabel: Record<string, string> = {
   call: 'Be Still',
   scripture: 'The Word',

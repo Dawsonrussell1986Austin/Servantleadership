@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F6F1E7"
+      "backgroundColor": "#FBFAF7"
     },
     "ios": {
       "supportsTablet": true,
@@ -24,19 +24,20 @@
       "package": "com.servantleadership.liturgies",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#F6F1E7"
+        "backgroundColor": "#FBFAF7"
       }
     },
     "web": {
       "bundler": "metro",
-      "output": "static"
+      "output": "static",
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F6F1E7",
+          "backgroundColor": "#FBFAF7",
           "resizeMode": "contain"
         }
       ],

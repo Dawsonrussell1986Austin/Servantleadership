@@ -70,6 +70,8 @@ export default function PlayerBar({ readingId }: { readingId: string }) {
           onPress={onPlayPress}
           style={({ pressed }) => [styles.playBtn, pressed && { opacity: 0.6 }]}
           hitSlop={16}
+          accessibilityRole="button"
+          accessibilityLabel={isPlaying ? 'Pause narration' : 'Play narration'}
         >
           {isLoading ? (
             <ActivityIndicator color={colors.ink} />

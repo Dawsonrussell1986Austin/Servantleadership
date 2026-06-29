@@ -77,6 +77,8 @@ export default function TodayScreen() {
       <View style={styles.hero}>
         <Pressable
           onPress={() => router.push(`/liturgy/${devotional.id}`)}
+          accessibilityRole="button"
+          accessibilityLabel={`Read today’s devotional: ${devotional.title}`}
           style={({ pressed }) => [styles.heroTop, pressed && { opacity: 0.85 }]}
         >
           <LiturgyCover liturgy={devotional} size="md" />
@@ -112,6 +114,8 @@ export default function TodayScreen() {
           <Pressable
             key={l.id}
             onPress={() => router.push(`/liturgy/${l.id}`)}
+            accessibilityRole="button"
+            accessibilityLabel={l.title}
             style={({ pressed }) => [styles.carouselItem, pressed && { opacity: 0.85 }]}
           >
             <LiturgyCover liturgy={l} size="md" />

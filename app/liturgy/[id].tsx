@@ -18,16 +18,20 @@ function RoundButton({
   onPress,
   active,
   label,
+  a11yLabel,
 }: {
   name?: keyof typeof Ionicons.glyphMap;
   onPress: () => void;
   active?: boolean;
   label?: string;
+  a11yLabel: string;
 }) {
   return (
     <Pressable
       onPress={onPress}
       hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={a11yLabel}
       style={({ pressed }) => [
         styles.roundBtn,
         active && styles.roundBtnActive,
@@ -76,16 +80,22 @@ export default function LiturgyScreen() {
     <View style={styles.screen}>
       {/* Top bar */}
       <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
-        <RoundButton name="chevron-back" onPress={() => router.back()} />
+        <RoundButton
+          name="chevron-back"
+          a11yLabel="Go back"
+          onPress={() => router.back()}
+        />
         <View style={styles.topRight}>
           <RoundButton
             label="A"
+            a11yLabel="Change text size"
             onPress={() =>
               setFontStep((s) => FONT_STEPS[(FONT_STEPS.indexOf(s) + 1) % FONT_STEPS.length])
             }
           />
           <RoundButton
             name={isPlaying ? 'pause' : 'headset'}
+            a11yLabel={isPlaying ? 'Pause narration' : 'Listen to this reading'}
             active={isActive}
             onPress={() => audio.toggleReading(reading.id)}
           />
@@ -117,6 +127,11 @@ export default function LiturgyScreen() {
         <View style={styles.amenWrap}>
           <Text style={styles.amen}>Amen.</Text>
         </View>
+
+        <Text style={styles.credit}>
+          Scripture quotations are from the Holy Bible, New International Version
+          (NIV).
+        </Text>
       </ScrollView>
 
       {/* Pinned player */}
@@ -205,6 +220,14 @@ const styles = StyleSheet.create({
     ...type.title,
     color: colors.inkFaint,
     fontStyle: 'italic',
+  },
+  credit: {
+    ...type.caption,
+    fontSize: 12,
+    color: colors.inkFaint,
+    textAlign: 'center',
+    marginTop: spacing.xl,
+    paddingHorizontal: spacing.lg,
   },
   player: {
     position: 'absolute',

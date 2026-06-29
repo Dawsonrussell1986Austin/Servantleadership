@@ -36,6 +36,8 @@ export default function LiturgyCard({ liturgy, onPress }: Props) {
       <Pressable
         onPress={() => audio.toggleReading(liturgy.id)}
         hitSlop={10}
+        accessibilityRole="button"
+        accessibilityLabel={isPlaying ? `Pause ${liturgy.title}` : `Listen to ${liturgy.title}`}
         style={({ pressed }) => [styles.play, pressed && { opacity: 0.7 }]}
       >
         <Ionicons

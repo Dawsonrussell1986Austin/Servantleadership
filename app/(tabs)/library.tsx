@@ -68,7 +68,12 @@ export default function LibraryScreen() {
             autoCapitalize="none"
           />
           {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={10}>
+            <Pressable
+              onPress={() => setQuery('')}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel="Clear search"
+            >
               <Ionicons name="close-circle" size={18} color={colors.inkFaint} />
             </Pressable>
           )}
