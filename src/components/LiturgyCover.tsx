@@ -1,18 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Liturgy } from '../content/types';
+import { Liturgy, CATEGORIES } from '../content/types';
+import { coverFor } from '../content/covers';
 import { colors, fonts, radius } from '../theme/theme';
-import { categoryGradient } from '../theme/categories';
-import { CATEGORIES } from '../content/types';
 
 type Size = 'sm' | 'md' | 'lg';
 
-const DIMS: Record<Size, { w: number; h: number; pad: number; title: number; label: number }> = {
-  sm: { w: 58, h: 78, pad: 8, title: 12, label: 8 },
-  md: { w: 132, h: 184, pad: 14, title: 18, label: 9 },
-  lg: { w: 150, h: 210, pad: 16, title: 20, label: 10 },
+const DIMS: Record<Size, { w: number; h: number; pad: number; title: number; label: number; r: number }> = {
+  sm: { w: 60, h: 82, pad: 8, title: 12, label: 8, r: 12 },
+  md: { w: 132, h: 184, pad: 14, title: 18, label: 9, r: radius.md },
+  lg: { w: 152, h: 212, pad: 16, title: 20, label: 10, r: radius.md },
 };
 
 const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
@@ -23,7 +22,9 @@ const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
 };
 
 function shortTitle(l: Liturgy): string {
-  return l.title.replace(/^An? (Liturgy|Devotional|Morning Liturgy|Evening Liturgy) (for |of |for the )?/i, '').replace(/^On /, '');
+  return l.title
+    .replace(/^An? (Morning |Evening )?(Liturgy|Devotional)( of| for( the)?)? /i, '')
+    .replace(/^On /, '');
 }
 
 export default function LiturgyCover({
@@ -34,53 +35,65 @@ export default function LiturgyCover({
   size?: Size;
 }) {
   const d = DIMS[size];
-  const grad = categoryGradient(liturgy.category);
-  const catLabel =
-    CATEGORIES.find((c) => c.id === liturgy.category)?.label ?? '';
+  const source = coverFor(liturgy.id, liturgy.category, liturgy.kind);
+  const catLabel = CATEGORIES.find((c) => c.id === liturgy.category)?.label ?? '';
+  const showText = size !== 'sm';
 
   return (
-    <LinearGradient
-      colors={grad}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={[styles.cover, { width: d.w, height: d.h, padding: d.pad, borderRadius: size === 'sm' ? 8 : radius.md }]}
-    >
-      <View style={styles.top}>
-        <Ionicons
-          name={ICONS[liturgy.category] ?? 'book-outline'}
-          size={size === 'sm' ? 12 : 16}
-          color="rgba(255,255,255,0.85)"
-        />
-        {size !== 'sm' && (
-          <Text style={[styles.label, { fontSize: d.label }]} numberOfLines={1}>
-            {(liturgy.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase())}
-          </Text>
-        )}
-      </View>
-
-      <Text
-        style={[styles.title, { fontSize: d.title, lineHeight: d.title * 1.2 }]}
-        numberOfLines={size === 'sm' ? 3 : 4}
+    <View style={[styles.shadow, { width: d.w, height: d.h, borderRadius: d.r }]}>
+      <ImageBackground
+        source={source}
+        style={{ width: d.w, height: d.h }}
+        imageStyle={{ borderRadius: d.r }}
+        resizeMode="cover"
       >
-        {shortTitle(liturgy)}
-      </Text>
+        <LinearGradient
+          colors={['rgba(15,12,9,0.10)', 'rgba(15,12,9,0.30)', 'rgba(15,12,9,0.82)']}
+          locations={[0, 0.45, 1]}
+          style={[styles.overlay, { borderRadius: d.r, padding: d.pad }]}
+        >
+          <View style={styles.top}>
+            <Ionicons
+              name={ICONS[liturgy.category] ?? 'book-outline'}
+              size={size === 'sm' ? 13 : 16}
+              color="rgba(255,255,255,0.95)"
+            />
+            {showText && (
+              <Text style={[styles.label, { fontSize: d.label }]} numberOfLines={1}>
+                {liturgy.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase()}
+              </Text>
+            )}
+          </View>
 
-      {size !== 'sm' && (
-        <Text style={styles.minutes}>{liturgy.minutes} MIN</Text>
-      )}
-    </LinearGradient>
+          {showText && (
+            <View>
+              <Text
+                style={[styles.title, { fontSize: d.title, lineHeight: d.title * 1.18 }]}
+                numberOfLines={4}
+              >
+                {shortTitle(liturgy)}
+              </Text>
+              <Text style={styles.minutes}>{liturgy.minutes} MIN</Text>
+            </View>
+          )}
+        </LinearGradient>
+      </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  cover: {
-    justifyContent: 'space-between',
-    overflow: 'hidden',
+  shadow: {
     shadowColor: '#000',
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
+    shadowOpacity: 0.2,
+    shadowRadius: 14,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
+    elevation: 5,
+    backgroundColor: colors.paperDeep,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
   top: {
     flexDirection: 'row',
@@ -88,10 +101,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   label: {
-    fontFamily: fonts.sans,
-    color: 'rgba(255,255,255,0.85)',
+    fontFamily: fonts.sansBold,
+    color: 'rgba(255,255,255,0.95)',
     letterSpacing: 1,
-    fontWeight: '700',
     flexShrink: 1,
     marginLeft: 6,
     textAlign: 'right',
@@ -102,10 +114,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   minutes: {
-    fontFamily: fonts.sans,
-    color: 'rgba(255,255,255,0.8)',
+    fontFamily: fonts.sansBold,
+    color: 'rgba(255,255,255,0.9)',
     fontSize: 10,
     letterSpacing: 1.2,
-    fontWeight: '700',
+    marginTop: 6,
   },
 });

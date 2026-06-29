@@ -1,38 +1,44 @@
 /**
  * Visual language for Servant.
- * Warm paper tones, muted ink, generous breathing room — a space that feels
- * more like an open prayer book than a productivity app.
+ * Modern, airy chrome — a clean geometric sans (Inter) for everything in the UI,
+ * and a warm serif (Georgia) reserved for the reading itself, on a near-white
+ * paper background. The feel: a calm modern reading app, not a busy product.
  */
 
 export const colors = {
-  // Paper
-  paper: '#F6F1E7',
-  paperRaised: '#FCF8F0',
-  paperDeep: '#EDE5D5',
+  // Paper — near-white, faintly warm
+  paper: '#FBFAF7',
+  paperRaised: '#FFFFFF',
+  paperDeep: '#F1EEE8',
 
   // Ink
-  ink: '#2B2722',
-  inkSoft: '#5A5247',
-  inkFaint: '#8C8273',
+  ink: '#201C17',
+  inkSoft: '#6E655A',
+  inkFaint: '#A79F93',
 
   // Accent — a quiet liturgical gold/clay
   accent: '#9C6B3F',
   accentSoft: '#C9A77E',
 
   // Categories
-  pressure: '#A8503E', // clay red — the hard days
-  people: '#4E6B57', // sage green — relationships
-  wins: '#9C6B3F', // gold — the high moments
-  rhythms: '#5A6B86', // slate blue — daily practice
+  pressure: '#A8503E',
+  people: '#4E6B57',
+  wins: '#9C6B3F',
+  rhythms: '#5A6B86',
 
-  line: '#E2D8C6',
+  line: '#ECE8E0',
   white: '#FFFFFF',
 };
 
+// Font family names. The Inter_* families are loaded in app/_layout via
+// @expo-google-fonts/inter; each weight is its own family.
 export const fonts = {
-  // System serif gives a printed, devotional feel without bundling font files.
+  sans: 'Inter_500Medium',
+  sansMedium: 'Inter_500Medium',
+  sansSemibold: 'Inter_600SemiBold',
+  sansBold: 'Inter_700Bold',
+  sansExtra: 'Inter_800ExtraBold',
   serif: 'Georgia',
-  sans: 'System',
 };
 
 export const spacing = {
@@ -45,17 +51,20 @@ export const spacing = {
 };
 
 export const radius = {
-  sm: 8,
-  md: 14,
-  lg: 22,
+  sm: 10,
+  md: 16,
+  lg: 24,
 };
 
 export const type = {
-  hero: { fontFamily: fonts.serif, fontSize: 34, lineHeight: 42 },
-  title: { fontFamily: fonts.serif, fontSize: 26, lineHeight: 34 },
-  heading: { fontFamily: fonts.serif, fontSize: 20, lineHeight: 28 },
+  // UI / headings — geometric sans
+  hero: { fontFamily: fonts.sansExtra, fontSize: 32, lineHeight: 38 },
+  title: { fontFamily: fonts.sansBold, fontSize: 24, lineHeight: 30 },
+  heading: { fontFamily: fonts.sansSemibold, fontSize: 19, lineHeight: 25 },
+  label: { fontFamily: fonts.sansBold, fontSize: 11, letterSpacing: 1.4 },
+  caption: { fontFamily: fonts.sansMedium, fontSize: 14, lineHeight: 20 },
+
+  // Reading — serif
   body: { fontFamily: fonts.serif, fontSize: 19, lineHeight: 31 },
   scripture: { fontFamily: fonts.serif, fontSize: 20, lineHeight: 32, fontStyle: 'italic' as const },
-  label: { fontFamily: fonts.sans, fontSize: 12, letterSpacing: 1.5 },
-  caption: { fontFamily: fonts.sans, fontSize: 14, lineHeight: 20 },
 };

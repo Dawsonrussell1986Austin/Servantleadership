@@ -67,17 +67,16 @@ export default function PlayerBar({ readingId }: { readingId: string }) {
 
         <Pressable
           onPress={onPlayPress}
-          style={({ pressed }) => [styles.playBtn, pressed && { opacity: 0.8 }]}
-          hitSlop={10}
+          style={({ pressed }) => [styles.playBtn, pressed && { opacity: 0.6 }]}
+          hitSlop={16}
         >
           {isLoading ? (
-            <ActivityIndicator color={colors.white} />
+            <ActivityIndicator color={colors.ink} />
           ) : (
             <Ionicons
               name={isPlaying ? 'pause' : 'play'}
-              size={26}
-              color={colors.white}
-              style={isPlaying ? undefined : { marginLeft: 3 }}
+              size={36}
+              color={colors.ink}
             />
           )}
         </Pressable>
@@ -138,17 +137,10 @@ const styles = StyleSheet.create({
     width: 48,
   },
   playBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.ink,
+    width: 56,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
   },
   note: {
     ...type.caption,

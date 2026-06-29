@@ -23,11 +23,17 @@ function greeting(d: Date): string {
   return 'Good evening';
 }
 
-// A rotating handful of library liturgies to feature in the carousel.
+// A rotating, category-diverse handful of library liturgies for the carousel.
 function featured(date: Date) {
   const day = Math.floor(date.getTime() / 86400000);
   const out = [] as typeof LITURGIES;
-  for (let i = 0; i < 7; i++) out.push(LITURGIES[(day + i) % LITURGIES.length]);
+  const seen = new Set<string>();
+  for (let i = 0; out.length < 8 && i < LITURGIES.length; i++) {
+    const l = LITURGIES[(day + i * 5) % LITURGIES.length];
+    if (seen.has(l.id)) continue;
+    seen.add(l.id);
+    out.push(l);
+  }
   return out;
 }
 
@@ -134,10 +140,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   brand: {
-    fontFamily: fonts.serif,
+    fontFamily: fonts.sansExtra,
     fontSize: 22,
     color: colors.ink,
-    fontWeight: '600',
+    letterSpacing: -0.3,
   },
   avatar: {
     width: 38,
@@ -156,9 +162,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   subtitle: {
-    ...type.body,
+    fontFamily: fonts.sansMedium,
+    fontSize: 16,
+    lineHeight: 22,
     color: colors.inkFaint,
-    marginTop: spacing.xs,
+    marginTop: spacing.sm,
   },
   sectionLabel: {
     ...type.label,
@@ -171,10 +179,13 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     backgroundColor: colors.paperRaised,
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.line,
     padding: spacing.lg,
     marginBottom: spacing.xl,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 3,
   },
   heroTop: {
     flexDirection: 'row',
