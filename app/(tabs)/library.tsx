@@ -135,13 +135,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: spacing.sm + 2,
+    alignItems: 'flex-start',
+    gap: spacing.sm + 4,
   },
   tileWrap: {
-    width: 102,
+    width: 104,
   },
   tile: {
-    width: '100%',
+    width: 104,
+    height: 150,
     borderRadius: radius.md,
     shadowColor: '#1A1206',
     shadowOpacity: 0.28,
@@ -150,8 +152,8 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   tileImg: {
-    width: '100%',
-    aspectRatio: 0.72, // matches the reading book covers
+    width: 104,
+    height: 150, // fixed so the image can't stretch on wide screens
   },
   tileImgRadius: {
     borderRadius: radius.md,
