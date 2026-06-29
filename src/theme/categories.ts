@@ -1,44 +1,39 @@
-import { colors } from './theme';
 import { CategoryId } from '../content/types';
 
-export const categoryColor = (id: CategoryId): string => {
-  switch (id) {
-    case 'pressure':
-      return colors.pressure;
-    case 'people':
-      return colors.people;
-    case 'wins':
-      return colors.wins;
-    case 'rhythms':
-      return colors.rhythms;
-    default:
-      return colors.accent;
-  }
+/** Two-stop gradient per category (used for shelves and cover tints). */
+const GRADIENTS: Record<CategoryId, [string, string]> = {
+  money: ['#3F8466', '#27604A'],
+  fear: ['#B05541', '#82382A'],
+  deals: ['#BE883F', '#8C601F'],
+  launching: ['#C76A3A', '#993F1E'],
+  partners: ['#3C8A84', '#256661'],
+  team: ['#4A66A6', '#2E467C'],
+  conversations: ['#9C5B72', '#6E3B4F'],
+  wins: ['#CFA23E', '#A2761E'],
+  rhythms: ['#5C6E88', '#475670'],
+  focus: ['#6E5DA0', '#483C72'],
 };
 
-/** A two-stop gradient per category for cover art. */
-export const categoryGradient = (id: CategoryId): [string, string] => {
-  switch (id) {
-    case 'pressure':
-      return ['#C2604B', '#8E3B2C'];
-    case 'people':
-      return ['#5E7E68', '#3C5544'];
-    case 'wins':
-      return ['#C08A4F', '#8A5A2E'];
-    case 'rhythms':
-      return ['#6B7C99', '#46546E'];
-    default:
-      return ['#C9A77E', '#9C6B3F'];
-  }
-};
-
-/** Short, single-word-ish labels for the narrow cover chip. */
-export const shortCategoryLabel: Record<CategoryId, string> = {
-  pressure: 'PRESSURE',
-  people: 'PEOPLE',
-  wins: 'MOMENTS',
+const SHORT: Record<CategoryId, string> = {
+  money: 'MONEY',
+  fear: 'FEAR',
+  deals: 'DEALS',
+  launching: 'LAUNCH',
+  partners: 'PARTNERS',
+  team: 'TEAM',
+  conversations: 'TALKS',
+  wins: 'WINS',
   rhythms: 'RHYTHMS',
+  focus: 'FOCUS',
 };
+
+export const categoryColor = (id: CategoryId): string => GRADIENTS[id]?.[0] ?? '#9C6B3F';
+
+export const categoryGradient = (id: CategoryId): [string, string] =>
+  GRADIENTS[id] ?? ['#C9A77E', '#9C6B3F'];
+
+/** Short, single-word labels for the narrow cover chip. */
+export const shortCategoryLabel: Record<CategoryId, string> = SHORT;
 
 export const sectionLabel: Record<string, string> = {
   call: 'Be Still',

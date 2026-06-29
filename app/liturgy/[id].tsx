@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { getReadingById } from '../../src/content';
-import { CATEGORIES } from '../../src/content/types';
+import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { lengthLabel } from '../../src/content/lengths';
 import LiturgyView from '../../src/components/LiturgyView';
 import LiturgyCover from '../../src/components/LiturgyCover';
@@ -75,7 +75,7 @@ export default function LiturgyScreen() {
 
   const isActive = audio.currentId === reading.id;
   const isPlaying = isActive && audio.isPlaying;
-  const catLabel = CATEGORIES.find((c) => c.id === reading.category)?.label ?? '';
+  const catLabel = CATEGORIES.find((c) => c.id === categoryOf(reading.id))?.label ?? '';
 
   return (
     <View style={styles.screen}>

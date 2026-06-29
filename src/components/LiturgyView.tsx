@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Liturgy, LiturgySection } from '../content/types';
+import { Liturgy, LiturgySection, categoryOf } from '../content/types';
 import { colors, spacing, type, radius } from '../theme/theme';
 import { categoryColor, sectionLabel } from '../theme/categories';
 
@@ -91,7 +91,7 @@ export default function LiturgyView({
   fontScale = 1,
   showHeader = true,
 }: Props) {
-  const accent = categoryColor(liturgy.category);
+  const accent = categoryColor(categoryOf(liturgy.id));
   return (
     <View>
       {showHeader && (

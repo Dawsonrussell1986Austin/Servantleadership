@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Liturgy } from '../content/types';
+import { Liturgy, categoryOf } from '../content/types';
 import { colors, spacing, type, radius } from '../theme/theme';
 import { categoryColor } from '../theme/categories';
 import { useAudio } from '../audio/AudioProvider';
@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function LiturgyCard({ liturgy, onPress }: Props) {
-  const accent = categoryColor(liturgy.category);
+  const accent = categoryColor(categoryOf(liturgy.id));
   const audio = useAudio();
   const isActive = audio.currentId === liturgy.id;
   const isPlaying = isActive && audio.isPlaying;

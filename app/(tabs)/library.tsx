@@ -17,13 +17,7 @@ import SearchBar from '../../src/components/SearchBar';
 import SearchResults from '../../src/components/SearchResults';
 import { colors, spacing, type, radius, fonts } from '../../src/theme/theme';
 import { categoryGradient } from '../../src/theme/categories';
-
-const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  pressure: 'flame-outline',
-  people: 'people-outline',
-  wins: 'sparkles-outline',
-  rhythms: 'partly-sunny-outline',
-};
+import { CATEGORY_ICON as ICONS } from '../../src/theme/categoryIcons';
 
 function CategoryTile({
   category,

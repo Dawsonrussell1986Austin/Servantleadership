@@ -13,7 +13,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-calling',
     title: 'On Why You Build',
     situation: 'Remembering the calling underneath the company.',
-    category: 'rhythms',
     minutes: 5,
     kind: 'devotional',
     sections: [
@@ -48,7 +47,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-integrity',
     title: 'On Integrity When No One Is Watching',
     situation: 'Choosing to be the same person in private and in public.',
-    category: 'people',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -83,7 +81,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-ambition',
     title: 'On Holy Ambition',
     situation: 'Wanting to build great things without being ruled by the wanting.',
-    category: 'wins',
     minutes: 5,
     kind: 'devotional',
     sections: [
@@ -118,7 +115,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-generosity',
     title: 'On Open Hands',
     situation: 'Building a life and a business marked by generosity.',
-    category: 'wins',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -153,7 +149,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-identity',
     title: 'On Who You Are Without the Company',
     situation: 'Anchoring your worth in something the business can’t give or take.',
-    category: 'rhythms',
     minutes: 5,
     kind: 'devotional',
     sections: [
@@ -188,7 +183,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-diligence',
     title: 'On Showing Up',
     situation: 'The quiet power of faithful, daily diligence.',
-    category: 'rhythms',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -223,7 +217,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-serving-others',
     title: 'On the People You Serve',
     situation: 'Seeing customers as people, not transactions.',
-    category: 'people',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -258,7 +251,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-patience',
     title: 'On the Long Game',
     situation: 'Trusting slow growth in a world obsessed with fast.',
-    category: 'pressure',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -293,7 +285,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-stewardship',
     title: 'On Stewarding What Isn’t Yours',
     situation: 'Holding the business as a trust, not a possession.',
-    category: 'wins',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -328,7 +319,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-excellence',
     title: 'On Doing It Well',
     situation: 'Pursuing excellence as an act of worship.',
-    category: 'rhythms',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -363,7 +353,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-humility',
     title: 'On Staying Low',
     situation: 'Leading from humility in a world that rewards self-promotion.',
-    category: 'people',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -398,7 +387,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-rest',
     title: 'On Working From Rest',
     situation: 'Refusing to let the work consume the whole of you.',
-    category: 'rhythms',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -433,7 +421,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-courage',
     title: 'On Stepping Out',
     situation: 'Facing the risk and fear that come with building.',
-    category: 'pressure',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -468,7 +455,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-perseverance',
     title: 'On Not Giving Up',
     situation: 'Enduring the long, hard middle of building something.',
-    category: 'pressure',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -503,7 +489,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-contentment',
     title: 'On Enough',
     situation: 'Finding contentment while still striving for more.',
-    category: 'wins',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -538,7 +523,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-wisdom',
     title: 'On Asking for Wisdom',
     situation: 'Seeking counsel and discernment for the decisions ahead.',
-    category: 'people',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -573,7 +557,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-servant-leader',
     title: 'On Leading Like a Servant',
     situation: 'Using authority to lift others rather than yourself.',
-    category: 'people',
     minutes: 5,
     kind: 'devotional',
     sections: [
@@ -608,7 +591,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-failure',
     title: 'On Grace for Your Failures',
     situation: 'Living with the mistakes and losses you carry.',
-    category: 'pressure',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -643,7 +625,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-purpose',
     title: 'On Building What Lasts',
     situation: 'Keeping eternity in view while building in time.',
-    category: 'rhythms',
     minutes: 5,
     kind: 'devotional',
     sections: [
@@ -678,7 +659,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-trust-outcomes',
     title: 'On Releasing the Outcome',
     situation: 'Doing your part and entrusting the results to God.',
-    category: 'wins',
     minutes: 4,
     kind: 'devotional',
     sections: [
@@ -713,7 +693,6 @@ export const DEVOTIONALS: Devotional[] = [
     id: 'd-gratitude',
     title: 'On Beginning With Thanks',
     situation: 'Letting gratitude reorder the way you see the day.',
-    category: 'rhythms',
     minutes: 4,
     kind: 'devotional',
     sections: [

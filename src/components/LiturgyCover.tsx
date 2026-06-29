@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Liturgy } from '../content/types';
+import { Liturgy, categoryOf } from '../content/types';
 import { coverFor } from '../content/covers';
 import { shortCategoryLabel } from '../theme/categories';
+import { CATEGORY_ICON } from '../theme/categoryIcons';
 import { colors, fonts, radius } from '../theme/theme';
 
 type Size = 'sm' | 'md' | 'lg';
@@ -15,12 +16,7 @@ const DIMS: Record<Size, { w: number; h: number; pad: number; title: number; lab
   lg: { w: 152, h: 212, pad: 16, title: 20, label: 10, r: radius.md },
 };
 
-const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  pressure: 'flame-outline',
-  people: 'people-outline',
-  wins: 'sparkles-outline',
-  rhythms: 'partly-sunny-outline',
-};
+const ICONS = CATEGORY_ICON;
 
 function shortTitle(l: Liturgy): string {
   return l.title
@@ -36,8 +32,9 @@ export default function LiturgyCover({
   size?: Size;
 }) {
   const d = DIMS[size];
-  const source = coverFor(liturgy.id, liturgy.category, liturgy.kind);
-  const catLabel = shortCategoryLabel[liturgy.category] ?? '';
+  const cat = categoryOf(liturgy.id);
+  const source = coverFor(liturgy.id);
+  const catLabel = shortCategoryLabel[cat] ?? '';
   const showText = size !== 'sm';
 
   return (
@@ -55,7 +52,7 @@ export default function LiturgyCover({
         >
           <View style={styles.top}>
             <Ionicons
-              name={ICONS[liturgy.category] ?? 'book-outline'}
+              name={ICONS[cat] ?? 'book-outline'}
               size={size === 'sm' ? 13 : 16}
               color="rgba(255,255,255,0.95)"
             />

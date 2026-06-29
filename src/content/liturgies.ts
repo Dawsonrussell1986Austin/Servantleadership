@@ -1,4 +1,4 @@
-import { Liturgy } from './types';
+import { Liturgy, categoryOf } from './types';
 
 /**
  * The library. Every liturgy follows a gentle arc:
@@ -11,7 +11,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'payroll',
     title: 'A Liturgy for Not Making Payroll',
     situation: 'When the account is short and people are counting on you.',
-    category: 'pressure',
     minutes: 5,
     sections: [
       {
@@ -45,7 +44,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'out-of-cash',
     title: 'A Liturgy for the Fear of Running Out',
     situation: 'When the runway is short and the math keeps you up at night.',
-    category: 'pressure',
     minutes: 5,
     sections: [
       {
@@ -79,7 +77,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'lost-deal',
     title: 'A Liturgy for the Deal That Fell Through',
     situation: 'When the “yes” you were counting on turned into a “no.”',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -113,7 +110,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'want-to-quit',
     title: 'A Liturgy for When You Want to Quit',
     situation: 'When you are exhausted and the dream feels like a burden.',
-    category: 'pressure',
     minutes: 5,
     sections: [
       {
@@ -148,7 +144,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'terrible-client',
     title: 'A Liturgy for a Terrible Client',
     situation: 'When someone you serve is unkind, unreasonable, or impossible.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -182,7 +177,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'business-partner',
     title: 'A Liturgy for Conflict With a Partner',
     situation: 'When you are angry or hurt by the person building beside you.',
-    category: 'people',
     minutes: 5,
     sections: [
       {
@@ -216,7 +210,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'hiring',
     title: 'A Liturgy for Bringing Someone On',
     situation: 'When you are about to entrust your work to a new person.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -250,7 +243,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'letting-go',
     title: 'A Liturgy for Letting Someone Go',
     situation: 'When you have to end someone’s role, and it weighs on you.',
-    category: 'people',
     minutes: 5,
     sections: [
       {
@@ -285,7 +277,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'closing-a-deal',
     title: 'A Liturgy for Closing a Deal',
     situation: 'When the “yes” comes and the win is real.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -319,7 +310,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'launching',
     title: 'A Liturgy for Launching',
     situation: 'On the day the thing you’ve built goes out into the world.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -353,7 +343,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'unexpected-success',
     title: 'A Liturgy for Success You Didn’t Expect',
     situation: 'When it works far better than you imagined, and it scares you.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -388,7 +377,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'morning',
     title: 'A Morning Liturgy for the Work',
     situation: 'Before the inbox, before the first meeting — set the day down.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -422,7 +410,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'evening',
     title: 'An Evening Liturgy for Laying It Down',
     situation: 'At the end of the day — to stop carrying what isn’t yours to carry.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -456,7 +443,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'comparison',
     title: 'A Liturgy for the Comparison Trap',
     situation: 'When everyone else’s highlight reel makes your work feel small.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -491,7 +477,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'waiting-on-yes',
     title: 'A Liturgy for the Hope of a Deal',
     situation: 'When a deal could close today or tomorrow and you can’t stop hoping.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -525,7 +510,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'overwhelmed',
     title: 'A Liturgy for Feeling Overwhelmed',
     situation: 'When there is too much, all at once, and you don’t know where to start.',
-    category: 'pressure',
     minutes: 5,
     sections: [
       {
@@ -559,7 +543,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'impossible-decision',
     title: 'A Liturgy for an Impossible Decision',
     situation: 'When you’re at a fork and terrified of choosing wrong.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -593,7 +576,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'fraud',
     title: 'A Liturgy for Feeling Like a Fraud',
     situation: 'When the voice says you’re not qualified and they’ll all find out.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -627,7 +609,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'public-mistake',
     title: 'A Liturgy for a Public Mistake',
     situation: 'When you messed up where everyone could see, and the shame is loud.',
-    category: 'pressure',
     minutes: 5,
     sections: [
       {
@@ -661,7 +642,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'uncertain-future',
     title: 'A Liturgy for an Uncertain Future',
     situation: 'When you can’t see around the corner and it scares you.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -696,7 +676,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'struggling-team-member',
     title: 'A Liturgy for a Struggling Team Member',
     situation: 'When someone you lead isn’t performing and you don’t know how to help.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -730,7 +709,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'betrayal',
     title: 'A Liturgy for Being Let Down',
     situation: 'When someone you trusted broke that trust.',
-    category: 'people',
     minutes: 5,
     sections: [
       {
@@ -764,7 +742,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'the-pitch',
     title: 'A Liturgy Before the Pitch',
     situation: 'Before you walk in to ask for the money, the partnership, the belief.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -798,7 +775,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'hard-conversation',
     title: 'A Liturgy for a Conversation You’re Dreading',
     situation: 'Before the talk you keep putting off.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -832,7 +808,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'saying-no',
     title: 'A Liturgy for Saying No',
     situation: 'When you need to decline, but disappointing people terrifies you.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -867,7 +842,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'first-yes',
     title: 'A Liturgy for the First Yes',
     situation: 'Your first customer, first dollar, first real sign it’s working.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -901,7 +875,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'milestone',
     title: 'A Liturgy for a Milestone',
     situation: 'An anniversary, a number hit, a marker of how far you’ve come.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -935,7 +908,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'recognition',
     title: 'A Liturgy for Being Recognized',
     situation: 'When the award, the praise, or the spotlight finds you.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -969,7 +941,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'selling-what-you-built',
     title: 'A Liturgy for Selling What You Built',
     situation: 'When you hand off, exit, or let go of the thing you made.',
-    category: 'wins',
     minutes: 5,
     sections: [
       {
@@ -1004,7 +975,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'boredom',
     title: 'A Liturgy for Boredom in the Work',
     situation: 'When the thrill is gone and the work feels gray.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1038,7 +1008,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'monday',
     title: 'A Liturgy for Monday Morning',
     situation: 'At the start of the week, before it all begins again.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1072,7 +1041,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'sabbath',
     title: 'A Liturgy for Sabbath',
     situation: 'For the day you stop — when stopping feels impossible.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1106,7 +1074,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'mundane',
     title: 'A Liturgy for the Mundane Tasks',
     situation: 'For the invoices, the inbox, the unglamorous work no one sees.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1140,7 +1107,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'gratitude',
     title: 'A Liturgy of Gratitude for the Work',
     situation: 'To stop chasing the next thing and give thanks for what is.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1175,7 +1141,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'harsh-review',
     title: 'A Liturgy for a Harsh Review',
     situation: 'When public criticism stings and you can’t stop rereading it.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -1209,7 +1174,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'competitor',
     title: 'A Liturgy for a Competitor on Your Heels',
     situation: 'When someone is gaining, copying, or beating you, and fear creeps in.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -1243,7 +1207,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'legal-threat',
     title: 'A Liturgy for a Legal Threat',
     situation: 'When a lawsuit, demand, or legal fight is hanging over you.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -1277,7 +1240,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'downturn',
     title: 'A Liturgy for a Downturn',
     situation: 'When the market turns, sales dry up, and the ground feels unsteady.',
-    category: 'pressure',
     minutes: 5,
     sections: [
       {
@@ -1311,7 +1273,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'ghosted',
     title: 'A Liturgy for Being Ghosted',
     situation: 'When the prospect, partner, or client just went silent.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -1345,7 +1306,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'flopped-launch',
     title: 'A Liturgy for a Launch That Flopped',
     situation: 'When you shipped it, hoped, and almost no one came.',
-    category: 'pressure',
     minutes: 4,
     sections: [
       {
@@ -1380,7 +1340,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'cofounder-split',
     title: 'A Liturgy for Parting With a Co-Founder',
     situation: 'When the road forks and you and your partner must go separate ways.',
-    category: 'people',
     minutes: 5,
     sections: [
       {
@@ -1414,7 +1373,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'asking-for-help',
     title: 'A Liturgy for Asking for Help',
     situation: 'When you’re stuck and pride is keeping you from reaching out.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -1448,7 +1406,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'negotiation',
     title: 'A Liturgy Before a Hard Negotiation',
     situation: 'Before you sit down across the table to hammer out a deal.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -1482,7 +1439,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'resignation',
     title: 'A Liturgy for When Someone Resigns',
     situation: 'When a valued person hands in their notice and you feel the loss.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -1516,7 +1472,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'room-of-strangers',
     title: 'A Liturgy Before a Room of Strangers',
     situation: 'Before walking into the event, the mixer, the room where you know no one.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -1550,7 +1505,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'delegating',
     title: 'A Liturgy for Letting Go of Control',
     situation: 'When you have to hand off work you’d rather keep gripping.',
-    category: 'people',
     minutes: 4,
     sections: [
       {
@@ -1585,7 +1539,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'profitable',
     title: 'A Liturgy for Turning Profitable',
     situation: 'When the business finally makes more than it spends.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -1619,7 +1572,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'first-generosity',
     title: 'A Liturgy for Your First Act of Generosity',
     situation: 'When the business can finally give something away.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -1653,7 +1605,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'key-hire-yes',
     title: 'A Liturgy for a Key Person Saying Yes',
     situation: 'When someone you really wanted agrees to join you.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -1687,7 +1638,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'paying-off-debt',
     title: 'A Liturgy for Paying Off the Debt',
     situation: 'When the loan is cleared and the weight finally lifts.',
-    category: 'wins',
     minutes: 4,
     sections: [
       {
@@ -1722,7 +1672,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'new-season',
     title: 'A Liturgy for a New Season',
     situation: 'At the start of a new year, quarter, or chapter of the work.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1756,7 +1705,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'late-night',
     title: 'A Liturgy for a Late Night at Work',
     situation: 'When it’s late, the work isn’t done, and you’re still going.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1790,7 +1738,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'scattered',
     title: 'A Liturgy for a Scattered Mind',
     situation: 'When you can’t focus and your attention is pulled in ten directions.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1824,7 +1771,6 @@ export const LITURGIES: Liturgy[] = [
     id: 'decision-fatigue',
     title: 'A Liturgy for Decision Fatigue',
     situation: 'When you’ve made a thousand choices and have nothing left to decide with.',
-    category: 'rhythms',
     minutes: 4,
     sections: [
       {
@@ -1860,7 +1806,7 @@ export const getLiturgyById = (id: string): Liturgy | undefined =>
   LITURGIES.find((l) => l.id === id);
 
 export const getLiturgiesByCategory = (category: string): Liturgy[] =>
-  LITURGIES.filter((l) => l.category === category);
+  LITURGIES.filter((l) => categoryOf(l.id) === category);
 
 /**
  * Deterministic "devotional of the day" — same for everyone on a given date,
