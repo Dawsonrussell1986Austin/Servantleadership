@@ -3,13 +3,14 @@ import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { getReadingById, readingKindLabel } from '../../src/content';
+import { getReadingById } from '../../src/content';
 import { CATEGORIES } from '../../src/content/types';
+import { lengthLabel } from '../../src/content/lengths';
 import LiturgyView from '../../src/components/LiturgyView';
 import LiturgyCover from '../../src/components/LiturgyCover';
 import PlayerBar from '../../src/components/PlayerBar';
 import { useAudio } from '../../src/audio/AudioProvider';
-import { colors, spacing, type } from '../../src/theme/theme';
+import { colors, spacing, type, fonts } from '../../src/theme/theme';
 
 const FONT_STEPS = [0.9, 1, 1.15, 1.3];
 
@@ -119,6 +120,7 @@ export default function LiturgyScreen() {
         </Text>
         <Text style={styles.title}>{reading.title}</Text>
         <Text style={styles.subtitle}>{reading.situation}</Text>
+        <Text style={styles.length}>{lengthLabel(reading)}</Text>
 
         <View style={styles.divider} />
 
@@ -203,6 +205,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.xs,
     paddingHorizontal: spacing.md,
+  },
+  length: {
+    fontFamily: fonts.sansSemibold,
+    fontSize: 12,
+    letterSpacing: 0.3,
+    color: colors.inkFaint,
+    textAlign: 'center',
+    marginTop: spacing.md,
   },
   divider: {
     alignSelf: 'center',

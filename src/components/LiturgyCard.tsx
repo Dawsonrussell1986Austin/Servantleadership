@@ -5,6 +5,7 @@ import { Liturgy } from '../content/types';
 import { colors, spacing, type, radius } from '../theme/theme';
 import { categoryColor } from '../theme/categories';
 import { useAudio } from '../audio/AudioProvider';
+import { lengthLabel } from '../content/lengths';
 import LiturgyCover from './LiturgyCover';
 
 type Props = {
@@ -31,7 +32,7 @@ export default function LiturgyCard({ liturgy, onPress }: Props) {
         <Text style={styles.situation} numberOfLines={2}>
           {liturgy.situation}
         </Text>
-        <Text style={[styles.meta, { color: accent }]}>{liturgy.minutes} MIN</Text>
+        <Text style={[styles.meta, { color: accent }]}>{lengthLabel(liturgy)}</Text>
       </View>
       <Pressable
         onPress={() => audio.toggleReading(liturgy.id)}
@@ -84,8 +85,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   meta: {
-    ...type.label,
-    fontWeight: '700',
+    fontFamily: type.label.fontFamily,
+    fontSize: 11.5,
+    letterSpacing: 0.2,
   },
   play: {
     width: 40,

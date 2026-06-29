@@ -74,7 +74,7 @@ export default function LiturgyCover({
               >
                 {shortTitle(liturgy)}
               </Text>
-              <Text style={styles.minutes}>{liturgy.minutes} MIN</Text>
+              <Text style={styles.minutes}>{liturgy.minutes} MIN READ</Text>
             </View>
           )}
         </LinearGradient>

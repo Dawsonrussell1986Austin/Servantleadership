@@ -9,18 +9,21 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import Constants from 'expo-constants';
 import { getDailyDevotional } from '../../src/content/devotionals';
 import { LITURGIES } from '../../src/content/liturgies';
 import LiturgyCover from '../../src/components/LiturgyCover';
 import PlayerBar from '../../src/components/PlayerBar';
 import { colors, spacing, type, radius, fonts } from '../../src/theme/theme';
 
+const USER_NAME =
+  (Constants.expoConfig?.extra as { userName?: string } | undefined)?.userName ??
+  'Dawson';
+
 function greeting(d: Date): string {
   const h = d.getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  const base = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  return USER_NAME ? `${base}, ${USER_NAME}` : base;
 }
 
 // A rotating, category-diverse handful of library liturgies for the carousel.
@@ -53,17 +56,6 @@ export default function TodayScreen() {
       }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.brand}>Servant</Text>
-        <LinearGradient
-          colors={['#C9A77E', '#9C6B3F']}
-          style={styles.avatar}
-        >
-          <Ionicons name="book" size={16} color={colors.white} />
-        </LinearGradient>
-      </View>
-
       {/* Greeting */}
       <View style={styles.greetingWrap}>
         <Text style={styles.greeting}>{greeting(now)}</Text>
@@ -83,7 +75,9 @@ export default function TodayScreen() {
         >
           <LiturgyCover liturgy={devotional} size="md" />
           <View style={styles.heroText}>
-            <Text style={styles.heroKind}>DEVOTIONAL · {devotional.minutes} MIN</Text>
+            <Text style={styles.heroKind}>
+              DEVOTIONAL · {devotional.minutes} MIN READ
+            </Text>
             <Text style={styles.heroTitle}>{devotional.title}</Text>
             <Text style={styles.heroSituation}>{devotional.situation}</Text>
             <View style={styles.readRow}>
