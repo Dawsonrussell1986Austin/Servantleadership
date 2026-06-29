@@ -1170,6 +1170,690 @@ export const LITURGIES: Liturgy[] = [
       },
     ],
   },
+  // ─────────────────────────────────────────── UNDER PRESSURE (more)
+  {
+    id: 'harsh-review',
+    title: 'A Liturgy for a Harsh Review',
+    situation: 'When public criticism stings and you can’t stop rereading it.',
+    category: 'pressure',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'You’ve read it five times now, and each time it lands a little harder. Set the screen down. Let the sting be felt, then let it pass.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Galatians 1:10',
+        body: '“Am I now trying to win the approval of human beings, or of God? … If I were still trying to please people, I would not be a servant of Christ.”',
+      },
+      {
+        type: 'reflection',
+        body: 'A single harsh voice has a strange power to drown out a hundred kind ones. But not all criticism is created equal: some is a gift wrapped in barbed wire — a true thing said unkindly — and some is just noise from someone who has never built anything. Have the humility to take the kernel of truth if there is one, and the freedom to release the rest. You cannot serve your work and the approval of every critic at once. Build for the One whose verdict actually holds.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, this criticism got under my skin. Give me the humility to learn whatever is true in it, and the freedom to let go of what is not. Loosen its grip on my mind. Anchor my worth in your approval, not the comment section, and let me keep building in peace.',
+      },
+      {
+        type: 'response',
+        body: 'I will take the truth and release the rest. I build for an audience of One.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go back to the work unshaken. One harsh voice does not get the final word.',
+      },
+    ],
+  },
+  {
+    id: 'competitor',
+    title: 'A Liturgy for a Competitor on Your Heels',
+    situation: 'When someone is gaining, copying, or beating you, and fear creeps in.',
+    category: 'pressure',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'You keep checking what they’re doing, and your stomach tightens each time. Look away from them for five minutes and back to what’s yours.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Proverbs 21:31',
+        body: '“The horse is made ready for the day of battle, but victory rests with the Lord.”',
+      },
+      {
+        type: 'reflection',
+        body: 'A competitor breathing down your neck can pull your eyes off your own road and onto theirs — and a runner who keeps looking sideways slows down. Do your diligence: prepare the horse, sharpen the work, learn what you can. But the outcome is not handed to whoever is most afraid of losing. Scarcity says there is only room for one; it isn’t usually true. Run your race with excellence and leave the victory in hands larger than the market.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, keep me from running scared. Help me prepare well without obsessing over them. Free me from the fear that there isn’t enough room for what I’m building. Let me compete with integrity, root for good work even in their hands, and trust you with the outcome.',
+      },
+      {
+        type: 'response',
+        body: 'I’ll prepare the horse and run my race. The victory rests with the Lord.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and run your own race well. Eyes forward.',
+      },
+    ],
+  },
+  {
+    id: 'legal-threat',
+    title: 'A Liturgy for a Legal Threat',
+    situation: 'When a lawsuit, demand, or legal fight is hanging over you.',
+    category: 'pressure',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'The letter, the threat, the what-ifs spinning at 2 a.m. — bring the dread here before it runs the night again.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Isaiah 54:17',
+        body: '“No weapon forged against you will prevail, and you will refute every tongue that accuses you. This is the heritage of the servants of the Lord …”',
+      },
+      {
+        type: 'reflection',
+        body: 'A legal threat is frightening partly because it feels so out of your control — another party, a process, an outcome you can’t fully steer. Do the wise and practical things: get good counsel, keep clean records, act with integrity. But underneath the strategy, there is a deeper security. You answer ultimately to a just God who sees the whole truth, who is not intimidated, and who is able to vindicate. Be honest, be wise, and refuse to let fear bully you into panic or compromise.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, this threat is heavy and I feel exposed. Give me wisdom and the right counsel. Where I’ve done wrong, give me humility to make it right; where I’m falsely accused, defend me. Quiet the fear that keeps me up at night. I entrust the outcome, and my reputation, to you.',
+      },
+      {
+        type: 'response',
+        body: 'I will be wise and honest, and trust the just Judge with what I cannot control.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go in peace. You are not defenseless; you are a servant of the Lord.',
+      },
+    ],
+  },
+  {
+    id: 'downturn',
+    title: 'A Liturgy for a Downturn',
+    situation: 'When the market turns, sales dry up, and the ground feels unsteady.',
+    category: 'pressure',
+    minutes: 5,
+    sections: [
+      {
+        type: 'call',
+        body: 'The numbers are sliding and forces far bigger than you are at work. You can’t fix the economy in five minutes — so don’t try. Just be still.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Habakkuk 3:17–18',
+        body: '“Though the fig tree does not bud and there are no grapes on the vines … yet I will rejoice in the Lord, I will be joyful in God my Savior.”',
+      },
+      {
+        type: 'reflection',
+        body: 'Habakkuk wrote those words staring at total economic ruin — empty fields, empty stalls, no harvest coming. His defiance was not denial; he names the loss plainly. But he refuses to let the failing harvest become the final word about his joy, because his joy was never planted in the harvest. Downturns strip away the illusion that you were ever in control of the market. What remains, when the vines are bare, is the question of where your hope was actually rooted. Make the hard, wise calls — and let your soul rest somewhere a recession can’t reach.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, the ground is shaking and I feel it in my chest. Give me clear eyes to make wise decisions and a steady heart while I make them. Where I must cut or wait or endure, give me courage. And teach me the defiant joy of Habakkuk — to rejoice in you even when the fields are bare.',
+      },
+      {
+        type: 'response',
+        body: 'Though the harvest fails, I will rejoice in the Lord. My hope was never in the market.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and weather it with wisdom and a joy that doesn’t depend on the numbers.',
+      },
+    ],
+  },
+  {
+    id: 'ghosted',
+    title: 'A Liturgy for Being Ghosted',
+    situation: 'When the prospect, partner, or client just went silent.',
+    category: 'pressure',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'You’ve checked your inbox again. Still nothing. The silence is loud, and your mind is filling it with stories. Quiet them for a moment.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Psalm 13:1–2',
+        body: '“How long, Lord? … How long must I wrestle with my thoughts and day after day have sorrow in my heart?”',
+      },
+      {
+        type: 'reflection',
+        body: 'Silence is uniquely maddening because it gives you nothing to work with — no closure, no reason, just an open door your anxiety walks through to invent worst-case stories. Notice that even the psalmist brings his “how long?” straight to God instead of spiraling alone. Their silence usually says more about their chaos than your worth: people go quiet because they’re overwhelmed, conflicted, or avoiding, far more often than because of anything you did. Do your honest follow-up, then release them. You are not required to carry a silence that isn’t yours to fill.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, the not-knowing is wearing me down, and I keep writing stories in the silence. Quiet my anxious mind. Help me follow up with dignity and then let go, instead of refreshing and rereading. My worth doesn’t hang on their reply. Carry what I can’t resolve.',
+      },
+      {
+        type: 'response',
+        body: 'Their silence is not my verdict. I’ll follow up with dignity and release the rest.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and let the silence be theirs to keep. You are free of it.',
+      },
+    ],
+  },
+  {
+    id: 'flopped-launch',
+    title: 'A Liturgy for a Launch That Flopped',
+    situation: 'When you shipped it, hoped, and almost no one came.',
+    category: 'pressure',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'The big day came and the response was… quiet. The disappointment is real. Don’t rush to spin it. Just sit here a moment.',
+      },
+      {
+        type: 'scripture',
+        reference: '2 Corinthians 4:8–9',
+        body: '“We are hard pressed on every side, but not crushed; perplexed, but not in despair … struck down, but not destroyed.”',
+      },
+      {
+        type: 'reflection',
+        body: 'A flat launch can feel like a verdict on you, not just the product — as if the silence is the world weighing your worth and finding it light. It isn’t. A launch is data, not a sentence. You were faithful to make something and put it into the world, which most people never dare to do, and that courage is not erased by a quiet first week. Grieve it honestly, learn what it’s teaching, and remember: hard pressed is not crushed, and struck down is not destroyed.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, I hoped for more, and the quiet hurts. Let me feel the disappointment without drowning in it. Keep me from reading this flop as a verdict on my worth. Show me what to learn, give me the heart to try again, and remind me that faithful work is never wasted in your economy.',
+      },
+      {
+        type: 'response',
+        body: 'Hard pressed, but not crushed. This is data, not a verdict on me.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and get back up. The faithfulness of building was never in vain.',
+      },
+    ],
+  },
+  // ─────────────────────────────────────────── WITH PEOPLE (more)
+  {
+    id: 'cofounder-split',
+    title: 'A Liturgy for Parting With a Co-Founder',
+    situation: 'When the road forks and you and your partner must go separate ways.',
+    category: 'people',
+    minutes: 5,
+    sections: [
+      {
+        type: 'call',
+        body: 'You started this together, and now the paths diverge. There’s grief in that, even when it’s right. Bring it here before the lawyers and the logistics.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Genesis 13:8–9',
+        body: '“So Abram said to Lot, ‘Let’s not have any quarreling between you and me … Is not the whole land before you? Let’s part company. If you go to the left, I’ll go to the right.’”',
+      },
+      {
+        type: 'reflection',
+        body: 'When Abram and Lot’s herds grew too large to share the land, Abram chose to part well rather than fight — generous even in separation, refusing to let the parting poison the relationship. Not every partnership is meant to last forever, and ending one is not always a failure; sometimes it’s the most honest, loving thing left to do. The question is not whether you split, but how. You can divide a company and still honor the person, still bless the road they take, still refuse the bitterness that wants the last word.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, this is the end of something we built together, and it aches. Help us part the way Abram chose — honestly, generously, without quarreling. Guard my heart from bitterness and my mouth from contempt. Let me be fair, even costly-fair. Bless them on the road they’re taking, and lead us both well.',
+      },
+      {
+        type: 'response',
+        body: 'I will part well, not just part. I can divide a company and still honor the person.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and separate with honor. The land is wide enough for you both.',
+      },
+    ],
+  },
+  {
+    id: 'asking-for-help',
+    title: 'A Liturgy for Asking for Help',
+    situation: 'When you’re stuck and pride is keeping you from reaching out.',
+    category: 'people',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'You’ve been carrying this alone, telling yourself you should be able to handle it. Loosen that grip for a moment.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Ecclesiastes 4:9–10',
+        body: '“Two are better than one … If either of them falls down, one can help the other up. But pity anyone who falls and has no one to help them up.”',
+      },
+      {
+        type: 'reflection',
+        body: 'The founder’s myth of self-sufficiency is a heavy and lonely lie. Somewhere you absorbed the idea that needing help is weakness, that asking exposes you — when in fact refusing to ask is the real exposure, leaving you to fall with no one to lift you. Asking for help is not an admission of inadequacy; it’s an admission of being human, which you are. The people who could help you often want to; you rob them of that gift, and yourself of the rescue, by staying silent. Reach out. Two really are better than one.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, my pride has me carrying this alone, and I’m worn out. Humble me enough to ask. Bring the right people to mind, and give me the courage to actually reach out instead of pretending I’m fine. Thank you that I was never meant to do this by myself.',
+      },
+      {
+        type: 'response',
+        body: 'Asking for help is strength, not weakness. I was not meant to do this alone.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and reach out. There are hands ready to help you up.',
+      },
+    ],
+  },
+  {
+    id: 'negotiation',
+    title: 'A Liturgy Before a Hard Negotiation',
+    situation: 'Before you sit down across the table to hammer out a deal.',
+    category: 'people',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'In a little while you’ll be across the table, and the pressure to win can make people into someone they’re not. Center yourself first.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Proverbs 11:1',
+        body: '“The Lord detests dishonest scales, but accurate weights find favor with him.”',
+      },
+      {
+        type: 'reflection',
+        body: 'Negotiation tempts you to believe that the goal is simply to win — to extract the most, concede the least, and let the other side fend for themselves. But a deal where one party is fleeced is not a victory; it’s a debt that comes due in reputation and conscience. You can be both shrewd and honest, both firm on your interests and fair to theirs. Aim for accurate scales: a deal you’d be at peace with if you were sitting on the other side of the table. The best agreements leave both parties able to shake hands and mean it.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, give me wisdom and nerve at this table. Help me advocate well for what’s right without greed or fear. Keep my scales honest. Let me be shrewd and fair at once, and aim for a deal both sides can live with. Where I’m tempted to win at any cost, hold me back.',
+      },
+      {
+        type: 'response',
+        body: 'I’ll be shrewd and honest at once. I want a deal I’d accept from the other chair.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go in with a clear head and honest scales.',
+      },
+    ],
+  },
+  {
+    id: 'resignation',
+    title: 'A Liturgy for When Someone Resigns',
+    situation: 'When a valued person hands in their notice and you feel the loss.',
+    category: 'people',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'They told you they’re leaving, and beneath the professional nod there’s a real ache. Let yourself feel it for a moment before you react.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Philippians 1:6',
+        body: '“… being confident of this, that he who began a good work in you will carry it on to completion until the day of Christ Jesus.”',
+      },
+      {
+        type: 'reflection',
+        body: 'When someone good leaves, the first instincts are often fear and a flicker of betrayal — what will we do without them, why would they go. But people are not yours to keep; they pass through your work for a season, and your calling was to steward that season well, not to own them. If you led them well, their leaving is partly your success: they grew, and now they go to grow further. Bless them genuinely. The good work in them did not begin with you, and it won’t end when they walk out the door.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, I’m losing someone good, and I feel the fear and the sting of it. Keep me from taking it personally or sending them off with coldness. Help me bless them sincerely and finish their time here with grace. Provide for the gap they leave, and go with them into what’s next.',
+      },
+      {
+        type: 'response',
+        body: 'People pass through for a season. I’ll bless them, not begrudge them.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and send them off well. The good work in them continues.',
+      },
+    ],
+  },
+  {
+    id: 'room-of-strangers',
+    title: 'A Liturgy Before a Room of Strangers',
+    situation: 'Before walking into the event, the mixer, the room where you know no one.',
+    category: 'people',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'You’re about to walk in, and part of you would rather not. Before you put on the networking face, remember who you already are.',
+      },
+      {
+        type: 'scripture',
+        reference: '1 Samuel 16:7',
+        body: '“People look at the outward appearance, but the Lord looks at the heart.”',
+      },
+      {
+        type: 'reflection',
+        body: 'A room of strangers triggers an old anxiety — to perform, to impress, to be interesting enough to matter. But you can walk in with nothing to prove, because the One whose opinion is final already sees your heart and calls you his. That frees you from working the room and lets you actually meet the people in it: to be curious instead of impressive, to ask more than you announce, to look for the one person who also feels out of place. You are not a brand to be pitched. You’re a person who can offer genuine attention to other persons.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, calm the part of me that wants to perform. Let me walk in secure in who I am to you, with nothing to prove. Help me be genuinely curious about the people I meet, present instead of polished. Lead me to the conversations that matter, and let me be a kind presence in that room.',
+      },
+      {
+        type: 'response',
+        body: 'I have nothing to prove. I’ll be present and curious, not impressive.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go in as yourself. The right connections don’t require a performance.',
+      },
+    ],
+  },
+  {
+    id: 'delegating',
+    title: 'A Liturgy for Letting Go of Control',
+    situation: 'When you have to hand off work you’d rather keep gripping.',
+    category: 'people',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'You know you can’t hold all of it, and yet handing it over feels like dropping it. Breathe, and open your hands a little.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Exodus 18:17–18',
+        body: '“Moses’ father-in-law replied, ‘What you are doing is not good. You and these people who come to you will only wear yourselves out. The work is too heavy for you; you cannot handle it alone.’”',
+      },
+      {
+        type: 'reflection',
+        body: 'Even Moses had to be told the obvious: doing everything yourself is not devotion, it’s a slow road to burnout for you and a bottleneck for everyone waiting on you. The grip feels responsible, but it’s often fear in disguise — fear that no one else will do it right, or that you’ll matter less if you’re not indispensable. Letting go is how things grow beyond you, and how others get the chance to rise. Hand it over, accept that it’ll be done differently and sometimes imperfectly, and trust that your worth was never your indispensability.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, I’m holding on too tightly, and it’s wearing me out and holding others back. Help me let go — to delegate real trust, not just tasks. Free me from needing to be indispensable. Give me grace when it’s done differently than I would, and help me build something that doesn’t depend on me alone.',
+      },
+      {
+        type: 'response',
+        body: 'Holding everything is not devotion. I’ll let go so others — and the work — can grow.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and open your hands. You were never meant to carry it all.',
+      },
+    ],
+  },
+  // ─────────────────────────────────────────── THE HIGH MOMENTS (more)
+  {
+    id: 'profitable',
+    title: 'A Liturgy for Turning Profitable',
+    situation: 'When the business finally makes more than it spends.',
+    category: 'wins',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'After all the months of spending more than you made, the line finally crossed. Pause and let the relief turn to thanks.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Proverbs 3:9–10',
+        body: '“Honor the Lord with your wealth, with the firstfruits of all your crops; then your barns will be filled to overflowing …”',
+      },
+      {
+        type: 'reflection',
+        body: 'Profit is a milestone worth honoring — proof that the thing can sustain itself, that real value met a real need. But the moment money starts flowing is exactly when the heart is most tested, because abundance reveals what you truly worship faster than scarcity ever could. The ancient wisdom is to honor God with the firstfruits — to give off the top, first, before the lifestyle quietly expands to swallow it all. Let profitability make you more generous and more grounded, not more grasping. The barns are a gift to steward, not a throne to sit on.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, thank you — the business can finally stand on its own. Keep my heart steady now that money is flowing. Help me honor you with the firstfruits, to give before I spend and bless before I accumulate. Don’t let abundance make me someone smaller. Make me a generous steward of what you’ve provided.',
+      },
+      {
+        type: 'response',
+        body: 'I’ll honor God with the firstfruits. Profit is a stewardship, not a throne.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and celebrate — with the first and best set aside, and an open hand.',
+      },
+    ],
+  },
+  {
+    id: 'first-generosity',
+    title: 'A Liturgy for Your First Act of Generosity',
+    situation: 'When the business can finally give something away.',
+    category: 'wins',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'For the first time, there’s enough to give some away — not because you have to, but because you can. Sit with what a gift that is.',
+      },
+      {
+        type: 'scripture',
+        reference: '2 Corinthians 9:7',
+        body: '“Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver.”',
+      },
+      {
+        type: 'reflection',
+        body: 'There may be no clearer sign that a business has become more than a survival machine than the moment it starts to give. Generosity is not the leftover after everything else is funded; it’s a decision of the heart that says this enterprise exists for more than itself. You don’t give because the spreadsheet finally allows it as an afterthought — you give cheerfully, on purpose, because you were blessed in order to bless. This first gift is a small thing that quietly sets the soul of the whole company. Let it be the first of many.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, thank you that there’s finally something to give. Make me a cheerful giver, not a reluctant one. Let generosity be built into this business from the start, not bolted on at the end. Show me where to send this, and let it be the first of many gifts that flow through what you’ve entrusted to me.',
+      },
+      {
+        type: 'response',
+        body: 'I was blessed to be a blessing. I give cheerfully, on purpose, not as an afterthought.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and give with joy. The cheerful giver is the one God loves.',
+      },
+    ],
+  },
+  {
+    id: 'key-hire-yes',
+    title: 'A Liturgy for a Key Person Saying Yes',
+    situation: 'When someone you really wanted agrees to join you.',
+    category: 'wins',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'The person you hoped for said yes. Before you race ahead to onboarding, pause and recognize the gift of it.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Proverbs 27:17',
+        body: '“As iron sharpens iron, so one person sharpens another.”',
+      },
+      {
+        type: 'reflection',
+        body: 'A great person choosing to join you is a quiet kind of providence — someone with options decided to spend a season of their one life on your mission. That’s not just a hire; it’s a trust. The best people don’t merely fill a role; they sharpen you, push your thinking, raise the standard, and become part of who you become. Receive them as a gift, not a resource. Steward their gifts, invest in their growth, and build a place worthy of the yes they just gave you.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, thank you for this person and their yes. Help me steward them well — to develop them, not just deploy them. Let us sharpen each other and build something good together. Make me the kind of leader who is worthy of the trust they’ve just placed in me.',
+      },
+      {
+        type: 'response',
+        body: 'This is a trust, not just a hire. I’ll steward the yes they gave me.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and build a place worthy of the people who join you.',
+      },
+    ],
+  },
+  {
+    id: 'paying-off-debt',
+    title: 'A Liturgy for Paying Off the Debt',
+    situation: 'When the loan is cleared and the weight finally lifts.',
+    category: 'wins',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'The balance is zero. The weight you carried so long that you stopped noticing it — gone. Stand in that lightness for a moment.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Romans 13:8',
+        body: '“Let no debt remain outstanding, except the continuing debt to love one another, for whoever loves others has fulfilled the law.”',
+      },
+      {
+        type: 'reflection',
+        body: 'Debt is a weight you carry in the body as much as the books — a low hum of obligation behind every decision. Clearing it is worth pausing to honor, because freedom regained is easy to take for granted within a week. Let this moment teach you something for the future: how good it feels to owe no one, and how worth it the discipline was. And notice the one debt Scripture says to keep carrying gladly — the debt of love, which is the only kind that makes you richer the more you pay it.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, thank you — the weight is gone and I can breathe. Let me not forget this lightness or slide carelessly back into bondage. Give me wisdom with what I owe and what I borrow. And keep me eager to pay the one debt worth carrying: to love the people around me well.',
+      },
+      {
+        type: 'response',
+        body: 'I owe no one but love. Thank you for the weight that has lifted.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and walk lighter. Keep only the debt of love.',
+      },
+    ],
+  },
+  // ─────────────────────────────────────────── DAILY RHYTHMS (more)
+  {
+    id: 'new-season',
+    title: 'A Liturgy for a New Season',
+    situation: 'At the start of a new year, quarter, or chapter of the work.',
+    category: 'rhythms',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'A page is turning — a new year, a new quarter, a new chapter. Before you fill it with plans, sit in the open space of it for a moment.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Isaiah 43:19',
+        body: '“See, I am doing a new thing! Now it springs up; do you not perceive it? I am making a way in the wilderness and streams in the wasteland.”',
+      },
+      {
+        type: 'reflection',
+        body: 'A new season invites two temptations: to drag every old failure and fear across the threshold with you, or to pin all your hope on resolutions you’ll power through by willpower. There’s a third way — to come with open hands, expectant that God is doing a new thing, often in places that looked like wasteland. Set your goals, yes, but hold them loosely enough to be surprised. The most important things this season holds are probably not yet on your list. Step in watchful, not just driven.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, thank you for a fresh page. I don’t want to carry old fears into it, or to trust only in my own willpower. Open my eyes to the new thing you’re doing, even in the dry places. Direct my plans, surprise me with what I couldn’t plan, and lead me through this season well.',
+      },
+      {
+        type: 'response',
+        body: 'God is doing a new thing. I’ll step into this season watchful and openhanded.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go into the new season expectant. There are streams coming in the wasteland.',
+      },
+    ],
+  },
+  {
+    id: 'late-night',
+    title: 'A Liturgy for a Late Night at Work',
+    situation: 'When it’s late, the work isn’t done, and you’re still going.',
+    category: 'rhythms',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'It’s late, the house is quiet, and you’re still at it. Before the next push, lift your eyes from the screen for a moment.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Psalm 121:1–2',
+        body: '“I lift up my eyes to the mountains — where does my help come from? My help comes from the Lord, the Maker of heaven and earth.”',
+      },
+      {
+        type: 'reflection',
+        body: 'There are honest late nights — a real deadline, a true push — and there are anxious ones, where you stay not because the work demands it but because stopping feels like losing control. It’s worth knowing which one this is. Either way, lift your eyes: your help does not ultimately come from one more hour of your own effort, but from the Maker of heaven and earth, who keeps working while you sleep. Do what genuinely needs doing tonight, then have the humility to stop and let the rest be carried by Someone who never tires.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, it’s late and I’m still pushing. Help me see clearly whether this is a faithful effort or anxious striving. Give me what I need for what truly must be done tonight, and the humility to stop when it’s enough. My help comes from you, not from one more exhausted hour. Carry what I lay down.',
+      },
+      {
+        type: 'response',
+        body: 'My help comes from the Lord, not one more hour. I’ll do what’s needed, then rest.',
+      },
+      {
+        type: 'benediction',
+        body: 'Finish what’s needed and lift your eyes. The Maker of heaven keeps the night watch.',
+      },
+    ],
+  },
+  {
+    id: 'scattered',
+    title: 'A Liturgy for a Scattered Mind',
+    situation: 'When you can’t focus and your attention is pulled in ten directions.',
+    category: 'rhythms',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'Ten tabs open in your browser, twenty in your head. Before you chase the next ping, let everything go quiet for just a moment.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Isaiah 26:3',
+        body: '“You will keep in perfect peace those whose minds are steadfast, because they trust in you.”',
+      },
+      {
+        type: 'reflection',
+        body: 'A scattered mind is rarely solved by trying harder to concentrate; the scatter is usually downstream of a deeper restlessness — too much input, too many open loops, a low hum of anxiety that keeps you reaching for the next thing. Peace and focus are siblings. A mind steadied on something solid can finally settle enough to do one thing well. Close the tabs. Name the one thing that matters most in the next hour. And anchor your restless attention, for a moment, on the One who holds it all together, so you don’t have to.',
+      },
+      {
+        type: 'prayer',
+        body: 'Father, my mind is everywhere and I can’t land. Quiet the noise inside and out. Steady me on you, and from that steadiness, help me focus on the one thing in front of me. Free me from the restlessness that keeps me grabbing at everything and finishing nothing. Give me a settled, single-minded peace.',
+      },
+      {
+        type: 'response',
+        body: 'A steadied mind can do one thing well. I’ll anchor, then focus on what matters most.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go and do one thing. Perfect peace is for the mind that stays.',
+      },
+    ],
+  },
+  {
+    id: 'decision-fatigue',
+    title: 'A Liturgy for Decision Fatigue',
+    situation: 'When you’ve made a thousand choices and have nothing left to decide with.',
+    category: 'rhythms',
+    minutes: 4,
+    sections: [
+      {
+        type: 'call',
+        body: 'Decision after decision, all day, and the tank is empty. Before you force the next call from fumes, stop and breathe.',
+      },
+      {
+        type: 'scripture',
+        reference: 'Psalm 32:8',
+        body: '“I will instruct you and teach you in the way you should go; I will counsel you with my loving eye on you.”',
+      },
+      {
+        type: 'reflection',
+        body: 'Being the founder means being the place where decisions pile up — every unresolved question routes to you, and by afternoon the well of judgment runs dry. Tired decisions are usually bad decisions, made from depletion rather than wisdom. Not everything has to be settled right now by sheer force of will. Some calls can wait until morning; some can be handed off; some only need a quick prayer and a good-enough answer. You are not the only counselor in the room — there is One who promises to guide you with a loving eye, if you’ll pause long enough to ask.',
+      },
+      {
+        type: 'prayer',
+        body: 'Lord, I’ve got nothing left to decide with, and I’m still being asked to choose. Give me the wisdom to know which calls truly can’t wait and which can rest until I’m clearer. Guide me where I genuinely must decide now. Thank you that I don’t have to be the only source of wisdom here. Counsel me.',
+      },
+      {
+        type: 'response',
+        body: 'Tired decisions are poor ones. I’ll decide what must be decided and trust God to guide the rest.',
+      },
+      {
+        type: 'benediction',
+        body: 'Go gently. You don’t have to settle everything tonight. You are being counseled.',
+      },
+    ],
+  },
 ];
 
 export const getLiturgyById = (id: string): Liturgy | undefined =>

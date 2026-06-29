@@ -21,6 +21,7 @@ import { buildNarration } from '../src/content/narration';
 const API_KEY = process.env.ELEVENLABS_API_KEY;
 const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'onwK4e9ZLuTAKqWW03F9'; // "Daniel" — calm, measured
 const MODEL_ID = process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2';
+const OUTPUT_FORMAT = process.env.ELEVENLABS_OUTPUT_FORMAT || 'mp3_44100_64';
 const FORCE = process.env.FORCE === '1';
 const ONLY = (process.env.ONLY || '')
   .split(',')
@@ -32,7 +33,7 @@ const OUT_DIR = path.resolve(__dirname, '../public/audio');
 
 async function ttsToFile(text: string, outPath: string): Promise<void> {
   const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+    `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}?output_format=${OUTPUT_FORMAT}`,
     {
       method: 'POST',
       headers: {
