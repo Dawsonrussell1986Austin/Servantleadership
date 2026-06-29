@@ -16,6 +16,22 @@ export const categoryColor = (id: CategoryId): string => {
   }
 };
 
+/** A two-stop gradient per category for cover art. */
+export const categoryGradient = (id: CategoryId): [string, string] => {
+  switch (id) {
+    case 'pressure':
+      return ['#C2604B', '#8E3B2C'];
+    case 'people':
+      return ['#5E7E68', '#3C5544'];
+    case 'wins':
+      return ['#C08A4F', '#8A5A2E'];
+    case 'rhythms':
+      return ['#6B7C99', '#46546E'];
+    default:
+      return ['#C9A77E', '#9C6B3F'];
+  }
+};
+
 export const sectionLabel: Record<string, string> = {
   call: 'Be Still',
   scripture: 'The Word',

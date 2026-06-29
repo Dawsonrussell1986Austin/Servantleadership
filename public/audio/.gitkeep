@@ -1,0 +1,2 @@
+# Generated narration MP3s live here (npm run audio:generate).
+# This keeps the folder in git so the web build always has /audio/.

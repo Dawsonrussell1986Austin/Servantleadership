@@ -4,16 +4,34 @@ import { Liturgy, LiturgySection } from '../content/types';
 import { colors, spacing, type, radius } from '../theme/theme';
 import { categoryColor, sectionLabel } from '../theme/categories';
 
-type Props = { liturgy: Liturgy };
+type Props = {
+  liturgy: Liturgy;
+  /** Multiplier for body text size (font-size toggle). */
+  fontScale?: number;
+  /** Render the built-in title/situation header. */
+  showHeader?: boolean;
+};
 
-function Section({ section, accent }: { section: LiturgySection; accent: string }) {
+function Section({
+  section,
+  accent,
+  scale,
+  dropCap,
+}: {
+  section: LiturgySection;
+  accent: string;
+  scale: number;
+  dropCap?: boolean;
+}) {
   const label = section.label ?? sectionLabel[section.type] ?? '';
 
   if (section.type === 'scripture') {
     return (
       <View style={[styles.scriptureBlock, { borderLeftColor: accent }]}>
         <Text style={[styles.eyebrow, { color: accent }]}>{label.toUpperCase()}</Text>
-        <Text style={styles.scripture}>{section.body}</Text>
+        <Text style={[styles.scripture, { fontSize: 20 * scale, lineHeight: 32 * scale }]}>
+          {section.body}
+        </Text>
         {section.reference ? (
           <Text style={styles.reference}>— {section.reference}</Text>
         ) : null}
@@ -25,7 +43,9 @@ function Section({ section, accent }: { section: LiturgySection; accent: string 
     return (
       <View style={[styles.responseBlock, { backgroundColor: colors.paperDeep }]}>
         <Text style={[styles.eyebrow, { color: accent }]}>{label.toUpperCase()}</Text>
-        <Text style={styles.response}>{section.body}</Text>
+        <Text style={[styles.response, { fontSize: 20 * scale, lineHeight: 28 * scale }]}>
+          {section.body}
+        </Text>
       </View>
     );
   }
@@ -35,34 +55,64 @@ function Section({ section, accent }: { section: LiturgySection; accent: string 
       <View style={styles.benedictionBlock}>
         <View style={[styles.rule, { backgroundColor: colors.line }]} />
         <Text style={[styles.eyebrow, { color: accent }]}>{label.toUpperCase()}</Text>
-        <Text style={styles.benediction}>{section.body}</Text>
+        <Text style={[styles.benediction, { fontSize: 19 * scale, lineHeight: 31 * scale }]}>
+          {section.body}
+        </Text>
       </View>
     );
   }
 
   // call, reflection, prayer
+  const bodyStyle = { fontSize: 19 * scale, lineHeight: 31 * scale };
+  if (dropCap && section.body.length > 1) {
+    const first = section.body.charAt(0);
+    const rest = section.body.slice(1);
+    return (
+      <View style={styles.block}>
+        <Text style={[styles.eyebrow, { color: accent }]}>{label.toUpperCase()}</Text>
+        <Text style={[styles.body, bodyStyle]}>
+          <Text style={[styles.dropCap, { color: accent }]}>{first}</Text>
+          {rest}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.block}>
       <Text style={[styles.eyebrow, { color: accent }]}>{label.toUpperCase()}</Text>
-      <Text style={styles.body}>{section.body}</Text>
+      <Text style={[styles.body, bodyStyle]}>{section.body}</Text>
     </View>
   );
 }
 
-export default function LiturgyView({ liturgy }: Props) {
+export default function LiturgyView({
+  liturgy,
+  fontScale = 1,
+  showHeader = true,
+}: Props) {
   const accent = categoryColor(liturgy.category);
   return (
     <View>
-      <Text style={[styles.eyebrow, styles.topEyebrow, { color: accent }]}>
-        {`${liturgy.minutes} MIN  ·  A LITURGY`}
-      </Text>
-      <Text style={styles.title}>{liturgy.title.replace(/^A Liturgy for /, '')}</Text>
-      <Text style={styles.situation}>{liturgy.situation}</Text>
-
-      <View style={[styles.divider, { backgroundColor: accent }]} />
+      {showHeader && (
+        <>
+          <Text style={[styles.eyebrow, styles.topEyebrow, { color: accent }]}>
+            {`${liturgy.minutes} MIN  ·  A LITURGY`}
+          </Text>
+          <Text style={styles.title}>{liturgy.title.replace(/^A Liturgy for /, '')}</Text>
+          <Text style={styles.situation}>{liturgy.situation}</Text>
+          <View style={[styles.divider, { backgroundColor: accent }]} />
+        </>
+      )}
 
       {liturgy.sections.map((s, i) => (
-        <Section key={`${liturgy.id}-${i}`} section={s} accent={accent} />
+        <Section
+          key={`${liturgy.id}-${i}`}
+          section={s}
+          accent={accent}
+          scale={fontScale}
+          dropCap={i === 0}
+        />
       ))}
     </View>
   );
@@ -99,6 +149,11 @@ const styles = StyleSheet.create({
   body: {
     ...type.body,
     color: colors.ink,
+  },
+  dropCap: {
+    fontFamily: type.body.fontFamily,
+    fontSize: 52,
+    fontWeight: '700',
   },
   scriptureBlock: {
     borderLeftWidth: 3,

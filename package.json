@@ -7,15 +7,18 @@
     "ios": "expo start --ios",
     "android": "expo start --android",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audio:generate": "tsx scripts/generate-audio.ts"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
     "@expo/vector-icons": "^14.0.0",
     "expo": "~52.0.0",
     "expo-asset": "~11.0.5",
+    "expo-av": "~15.0.2",
     "expo-constants": "~17.0.0",
     "expo-font": "~13.0.0",
+    "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.0",
     "expo-router": "~4.0.0",
     "expo-splash-screen": "~0.29.0",
@@ -30,6 +33,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.0",
     "@types/react": "~18.3.12",
+    "tsx": "^4.22.4",
     "typescript": "^5.3.3"
   },
   "private": true

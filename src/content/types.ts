@@ -33,7 +33,16 @@ export type Liturgy = {
   /** Approximate read/pray time in minutes. */
   minutes: number;
   sections: LiturgySection[];
+  /**
+   * 'liturgy' = a specific, situational reading (lives in the Library).
+   * 'devotional' = a generic daily entrepreneurship reading (the Today tab).
+   * Defaults to 'liturgy' when omitted.
+   */
+  kind?: 'liturgy' | 'devotional';
 };
+
+/** A daily devotional shares the same shape as a liturgy. */
+export type Devotional = Liturgy;
 
 export const CATEGORIES: Category[] = [
   {
