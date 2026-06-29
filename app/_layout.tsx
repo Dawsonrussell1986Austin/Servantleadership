@@ -47,6 +47,10 @@ export default function RootLayout() {
         >
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
+            name="category/[id]"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
             name="liturgy/[id]"
             options={{ presentation: 'card', animation: 'slide_from_right' }}
           />
