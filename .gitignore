@@ -15,6 +15,9 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# App Store Connect API key lives here locally; never commit it
+/credentials/
+
 # Metro
 .metro-health-check*
 

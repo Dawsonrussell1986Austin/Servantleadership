@@ -50,7 +50,12 @@
           "color": "#9C6B3F"
         }
       ],
-      "@bacons/apple-targets"
+      [
+        "@bacons/apple-targets",
+        {
+          "appleTeamId": "V87Q26T9TS"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

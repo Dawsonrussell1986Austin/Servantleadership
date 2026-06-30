@@ -23,6 +23,29 @@ eas login            # creates/uses your free Expo account
 
 ---
 
+## Your account values (already wired into config)
+
+These are filled in for you — Team ID in `app.json` (widget plugin) and the
+submit credentials in `eas.json`:
+
+| Value | Yours | Where it's used |
+| ----- | ----- | --------------- |
+| Apple Team ID | `V87Q26T9TS` | code signing (app + widget) |
+| App Store Connect App ID | `87988350` | `eas submit` target |
+| API Key ID | `98MK8JGSXV` | `eas submit` auth |
+| API Issuer ID | `c7d2d1ce-…` | `eas submit` auth |
+
+**One manual step:** the API private key (`.p8`) must NOT be committed, so place
+your downloaded file on your machine at:
+
+```
+credentials/AuthKey_98MK8JGSXV.p8
+```
+
+(`/credentials/` is git-ignored.) `eas.json` points `ascApiKeyPath` there.
+
+---
+
 ## 1. First build to your phone (no paid features needed)
 
 This gets the app — reminders, the reader, audio — running on a real device.
@@ -121,6 +144,20 @@ To change the widget's wording or design, edit `targets/widget/index.swift`
 > in-app devotional of the day. If you'd rather it show the exact same reading
 > as the app, that needs an App Group + writing the day's text from JS — say so
 > and it's a small follow-up.
+
+## Submitting to TestFlight / App Store
+
+Credentials are pre-wired in `eas.json` (`submit.production.ios`), so once the
+`.p8` is at `credentials/AuthKey_98MK8JGSXV.p8`:
+
+```bash
+eas build  --profile production --platform ios
+eas submit --profile production --platform ios --latest
+```
+
+No interactive Apple login needed — it authenticates with your API key.
+
+---
 
 ## 6. Remaining (needs a backend — not yet built)
 
