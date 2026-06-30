@@ -61,6 +61,10 @@ export default function RootLayout() {
             options={{ animation: 'slide_from_right' }}
           />
           <Stack.Screen
+            name="privacy"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
             name="paywall"
             options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
           />

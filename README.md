@@ -1,4 +1,4 @@
-# Servant — Daily Devotionals & Liturgies for Christian Entrepreneurs
+# Founded — Daily Devotionals & Liturgies for Christian Entrepreneurs
 
 A quiet, content-only app. No feeds, no inputs, no metrics to chase — just a
 **daily devotional** for the ordinary day, and a **library of liturgies for the

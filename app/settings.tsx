@@ -142,7 +142,7 @@ export default function Settings() {
           )}
           {denied && !isWeb && (
             <Text style={styles.noteWarn}>
-              Notifications are turned off for Servant. Enable them in your
+              Notifications are turned off for Founded. Enable them in your
               device Settings to get daily reminders.
             </Text>
           )}
@@ -211,7 +211,7 @@ export default function Settings() {
             <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>ACCOUNT</Text>
             <View style={styles.card}>
               <Text style={styles.accountBlurb}>
-                Sign in to keep your access across devices. Optional — Servant
+                Sign in to keep your access across devices. Optional — Founded
                 stores no personal data.
               </Text>
               <View style={{ marginTop: spacing.md }}>
@@ -224,13 +224,20 @@ export default function Settings() {
         <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>ABOUT</Text>
         <View style={styles.card}>
           <View style={styles.aboutRow}>
-            <Text style={styles.rowTitle}>Servant</Text>
+            <Text style={styles.rowTitle}>Founded</Text>
             <Text style={styles.rowSub}>Version {version}</Text>
           </View>
           <Text style={styles.aboutBlurb}>
             A quiet daily devotional and a library of liturgies for the work of
             building something.
           </Text>
+          <Pressable
+            onPress={() => router.push('/privacy')}
+            style={({ pressed }) => [styles.privacyRow, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={styles.privacyLink}>Privacy Policy</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.inkFaint} />
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -303,6 +310,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   aboutBlurb: { ...type.caption, color: colors.inkSoft, marginTop: spacing.sm },
+  privacyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+  },
+  privacyLink: { ...type.body, fontSize: 15, color: colors.ink, fontFamily: fonts.sansMedium },
   accountBlurb: { ...type.caption, color: colors.inkSoft },
   unlockBtn: {
     backgroundColor: colors.ink,

@@ -96,7 +96,7 @@ export default function Paywall() {
           <Ionicons name="close" size={26} color="rgba(255,255,255,0.7)" />
         </Pressable>
 
-        <Text style={styles.kicker}>SERVANT · FULL ACCESS</Text>
+        <Text style={styles.kicker}>FOUNDED · FULL ACCESS</Text>
         <Text style={styles.title}>Every liturgy,{'\n'}for every moment of the work.</Text>
         <Text style={styles.lede}>
           The daily devotional is always free. Unlock the full library and audio

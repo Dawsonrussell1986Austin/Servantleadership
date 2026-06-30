@@ -1,4 +1,4 @@
-# Servant — iOS / native setup
+# Founded — iOS / native setup
 
 The app is built so it runs **fully unlocked today** with zero accounts, and you
 flip on the account-gated features (paywall, Apple Sign In, reminders) by adding
@@ -71,19 +71,30 @@ What already works on device with no further setup:
 The gate: the **daily devotional is free**; the **library + audio are premium**.
 Until a key is present, `isPremium` is forced `true` so nothing is locked.
 
+> **Recommended for the fastest App Store launch:** ship v1 with the key left
+> blank (everything unlocked, no IAP review friction), then turn the paywall on
+> in a v1.1 update once the steps below are done and your products are approved.
+
 1. Create a RevenueCat account → https://app.revenuecat.com
-2. Add an **iOS app**, connect it to your App Store Connect app.
-3. In App Store Connect, create an **auto-renewing subscription** product
-   (e.g. `servant_monthly`). Add it to an **Offering** in RevenueCat and attach
-   it to an **Entitlement whose identifier is exactly `premium`**
+2. Add an **iOS app**, connect it to your App Store Connect app (App ID `87988350`)
+   using the **In-App Purchase key** (`ApiKey_S2U8RD15Q2H8.p8` + Key ID
+   `S2U8RD15Q2H8` + your Issuer ID) under RevenueCat → Project Settings → Apple.
+3. In App Store Connect, create the subscription/IAP products
+   (`monthly`, `yearly`, `lifetime`). Add them to an **Offering** in RevenueCat
+   and attach them to an **Entitlement whose identifier is exactly `Founded Pro`**
    (this matches `ENTITLEMENT_ID` in `src/purchases/Entitlements.tsx`).
-4. Copy the RevenueCat **iOS public API key** into `app.json`:
+4. Copy the RevenueCat **iOS public SDK key** (starts with `appl_`, from
+   RevenueCat → API Keys) into `app.json`:
 
    ```json
    "extra": {
      "revenueCatApiKeyIos": "appl_XXXXXXXXXXXXXXXX"
    }
    ```
+
+   > You provided `test_fcLAMogHVyszhwADOzQSEqXSkpz` — that isn't the `appl_`
+   > App Store SDK key the iOS app needs; grab the `appl_` one from the API Keys
+   > page. (A bad key just leaves the app unlocked — it won't crash.)
 
 5. Rebuild (`eas build`). Now non-subscribers see the lock + paywall; the
    paywall pulls live pricing from your Offering, and Subscribe / Restore work.
@@ -134,7 +145,7 @@ eas build --profile development --platform ios
 
 - `npx expo prebuild` regenerates the native iOS project including the widget
   extension; EAS does this automatically during the build.
-- After installing, long-press the home screen → **+** → search **Servant** →
+- After installing, long-press the home screen → **+** → search **Founded** →
   add the **Today's Verse** widget.
 
 To change the widget's wording or design, edit `targets/widget/index.swift`

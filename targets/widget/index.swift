@@ -106,7 +106,7 @@ struct ServantWidgetView: View {
                 Circle()
                     .fill(Brand.accent)
                     .frame(width: 6, height: 6)
-                Text("SERVANT")
+                Text("FOUNDED")
                     .font(.system(size: 11, weight: .bold))
                     .tracking(1.6)
                     .foregroundColor(Brand.accent)

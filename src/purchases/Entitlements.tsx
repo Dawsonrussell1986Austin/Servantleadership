@@ -23,7 +23,8 @@ import React, {
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-export const ENTITLEMENT_ID = 'premium';
+// Must match the entitlement identifier in the RevenueCat dashboard EXACTLY.
+export const ENTITLEMENT_ID = 'Founded Pro';
 
 type PackageLike = {
   identifier: string;

@@ -1,7 +1,7 @@
 /** @type {import('@bacons/apple-targets').Config} */
 module.exports = {
   type: 'widget',
-  name: 'Servant',
+  name: 'Founded',
   // Brand accent, exposed to SwiftUI as Color("AccentColor")/asset catalog.
   colors: {
     $accent: '#9C6B3F',

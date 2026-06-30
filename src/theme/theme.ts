@@ -1,5 +1,5 @@
 /**
- * Visual language for Servant.
+ * Visual language for Founded.
  * Modern, airy chrome — a clean geometric sans (Inter) for everything in the UI,
  * and a warm serif (Georgia) reserved for the reading itself, on a near-white
  * paper background. The feel: a calm modern reading app, not a busy product.
