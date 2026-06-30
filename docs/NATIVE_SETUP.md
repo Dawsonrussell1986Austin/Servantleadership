@@ -93,12 +93,37 @@ notification permission iOS prompts for.
 
 ---
 
-## 5. Remaining (need native code / a backend — not yet built)
+## 5. Home-screen widget — built
 
-- **Home-screen widget** — WidgetKit is Swift and needs a config plugin
-  (e.g. `@bacons/apple-targets`) plus an app group to share the day's reading.
-  This is the one piece that requires writing a little native Swift; it can be
-  added without disturbing the JS app. Flag when you want it.
+A WidgetKit widget lives in `targets/widget/` (SwiftUI), wired through the
+`@bacons/apple-targets` config plugin. It shows a quiet daily line of Scripture
+in small and medium sizes, and is **self-contained** — it computes the day's
+line itself, so it works the instant it's added, with no app launch, shared
+storage, or network.
+
+To build it you only need your **Apple Team ID** (find it at
+https://developer.apple.com/account → Membership):
+
+```bash
+export EXPO_APPLE_TEAM_ID=XXXXXXXXXX   # your 10-char team id
+eas build --profile development --platform ios
+```
+
+- `npx expo prebuild` regenerates the native iOS project including the widget
+  extension; EAS does this automatically during the build.
+- After installing, long-press the home screen → **+** → search **Servant** →
+  add the **Today's Verse** widget.
+
+To change the widget's wording or design, edit `targets/widget/index.swift`
+(the `LINES` array is the rotation; the SwiftUI views are below it).
+
+> Note: the widget rotates its own curated verses rather than mirroring the
+> in-app devotional of the day. If you'd rather it show the exact same reading
+> as the app, that needs an App Group + writing the day's text from JS — say so
+> and it's a small follow-up.
+
+## 6. Remaining (needs a backend — not yet built)
+
 - **Remote push notifications** — only needed for server-sent messages
   (announcements, etc.). Daily reminders already work locally without this.
   Requires an APNs key and a small backend to send via Expo's push service.
@@ -114,5 +139,6 @@ notification permission iOS prompts for.
 | Reminders logic    | `src/lib/reminders.ts` |
 | Settings UI        | `app/settings.tsx` |
 | Apple Sign In      | `src/components/AppleSignInButton.tsx` |
+| Home-screen widget | `targets/widget/index.swift` + `targets/widget/expo-target.config.js` |
 | Build profiles     | `eas.json` |
 | Keys / config      | `app.json` → `expo.extra` |
