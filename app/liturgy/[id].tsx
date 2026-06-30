@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { getReadingById } from '../../src/content';
+import { useEntitlement } from '../../src/purchases/Entitlements';
 import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { lengthLabel } from '../../src/content/lengths';
 import { categoryColor } from '../../src/theme/categories';
@@ -62,7 +63,16 @@ export default function LiturgyScreen() {
   const audio = useAudio();
   const { id } = useLocalSearchParams<{ id: string }>();
   const reading = id ? getReadingById(id) : undefined;
+  const { isPremium } = useEntitlement();
   const [fontStep, setFontStep] = useState(1);
+
+  // Safety net for deep links: a premium reading opened while locked
+  // (e.g. a shared URL) bounces to the paywall instead of the reader.
+  const gated = !!reading && reading.kind !== 'devotional' && !isPremium;
+  useEffect(() => {
+    if (gated) router.replace('/paywall');
+  }, [gated, router]);
+  if (gated) return <View style={styles.screen} />;
 
   if (!reading) {
     return (

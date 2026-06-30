@@ -10,9 +10,11 @@ import LiturgyCover from './LiturgyCover';
 type Props = {
   liturgy: Liturgy;
   onPress: () => void;
+  /** When true, the card reads as premium-locked and taps go to onPress. */
+  locked?: boolean;
 };
 
-export default function LiturgyCard({ liturgy, onPress }: Props) {
+export default function LiturgyCard({ liturgy, onPress, locked = false }: Props) {
   const audio = useAudio();
   const isActive = audio.currentId === liturgy.id;
   const isPlaying = isActive && audio.isPlaying;
@@ -32,20 +34,32 @@ export default function LiturgyCard({ liturgy, onPress }: Props) {
         </Text>
         <Text style={styles.meta}>{lengthLabel(liturgy)}</Text>
       </View>
-      <Pressable
-        onPress={() => audio.toggleReading(liturgy.id)}
-        hitSlop={10}
-        accessibilityRole="button"
-        accessibilityLabel={isPlaying ? `Pause ${liturgy.title}` : `Listen to ${liturgy.title}`}
-        style={({ pressed }) => [styles.play, pressed && { opacity: 0.7 }]}
-      >
-        <Ionicons
-          name={isPlaying ? 'pause' : 'play'}
-          size={18}
-          color={colors.ink}
-          style={isPlaying ? undefined : { marginLeft: 2 }}
-        />
-      </Pressable>
+      {locked ? (
+        <Pressable
+          onPress={onPress}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel={`Unlock ${liturgy.title}`}
+          style={({ pressed }) => [styles.play, pressed && { opacity: 0.7 }]}
+        >
+          <Ionicons name="lock-closed" size={16} color={colors.inkFaint} />
+        </Pressable>
+      ) : (
+        <Pressable
+          onPress={() => audio.toggleReading(liturgy.id)}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel={isPlaying ? `Pause ${liturgy.title}` : `Listen to ${liturgy.title}`}
+          style={({ pressed }) => [styles.play, pressed && { opacity: 0.7 }]}
+        >
+          <Ionicons
+            name={isPlaying ? 'pause' : 'play'}
+            size={18}
+            color={colors.ink}
+            style={isPlaying ? undefined : { marginLeft: 2 }}
+          />
+        </Pressable>
+      )}
     </Pressable>
   );
 }

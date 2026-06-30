@@ -56,7 +56,9 @@
     },
     "extra": {
       "audioBaseUrl": "https://servant-liturgies.vercel.app",
-      "userName": "Dawson"
+      "userName": "Dawson",
+      "revenueCatApiKeyIos": "",
+      "revenueCatApiKeyAndroid": ""
     }
   }
 }

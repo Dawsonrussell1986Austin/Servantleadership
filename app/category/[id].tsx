@@ -8,6 +8,7 @@ import { getLiturgiesByCategory } from '../../src/content/liturgies';
 import LiturgyCard from '../../src/components/LiturgyCard';
 import SearchBar from '../../src/components/SearchBar';
 import SearchResults from '../../src/components/SearchResults';
+import { useEntitlement } from '../../src/purchases/Entitlements';
 import { colors, spacing, type } from '../../src/theme/theme';
 import { categoryColor } from '../../src/theme/categories';
 
@@ -17,11 +18,17 @@ export default function CategoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const category = CATEGORIES.find((c) => c.id === id);
   const liturgies = id ? getLiturgiesByCategory(id) : [];
+  const { isPremium } = useEntitlement();
+  const locked = !isPremium;
   const [query, setQuery] = useState('');
   const searching = query.trim().length >= 2;
 
   const open = (lid: string) => {
     Keyboard.dismiss();
+    if (locked) {
+      router.push('/paywall');
+      return;
+    }
     router.push(`/liturgy/${lid}`);
   };
 
@@ -64,7 +71,7 @@ export default function CategoryScreen() {
       </View>
 
       {searching ? (
-        <SearchResults query={query} onOpen={open} onSuggest={setQuery} />
+        <SearchResults query={query} onOpen={open} onSuggest={setQuery} locked={locked} />
       ) : (
         <FlatList
           data={liturgies}
@@ -81,7 +88,7 @@ export default function CategoryScreen() {
             </Text>
           }
           renderItem={({ item }) => (
-            <LiturgyCard liturgy={item} onPress={() => open(item.id)} />
+            <LiturgyCard liturgy={item} onPress={() => open(item.id)} locked={locked} />
           )}
         />
       )}

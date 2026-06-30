@@ -22,6 +22,8 @@ import {
   DEFAULT_PREFS,
   type ReminderPrefs,
 } from '../src/lib/reminders';
+import AppleSignInButton from '../src/components/AppleSignInButton';
+import { useEntitlement } from '../src/purchases/Entitlements';
 
 const PRESET_TIMES: { label: string; hour: number; minute: number }[] = [
   { label: 'Early · 6:00 AM', hour: 6, minute: 0 },
@@ -36,6 +38,7 @@ export default function Settings() {
   const router = useRouter();
   const isWeb = Platform.OS === 'web';
 
+  const { isPremium, configured } = useEntitlement();
   const [prefs, setPrefs] = useState<ReminderPrefs>(DEFAULT_PREFS);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -172,6 +175,52 @@ export default function Settings() {
           Currently set for {formatTime(prefs.hour, prefs.minute)}.
         </Text>
 
+        <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>MEMBERSHIP</Text>
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <View style={styles.rowText}>
+              <Text style={styles.rowTitle}>
+                {isPremium ? 'Full access' : 'Daily devotional'}
+              </Text>
+              <Text style={styles.rowSub}>
+                {isPremium
+                  ? 'You have the full library and audio.'
+                  : 'Unlock the full library and audio narration.'}
+              </Text>
+            </View>
+            {isPremium ? (
+              <Ionicons name="checkmark-circle" size={24} color={colors.people} />
+            ) : (
+              <Pressable
+                onPress={() => router.push('/paywall')}
+                style={({ pressed }) => [styles.unlockBtn, pressed && { opacity: 0.85 }]}
+              >
+                <Text style={styles.unlockBtnText}>Unlock</Text>
+              </Pressable>
+            )}
+          </View>
+          {!isPremium && !configured && !isWeb && (
+            <Text style={styles.note}>
+              Billing isn’t connected yet — all content is currently unlocked.
+            </Text>
+          )}
+        </View>
+
+        {!isWeb && (
+          <>
+            <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>ACCOUNT</Text>
+            <View style={styles.card}>
+              <Text style={styles.accountBlurb}>
+                Sign in to keep your access across devices. Optional — Servant
+                stores no personal data.
+              </Text>
+              <View style={{ marginTop: spacing.md }}>
+                <AppleSignInButton />
+              </View>
+            </View>
+          </>
+        )}
+
         <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>ABOUT</Text>
         <View style={styles.card}>
           <View style={styles.aboutRow}>
@@ -254,4 +303,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   aboutBlurb: { ...type.caption, color: colors.inkSoft, marginTop: spacing.sm },
+  accountBlurb: { ...type.caption, color: colors.inkSoft },
+  unlockBtn: {
+    backgroundColor: colors.ink,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    marginLeft: spacing.md,
+  },
+  unlockBtnText: { fontFamily: fonts.sansBold, fontSize: 14, color: colors.white },
 });

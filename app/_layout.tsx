@@ -19,6 +19,7 @@ import {
 } from '@expo-google-fonts/bricolage-grotesque';
 import { colors } from '../src/theme/theme';
 import { AudioProvider } from '../src/audio/AudioProvider';
+import { EntitlementProvider } from '../src/purchases/Entitlements';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -44,7 +45,8 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AudioProvider>
+      <EntitlementProvider>
+        <AudioProvider>
         <StatusBar style="dark" />
         <Stack
           screenOptions={{
@@ -59,6 +61,10 @@ export default function RootLayout() {
             options={{ animation: 'slide_from_right' }}
           />
           <Stack.Screen
+            name="paywall"
+            options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+          />
+          <Stack.Screen
             name="category/[id]"
             options={{ animation: 'slide_from_right' }}
           />
@@ -67,7 +73,8 @@ export default function RootLayout() {
             options={{ presentation: 'card', animation: 'slide_from_right' }}
           />
         </Stack>
-      </AudioProvider>
+        </AudioProvider>
+      </EntitlementProvider>
     </SafeAreaProvider>
   );
 }

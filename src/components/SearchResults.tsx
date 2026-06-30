@@ -11,10 +11,12 @@ export default function SearchResults({
   query,
   onOpen,
   onSuggest,
+  locked = false,
 }: {
   query: string;
   onOpen: (id: string) => void;
   onSuggest: (q: string) => void;
+  locked?: boolean;
 }) {
   const trimmed = query.trim();
   const results = useMemo(() => {
@@ -56,7 +58,7 @@ export default function SearchResults({
         </Text>
       }
       renderItem={({ item }) => (
-        <LiturgyCard liturgy={item.liturgy} onPress={() => onOpen(item.liturgy.id)} />
+        <LiturgyCard liturgy={item.liturgy} onPress={() => onOpen(item.liturgy.id)} locked={locked} />
       )}
     />
   );

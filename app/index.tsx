@@ -21,6 +21,7 @@ import CategoryTile from '../src/components/CategoryTile';
 import PlayerBar from '../src/components/PlayerBar';
 import FadeInUp from '../src/components/FadeInUp';
 import SearchBar from '../src/components/SearchBar';
+import { useEntitlement } from '../src/purchases/Entitlements';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
 
 const USER_NAME =
@@ -44,6 +45,8 @@ const SUGGESTIONS = ['Angry client', 'Can’t make payroll', 'Closing a deal', '
 export default function Home() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { isPremium } = useEntitlement();
+  const locked = !isPremium;
   const now = new Date();
   const devotional = getDailyDevotional(now);
 
@@ -63,8 +66,14 @@ export default function Home() {
     [],
   );
 
-  const open = (id: string) => {
+  // The daily devotional is always free; the library is premium. Tapping a
+  // locked reading opens the paywall instead of the reader.
+  const open = (id: string, free = false) => {
     Keyboard.dismiss();
+    if (locked && !free) {
+      router.push('/paywall');
+      return;
+    }
     router.push(`/liturgy/${id}`);
   };
 
@@ -104,7 +113,7 @@ export default function Home() {
         <Text style={styles.sectionLabel}>TODAY’S DEVOTIONAL</Text>
         <View style={styles.hero}>
           <Pressable
-            onPress={() => open(devotional.id)}
+            onPress={() => open(devotional.id, true)}
             accessibilityRole="button"
             accessibilityLabel={`Read today’s devotional: ${devotional.title}`}
             style={({ pressed }) => [styles.heroTop, pressed && { opacity: 0.85 }]}
@@ -135,6 +144,25 @@ export default function Home() {
         <Text style={styles.libIntro}>
           A liturgy for the moment you’re in — search it, or browse the shelves.
         </Text>
+
+        {locked && (
+          <Pressable
+            onPress={() => router.push('/paywall')}
+            accessibilityRole="button"
+            accessibilityLabel="Unlock the full library"
+            style={({ pressed }) => [styles.unlockBanner, pressed && { opacity: 0.9 }]}
+          >
+            <View style={styles.unlockIcon}>
+              <Ionicons name="lock-open-outline" size={16} color={colors.paper} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.unlockTitle}>Unlock the full library</Text>
+              <Text style={styles.unlockSub}>Every liturgy and audio narration.</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={colors.inkFaint} />
+          </Pressable>
+        )}
+
         <SearchBar value={query} onChangeText={setQuery} />
 
         {searching ? (
@@ -145,7 +173,7 @@ export default function Home() {
                   {results.length} {results.length === 1 ? 'liturgy' : 'liturgies'} for “{query.trim()}”
                 </Text>
                 {results.map((r) => (
-                  <LiturgyCard key={r.liturgy.id} liturgy={r.liturgy} onPress={() => open(r.liturgy.id)} />
+                  <LiturgyCard key={r.liturgy.id} liturgy={r.liturgy} onPress={() => open(r.liturgy.id)} locked={locked} />
                 ))}
               </>
             ) : (
@@ -207,7 +235,7 @@ export default function Home() {
             ) : (
               <View style={styles.allList}>
                 {allLiturgies.map((l) => (
-                  <LiturgyCard key={l.id} liturgy={l} onPress={() => open(l.id)} />
+                  <LiturgyCard key={l.id} liturgy={l} onPress={() => open(l.id)} locked={locked} />
                 ))}
               </View>
             )}
@@ -280,6 +308,28 @@ const styles = StyleSheet.create({
   readLink: { ...type.caption, color: colors.ink, fontWeight: '700', marginRight: 4 },
   heroDivider: { height: 1, backgroundColor: colors.line, marginVertical: spacing.lg },
   libIntro: { ...type.caption, color: colors.inkSoft, marginTop: -spacing.sm, marginBottom: spacing.md },
+
+  unlockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.paperRaised,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  unlockIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  unlockTitle: { fontFamily: fonts.sansSemibold, fontSize: 15, color: colors.ink },
+  unlockSub: { ...type.caption, fontSize: 13, color: colors.inkSoft, marginTop: 1 },
 
   segment: {
     flexDirection: 'row',
