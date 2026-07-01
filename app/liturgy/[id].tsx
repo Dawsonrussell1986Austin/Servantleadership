@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { getReadingById } from '../../src/content';
 import { useEntitlement } from '../../src/purchases/Entitlements';
+import { useProgress } from '../../src/lib/progress';
 import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { coverFor } from '../../src/content/covers';
 import { lengthLabel } from '../../src/content/lengths';
@@ -82,7 +83,15 @@ export default function LiturgyScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const reading = id ? getReadingById(id) : undefined;
   const { isPremium } = useEntitlement();
+  const { markRead } = useProgress();
   const [fontStep, setFontStep] = useState(1);
+
+  // Mark this reading as read once it's open (and allowed to be shown).
+  const readingId = reading?.id;
+  const canMark = !!reading && (reading.kind === 'devotional' || isPremium);
+  useEffect(() => {
+    if (readingId && canMark) markRead(readingId);
+  }, [readingId, canMark, markRead]);
 
   // Safety net for deep links: a premium reading opened while locked
   // (e.g. a shared URL) bounces to the paywall instead of the reader.

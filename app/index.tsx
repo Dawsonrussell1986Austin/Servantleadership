@@ -110,7 +110,19 @@ export default function Home() {
 
       {/* Today's devotional */}
       <FadeInUp delay={90}>
-        <Text style={styles.sectionLabel}>TODAY’S DEVOTIONAL</Text>
+        <View style={styles.sectionRow}>
+          <Text style={[styles.sectionLabel, styles.sectionLabelFlush]}>TODAY’S DEVOTIONAL</Text>
+          <Pressable
+            onPress={() => router.push('/devotionals')}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Browse all devotionals"
+            style={({ pressed }) => [styles.allLink, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={styles.allLinkText}>All</Text>
+            <Ionicons name="chevron-forward" size={14} color={colors.inkSoft} />
+          </Pressable>
+        </View>
         <View style={styles.hero}>
           <Pressable
             onPress={() => open(devotional.id, true)}
@@ -281,6 +293,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: spacing.xl,
     marginBottom: spacing.md,
+  },
+  sectionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
+  },
+  sectionLabelFlush: { marginTop: 0, marginBottom: 0 },
+  allLink: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  allLinkText: {
+    fontFamily: fonts.sansSemibold,
+    fontSize: 13,
+    color: colors.inkSoft,
   },
   hero: {
     backgroundColor: colors.paperRaised,

@@ -9,6 +9,11 @@ import React, {
 import { audioUrl } from './audioUrl';
 import { getReadingById } from '../content';
 import { buildSpeechText } from '../content/narration';
+import {
+  getSelectedVoice,
+  loadSelectedVoice,
+  resolveVoiceIdentifier,
+} from './voices';
 
 // expo-av's types — kept loose so we can dynamically import it (and keep it out
 // of the web static-render pass entirely).
@@ -198,11 +203,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       }
       const text = buildSpeechText(reading);
       const words = text.split(/\s+/).filter(Boolean).length;
-      const durationMillis = Math.round((words / WORDS_PER_SEC) * 1000);
+      const voice = getSelectedVoice();
+      const rate = SPEECH_RATE * (voice.rate ?? 1);
+      const durationMillis = Math.round((words / (WORDS_PER_SEC * (voice.rate ?? 1))) * 1000);
       try {
         const Speech = await getSpeech();
+        const voiceId = await resolveVoiceIdentifier(Speech, voice);
         Speech.speak(text, {
-          rate: SPEECH_RATE,
+          rate,
+          pitch: voice.pitch ?? 1,
+          voice: voiceId,
           onDone: () => {
             clearTick();
             patch({ isPlaying: false, positionMillis: stateRef.current.durationMillis });
@@ -289,6 +299,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         mode: null,
       });
 
+      // A chosen device voice narrates every reading live; skip the studio MP3.
+      if (getSelectedVoice().kind === 'device') {
+        await speakReading(id);
+        return;
+      }
+
       const url = audioUrl(id);
       const hasFile = await fileExists(url);
 
@@ -347,6 +363,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, [stopAll]);
 
   useEffect(() => {
+    void loadSelectedVoice();
     return () => {
       clearTick();
       void unloadFile();

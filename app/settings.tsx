@@ -24,6 +24,13 @@ import {
 } from '../src/lib/reminders';
 import AppleSignInButton from '../src/components/AppleSignInButton';
 import { useEntitlement } from '../src/purchases/Entitlements';
+import {
+  VOICES,
+  useSelectedVoiceId,
+  setSelectedVoice,
+  resolveVoiceIdentifier,
+  type Voice,
+} from '../src/audio/voices';
 
 const PRESET_TIMES: { label: string; hour: number; minute: number }[] = [
   { label: 'Early · 6:00 AM', hour: 6, minute: 0 },
@@ -39,6 +46,7 @@ export default function Settings() {
   const isWeb = Platform.OS === 'web';
 
   const { isPremium, configured } = useEntitlement();
+  const voiceId = useSelectedVoiceId();
   const [prefs, setPrefs] = useState<ReminderPrefs>(DEFAULT_PREFS);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -81,6 +89,23 @@ export default function Settings() {
       }
     } finally {
       setBusy(false);
+    }
+  };
+
+  const onPickVoice = async (v: Voice) => {
+    setSelectedVoice(v.id);
+    if (v.kind !== 'device') return; // studio is pre-recorded — nothing to preview
+    try {
+      const Speech = await import('expo-speech');
+      Speech.stop();
+      const id = await resolveVoiceIdentifier(Speech, v);
+      Speech.speak('This is how your daily reading will sound.', {
+        voice: id,
+        pitch: v.pitch ?? 1,
+        rate: 0.9 * (v.rate ?? 1),
+      });
+    } catch {
+      // preview is best-effort
     }
   };
 
@@ -173,6 +198,46 @@ export default function Settings() {
         </View>
         <Text style={styles.caption}>
           Currently set for {formatTime(prefs.hour, prefs.minute)}.
+        </Text>
+
+        <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>NARRATION VOICE</Text>
+        <View style={styles.card}>
+          {VOICES.map((v, i) => {
+            const active = voiceId === v.id;
+            return (
+              <Pressable
+                key={v.id}
+                onPress={() => onPickVoice(v)}
+                style={({ pressed }) => [
+                  styles.voiceRow,
+                  i > 0 && styles.timeRowBorder,
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <View style={{ flex: 1, paddingRight: spacing.sm }}>
+                  <Text style={[styles.voiceLabel, active && styles.timeLabelActive]}>
+                    {v.label}
+                  </Text>
+                  <Text style={styles.voiceDesc}>{v.description}</Text>
+                </View>
+                <Ionicons
+                  name={
+                    active
+                      ? 'checkmark-circle'
+                      : v.kind === 'device'
+                      ? 'play-circle-outline'
+                      : 'ellipse-outline'
+                  }
+                  size={22}
+                  color={active ? colors.ink : colors.inkFaint}
+                />
+              </Pressable>
+            );
+          })}
+        </View>
+        <Text style={styles.caption}>
+          “Studio” is the pre-recorded narration. The other voices read every
+          devotional aloud on your device — tap one to hear a sample.
         </Text>
 
         <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>MEMBERSHIP</Text>
@@ -295,6 +360,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   timeRowBorder: { borderTopWidth: 1, borderTopColor: colors.line },
+  voiceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.md,
+  },
+  voiceLabel: { ...type.body, fontSize: 16, color: colors.inkSoft },
+  voiceDesc: { ...type.caption, fontSize: 13, color: colors.inkFaint, marginTop: 1 },
   timeLabel: { ...type.body, fontSize: 16, color: colors.inkSoft },
   timeLabelActive: { color: colors.ink, fontFamily: fonts.sansSemibold },
   caption: {

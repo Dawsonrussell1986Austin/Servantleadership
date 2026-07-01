@@ -20,6 +20,7 @@ import {
 import { colors } from '../src/theme/theme';
 import { AudioProvider } from '../src/audio/AudioProvider';
 import { EntitlementProvider } from '../src/purchases/Entitlements';
+import { ProgressProvider, ListenTracker } from '../src/lib/progress';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -47,7 +48,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <EntitlementProvider>
         <AudioProvider>
+        <ProgressProvider>
         <StatusBar style="dark" />
+        <ListenTracker />
         <Stack
           screenOptions={{
             headerShown: false,
@@ -58,6 +61,10 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen
             name="settings"
+            options={{ animation: 'slide_from_right' }}
+          />
+          <Stack.Screen
+            name="devotionals"
             options={{ animation: 'slide_from_right' }}
           />
           <Stack.Screen
@@ -77,6 +84,7 @@ export default function RootLayout() {
             options={{ presentation: 'card', animation: 'slide_from_right' }}
           />
         </Stack>
+        </ProgressProvider>
         </AudioProvider>
       </EntitlementProvider>
     </SafeAreaProvider>
