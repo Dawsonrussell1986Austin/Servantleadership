@@ -1,4 +1,5 @@
 import { Devotional } from './types';
+import { scheduledDevotionalId } from './schedule';
 
 /**
  * The DAILY devotionals — generic, broadly-applicable readings on faith and
@@ -1329,12 +1330,12 @@ export const getDevotionalById = (id: string): Devotional | undefined =>
   DEVOTIONALS.find((d) => d.id === id);
 
 /**
- * Deterministic "devotional of the day" — same for everyone on a given date,
- * rotating through the generic daily devotionals before repeating.
+ * The devotional of the day — tied to the calendar date via the frozen
+ * schedule (see schedule.ts), so a given date is stable and never shifts when
+ * new devotionals are added. Sundays get rest/Sabbath readings; fixed holidays
+ * get a fitting one.
  */
 export const getDailyDevotional = (date = new Date()): Devotional => {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diff = date.getTime() - start.getTime();
-  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  return DEVOTIONALS[dayOfYear % DEVOTIONALS.length];
+  const id = scheduledDevotionalId(date);
+  return getDevotionalById(id) ?? DEVOTIONALS[0];
 };

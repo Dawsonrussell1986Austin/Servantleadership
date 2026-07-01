@@ -116,11 +116,11 @@ export default function Home() {
             onPress={() => router.push('/devotionals')}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel="Browse all devotionals"
+            accessibilityLabel="View calendar"
             style={({ pressed }) => [styles.allLink, pressed && { opacity: 0.6 }]}
           >
-            <Text style={styles.allLinkText}>All</Text>
-            <Ionicons name="chevron-forward" size={14} color={colors.inkSoft} />
+            <Ionicons name="calendar-outline" size={14} color={colors.inkSoft} />
+            <Text style={styles.allLinkText}>View calendar</Text>
           </Pressable>
         </View>
         <View style={styles.hero}>

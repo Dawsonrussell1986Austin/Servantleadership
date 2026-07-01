@@ -13,6 +13,7 @@ export {
   getDevotionalById,
   getDailyDevotional,
 } from './devotionals';
+export { scheduledDevotionalId } from './schedule';
 
 /** Everything readable in the app — devotionals + liturgies. */
 export const ALL_READINGS: Liturgy[] = [...DEVOTIONALS, ...LITURGIES];
