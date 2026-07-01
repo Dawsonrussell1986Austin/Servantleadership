@@ -115,7 +115,7 @@ export default function LiturgyScreen() {
   const isActive = audio.currentId === reading.id;
   const isPlaying = isActive && audio.isPlaying;
   const cat = categoryOf(reading.id);
-  const accent = categoryColor(cat);
+  const accent = colors.accent;
   const catLabel = CATEGORIES.find((c) => c.id === cat)?.label ?? '';
   const kindLabel = reading.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase();
 

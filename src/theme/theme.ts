@@ -1,47 +1,49 @@
 /**
- * Visual language for Founded.
- * Modern, airy chrome — a clean geometric sans (Inter) for everything in the UI,
- * and a warm serif (Georgia) reserved for the reading itself, on a near-white
- * paper background. The feel: a calm modern reading app, not a busy product.
+ * Visual language for Founded — per the Founded Style Guide.
+ *
+ * A warm, editorial system: cream paper, a bold terracotta accent, a
+ * high-contrast display serif (DM Serif Display) for headlines and Scripture,
+ * and Archivo for everything in the UI. Georgia is kept for long-form reading
+ * body, where a display serif would be unreadable.
  */
 
 export const colors = {
-  // Paper — near-white, faintly warm
-  paper: '#FBFAF7',
-  paperRaised: '#FFFFFF',
-  paperDeep: '#F1EEE8',
+  // Paper — warm cream
+  paper: '#F4F0E9',
+  paperRaised: '#FBF9F4',
+  paperDeep: '#EAE0D2',
 
   // Ink
-  ink: '#201C17',
-  inkSoft: '#6E655A',
-  inkFaint: '#A79F93',
+  ink: '#1A1613',
+  inkSoft: '#5F574D',
+  inkFaint: '#8A8177',
 
-  // Accent — a quiet liturgical gold/clay
-  accent: '#9C6B3F',
-  accentSoft: '#C9A77E',
+  // Accent — terracotta clay
+  accent: '#BF4A2B',
+  accentSoft: '#E0A98F',
 
   // Categories
   pressure: '#A8503E',
   people: '#4E6B57',
-  wins: '#9C6B3F',
+  wins: '#BF4A2B',
   rhythms: '#5A6B86',
 
-  line: '#ECE8E0',
+  line: '#E2D8C8',
   white: '#FFFFFF',
 };
 
-// Font families (loaded in app/_layout). Bricolage Grotesque is the
-// characterful display face for headings; Inter handles small UI text;
-// Georgia is reserved for the reading itself.
+// Font families (loaded in app/_layout). DM Serif Display is the editorial
+// display face; Archivo handles all UI text; Georgia is the reading body.
 export const fonts = {
-  display: 'BricolageGrotesque_700Bold',
-  displayExtra: 'BricolageGrotesque_800ExtraBold',
-  displaySemibold: 'BricolageGrotesque_600SemiBold',
-  sans: 'Inter_500Medium',
-  sansMedium: 'Inter_500Medium',
-  sansSemibold: 'Inter_600SemiBold',
-  sansBold: 'Inter_700Bold',
-  sansExtra: 'Inter_800ExtraBold',
+  display: 'DMSerifDisplay_400Regular',
+  displayExtra: 'DMSerifDisplay_400Regular',
+  displaySemibold: 'DMSerifDisplay_400Regular',
+  displayItalic: 'DMSerifDisplay_400Regular_Italic',
+  sans: 'Archivo_500Medium',
+  sansMedium: 'Archivo_500Medium',
+  sansSemibold: 'Archivo_600SemiBold',
+  sansBold: 'Archivo_700Bold',
+  sansExtra: 'Archivo_800ExtraBold',
   serif: 'Georgia',
 };
 
@@ -61,11 +63,11 @@ export const radius = {
 };
 
 export const type = {
-  // Display / headings — Bricolage Grotesque
-  hero: { fontFamily: fonts.displayExtra, fontSize: 32, lineHeight: 38 },
-  title: { fontFamily: fonts.display, fontSize: 25, lineHeight: 31 },
-  heading: { fontFamily: fonts.displaySemibold, fontSize: 19, lineHeight: 25 },
-  // Small UI text — Inter
+  // Display / headings — DM Serif Display
+  hero: { fontFamily: fonts.display, fontSize: 40, lineHeight: 44 },
+  title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34 },
+  heading: { fontFamily: fonts.display, fontSize: 21, lineHeight: 27 },
+  // Small UI text — Archivo
   label: { fontFamily: fonts.sansBold, fontSize: 11, letterSpacing: 1.4 },
   caption: { fontFamily: fonts.sansMedium, fontSize: 14, lineHeight: 20 },
 

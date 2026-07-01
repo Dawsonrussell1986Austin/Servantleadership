@@ -91,7 +91,7 @@ export default function LiturgyView({
   fontScale = 1,
   showHeader = true,
 }: Props) {
-  const accent = categoryColor(categoryOf(liturgy.id));
+  const accent = colors.accent;
   return (
     <View>
       {showHeader && (
