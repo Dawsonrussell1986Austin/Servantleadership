@@ -22,6 +22,7 @@ import PlayerBar from '../src/components/PlayerBar';
 import FadeInUp from '../src/components/FadeInUp';
 import SearchBar from '../src/components/SearchBar';
 import { useEntitlement } from '../src/purchases/Entitlements';
+import { usePersonal } from '../src/lib/personal';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
 
 const USER_NAME =
@@ -46,9 +47,11 @@ export default function Home() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isPremium } = useEntitlement();
+  const { resurfacedPrayer } = usePersonal();
   const locked = !isPremium;
   const now = new Date();
   const devotional = getDailyDevotional(now);
+  const resurface = resurfacedPrayer();
 
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'shelves' | 'all'>('shelves');
@@ -107,6 +110,29 @@ export default function Home() {
         </Text>
         <Text style={styles.subtitle}>A few quiet minutes to begin the day well.</Text>
       </FadeInUp>
+
+      {/* A prayer, gently resurfaced */}
+      {resurface && (
+        <FadeInUp delay={60}>
+          <Pressable
+            onPress={() => router.push('/prayers')}
+            accessibilityRole="button"
+            accessibilityLabel="Revisit a prayer"
+            style={({ pressed }) => [styles.resurface, pressed && { opacity: 0.9 }]}
+          >
+            <View style={styles.resurfaceIcon}>
+              <Ionicons name="heart-outline" size={16} color={colors.white} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.resurfaceLabel}>A WHILE AGO, YOU PRAYED</Text>
+              <Text style={styles.resurfaceText} numberOfLines={2}>
+                “{resurface.text}”
+              </Text>
+              <Text style={styles.resurfaceAsk}>How is it? Tap to revisit.</Text>
+            </View>
+          </Pressable>
+        </FadeInUp>
+      )}
 
       {/* Today's devotional */}
       <FadeInUp delay={90}>
@@ -335,6 +361,34 @@ const styles = StyleSheet.create({
   heroDivider: { height: 1, backgroundColor: colors.line, marginVertical: spacing.lg },
   libIntro: { ...type.caption, color: colors.inkSoft, marginTop: -spacing.sm, marginBottom: spacing.md },
 
+  resurface: {
+    flexDirection: 'row',
+    backgroundColor: colors.paperRaised,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.lg,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+  },
+  resurfaceIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  resurfaceLabel: { ...type.label, fontSize: 10, color: colors.accent, fontWeight: '700' },
+  resurfaceText: {
+    ...type.body,
+    fontSize: 16,
+    lineHeight: 23,
+    color: colors.ink,
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+  resurfaceAsk: { ...type.caption, fontSize: 13, color: colors.inkSoft, marginTop: 4 },
   unlockBanner: {
     flexDirection: 'row',
     alignItems: 'center',

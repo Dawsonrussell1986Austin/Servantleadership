@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Liturgy, LiturgySection, categoryOf } from '../content/types';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { Liturgy, LiturgySection } from '../content/types';
 import { colors, spacing, type, radius } from '../theme/theme';
-import { categoryColor, sectionLabel } from '../theme/categories';
+import { sectionLabel } from '../theme/categories';
 
 type Props = {
   liturgy: Liturgy;
@@ -10,6 +10,8 @@ type Props = {
   fontScale?: number;
   /** Render the built-in title/situation header. */
   showHeader?: boolean;
+  /** Press-and-hold a line to save it. */
+  onSaveLine?: (text: string, reference?: string) => void;
 };
 
 function Section({
@@ -90,6 +92,7 @@ export default function LiturgyView({
   liturgy,
   fontScale = 1,
   showHeader = true,
+  onSaveLine,
 }: Props) {
   const accent = colors.accent;
   return (
@@ -106,13 +109,13 @@ export default function LiturgyView({
       )}
 
       {liturgy.sections.map((s, i) => (
-        <Section
+        <Pressable
           key={`${liturgy.id}-${i}`}
-          section={s}
-          accent={accent}
-          scale={fontScale}
-          dropCap={i === 0}
-        />
+          onLongPress={onSaveLine ? () => onSaveLine(s.body, s.reference) : undefined}
+          delayLongPress={300}
+        >
+          <Section section={s} accent={accent} scale={fontScale} dropCap={i === 0} />
+        </Pressable>
       ))}
     </View>
   );

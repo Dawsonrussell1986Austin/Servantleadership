@@ -286,6 +286,26 @@ export default function Settings() {
           </>
         )}
 
+        <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>YOURS</Text>
+        <View style={styles.card}>
+          <Pressable
+            onPress={() => router.push('/saved')}
+            style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.6 }]}
+          >
+            <Ionicons name="bookmark-outline" size={20} color={colors.ink} />
+            <Text style={styles.linkRowText}>Words That Held Me</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.inkFaint} />
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/prayers')}
+            style={({ pressed }) => [styles.linkRow, styles.linkRowBorder, pressed && { opacity: 0.6 }]}
+          >
+            <Ionicons name="heart-outline" size={20} color={colors.ink} />
+            <Text style={styles.linkRowText}>Prayers</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.inkFaint} />
+          </Pressable>
+        </View>
+
         <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>ABOUT</Text>
         <View style={styles.card}>
           <View style={styles.aboutRow}>
@@ -394,6 +414,14 @@ const styles = StyleSheet.create({
   },
   privacyLink: { ...type.body, fontSize: 15, color: colors.ink, fontFamily: fonts.sansMedium },
   accountBlurb: { ...type.caption, color: colors.inkSoft },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  linkRowBorder: { borderTopWidth: 1, borderTopColor: colors.line },
+  linkRowText: { ...type.body, fontSize: 16, color: colors.ink, flex: 1, fontFamily: fonts.sansMedium },
   unlockBtn: {
     backgroundColor: colors.ink,
     borderRadius: radius.lg,

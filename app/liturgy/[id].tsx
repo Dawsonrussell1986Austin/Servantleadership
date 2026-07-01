@@ -7,6 +7,9 @@ import {
   StyleSheet,
   ImageBackground,
   useWindowDimensions,
+  Modal,
+  TextInput,
+  Keyboard,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -16,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { getReadingById } from '../../src/content';
 import { useEntitlement } from '../../src/purchases/Entitlements';
 import { useProgress } from '../../src/lib/progress';
+import { usePersonal } from '../../src/lib/personal';
 import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { coverFor } from '../../src/content/covers';
 import { lengthLabel } from '../../src/content/lengths';
@@ -24,7 +28,7 @@ import LiturgyView from '../../src/components/LiturgyView';
 import FadeInUp from '../../src/components/FadeInUp';
 import PlayerBar from '../../src/components/PlayerBar';
 import { useAudio } from '../../src/audio/AudioProvider';
-import { colors, spacing, type, fonts } from '../../src/theme/theme';
+import { colors, spacing, type, fonts, radius } from '../../src/theme/theme';
 
 const FONT_STEPS = [0.9, 1, 1.15, 1.3];
 
@@ -84,7 +88,16 @@ export default function LiturgyScreen() {
   const reading = id ? getReadingById(id) : undefined;
   const { isPremium } = useEntitlement();
   const { markRead } = useProgress();
+  const { addSaved, addPrayer } = usePersonal();
   const [fontStep, setFontStep] = useState(1);
+  const [toast, setToast] = useState<string | null>(null);
+  const [prayerOpen, setPrayerOpen] = useState(false);
+  const [prayerText, setPrayerText] = useState('');
+
+  const flash = (m: string) => {
+    setToast(m);
+    setTimeout(() => setToast(null), 1900);
+  };
 
   // Mark this reading as read once it's open (and allowed to be shown).
   const readingId = reading?.id;
@@ -118,6 +131,29 @@ export default function LiturgyScreen() {
   const accent = colors.accent;
   const catLabel = CATEGORIES.find((c) => c.id === cat)?.label ?? '';
   const kindLabel = reading.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase();
+
+  const scripture = reading.sections.find((s) => s.type === 'scripture');
+  const shareVerse = () =>
+    router.push({
+      pathname: '/share',
+      params: { text: scripture?.body ?? reading.title, reference: scripture?.reference ?? '' },
+    });
+  const saveLine = (text: string, reference?: string) => {
+    addSaved({ readingId: reading.id, readingTitle: reading.title, text, reference });
+    flash('Saved to your collection');
+  };
+  const savePrayer = () => {
+    const t = prayerText.trim();
+    if (!t) {
+      setPrayerOpen(false);
+      return;
+    }
+    addPrayer({ readingId: reading.id, readingTitle: reading.title, text: t });
+    setPrayerText('');
+    Keyboard.dismiss();
+    setPrayerOpen(false);
+    flash('Prayer saved — I’ll bring it back to you');
+  };
 
   // Full-bleed hero across the top third of the screen.
   const heroHeight = Math.max(300, Math.round(height * 0.42));
@@ -162,7 +198,32 @@ export default function LiturgyScreen() {
         <FadeInUp>
           <View style={styles.body}>
             <View style={[styles.accentRule, { backgroundColor: accent }]} />
-            <LiturgyView liturgy={reading} fontScale={fontStep} showHeader={false} />
+            <LiturgyView
+              liturgy={reading}
+              fontScale={fontStep}
+              showHeader={false}
+              onSaveLine={saveLine}
+            />
+
+            <Text style={styles.saveHint}>Press and hold any line to save it.</Text>
+
+            {/* Actions */}
+            <View style={styles.actionRow}>
+              <Pressable
+                onPress={() => setPrayerOpen(true)}
+                style={({ pressed }) => [styles.actionPrimary, pressed && { opacity: 0.9 }]}
+              >
+                <Ionicons name="heart-outline" size={18} color={colors.white} />
+                <Text style={styles.actionPrimaryText}>Pray about this</Text>
+              </Pressable>
+              <Pressable
+                onPress={shareVerse}
+                style={({ pressed }) => [styles.actionGhost, pressed && { opacity: 0.7 }]}
+              >
+                <Ionicons name="share-outline" size={18} color={colors.ink} />
+                <Text style={styles.actionGhostText}>Share</Text>
+              </Pressable>
+            </View>
 
             <View style={styles.amenWrap}>
               <Text style={styles.amen}>Amen.</Text>
@@ -192,6 +253,11 @@ export default function LiturgyScreen() {
             }
           />
           <RoundButton
+            name="share-outline"
+            a11yLabel="Share a verse"
+            onPress={shareVerse}
+          />
+          <RoundButton
             name={isPlaying ? 'pause' : 'headset'}
             a11yLabel={isPlaying ? 'Pause narration' : 'Listen to this reading'}
             active={isActive}
@@ -204,6 +270,52 @@ export default function LiturgyScreen() {
       <View style={[styles.player, { paddingBottom: insets.bottom + spacing.md }]}>
         <PlayerBar readingId={reading.id} />
       </View>
+
+      {/* Toast */}
+      {toast && (
+        <View style={[styles.toast, { bottom: insets.bottom + 96 }]} pointerEvents="none">
+          <Ionicons name="checkmark-circle" size={16} color={colors.white} />
+          <Text style={styles.toastText}>{toast}</Text>
+        </View>
+      )}
+
+      {/* Pray-about-this modal */}
+      <Modal
+        visible={prayerOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPrayerOpen(false)}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={() => setPrayerOpen(false)} />
+        <View style={[styles.modalCard, { paddingBottom: insets.bottom + spacing.lg }]}>
+          <Text style={styles.modalKicker}>PRAY ABOUT THIS</Text>
+          <Text style={styles.modalTitle}>What’s on your heart?</Text>
+          <Text style={styles.modalHint}>
+            Name the real thing — a decision, payroll, a person. Founded will
+            bring it back to you later.
+          </Text>
+          <TextInput
+            value={prayerText}
+            onChangeText={setPrayerText}
+            placeholder="e.g. Wisdom on the hire I’m deciding…"
+            placeholderTextColor={colors.inkFaint}
+            multiline
+            autoFocus
+            style={styles.modalInput}
+          />
+          <View style={styles.modalActions}>
+            <Pressable onPress={() => setPrayerOpen(false)} hitSlop={8}>
+              <Text style={styles.modalCancel}>Cancel</Text>
+            </Pressable>
+            <Pressable
+              onPress={savePrayer}
+              style={({ pressed }) => [styles.modalSave, pressed && { opacity: 0.9 }]}
+            >
+              <Text style={styles.modalSaveText}>Save prayer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -328,6 +440,97 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
   },
+
+  saveHint: {
+    ...type.caption,
+    fontSize: 12,
+    color: colors.inkFaint,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginTop: spacing.xl,
+  },
+  actionPrimary: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.accent,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+  },
+  actionPrimaryText: { fontFamily: fonts.sansBold, fontSize: 15, color: colors.white },
+  actionGhost: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.paperDeep,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+  },
+  actionGhostText: { fontFamily: fonts.sansBold, fontSize: 15, color: colors.ink },
+
+  toast: {
+    position: 'absolute',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.ink,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.lg,
+  },
+  toastText: { fontFamily: fonts.sansSemibold, fontSize: 14, color: colors.white },
+
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(26,22,19,0.45)' },
+  modalCard: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.paper,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    padding: spacing.lg,
+  },
+  modalKicker: { ...type.label, color: colors.accent, fontWeight: '700', marginBottom: spacing.sm },
+  modalTitle: { ...type.title, fontSize: 24, color: colors.ink },
+  modalHint: { ...type.caption, color: colors.inkSoft, marginTop: spacing.xs, marginBottom: spacing.md },
+  modalInput: {
+    ...type.body,
+    fontSize: 17,
+    color: colors.ink,
+    backgroundColor: colors.paperRaised,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+    padding: spacing.md,
+    minHeight: 96,
+    textAlignVertical: 'top',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: spacing.lg,
+    marginTop: spacing.lg,
+  },
+  modalCancel: { ...type.body, fontSize: 16, color: colors.inkSoft, fontFamily: fonts.sansSemibold },
+  modalSave: {
+    backgroundColor: colors.ink,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+  },
+  modalSaveText: { fontFamily: fonts.sansBold, fontSize: 15, color: colors.white },
   missing: {
     ...type.body,
     color: colors.inkSoft,
