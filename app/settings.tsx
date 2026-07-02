@@ -8,6 +8,7 @@ import {
   Switch,
   ActivityIndicator,
   Platform,
+  TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -84,6 +85,32 @@ export default function Settings() {
       }
     } finally {
       setBusy(false);
+    }
+  };
+
+  const [email, setEmail] = useState('');
+  const [emailState, setEmailState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+
+  const subscribeEmail = async () => {
+    const value = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setEmailState('error');
+      return;
+    }
+    setEmailState('sending');
+    try {
+      const base =
+        Platform.OS === 'web'
+          ? ''
+          : ((Constants.expoConfig?.extra as { audioBaseUrl?: string } | undefined)?.audioBaseUrl ?? '');
+      const r = await fetch(`${base}/api/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: value }),
+      });
+      setEmailState(r.ok ? 'done' : 'error');
+    } catch {
+      setEmailState('error');
     }
   };
 
@@ -196,6 +223,56 @@ export default function Settings() {
         <Text style={styles.caption}>
           Currently set for {formatTime(prefs.hour, prefs.minute)}.
         </Text>
+
+        <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>DAILY EMAIL</Text>
+        <View style={styles.card}>
+          {emailState === 'done' ? (
+            <View style={styles.row}>
+              <Ionicons name="checkmark-circle" size={22} color={colors.people} />
+              <Text style={[styles.rowSub, { marginLeft: spacing.sm, flex: 1 }]}>
+                You’re subscribed. The day’s devotional will arrive each morning.
+              </Text>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.rowTitle}>Get it in your inbox</Text>
+              <Text style={styles.rowSub}>
+                The day’s devotional, emailed each morning.
+              </Text>
+              <View style={styles.emailRow}>
+                <TextInput
+                  value={email}
+                  onChangeText={(t) => {
+                    setEmail(t);
+                    if (emailState === 'error') setEmailState('idle');
+                  }}
+                  placeholder="you@company.com"
+                  placeholderTextColor={colors.inkFaint}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  inputMode="email"
+                  style={styles.emailInput}
+                />
+                <Pressable
+                  onPress={subscribeEmail}
+                  disabled={emailState === 'sending'}
+                  style={({ pressed }) => [styles.emailBtn, pressed && { opacity: 0.9 }]}
+                >
+                  {emailState === 'sending' ? (
+                    <ActivityIndicator color={colors.white} />
+                  ) : (
+                    <Text style={styles.emailBtnText}>Subscribe</Text>
+                  )}
+                </Pressable>
+              </View>
+              {emailState === 'error' && (
+                <Text style={styles.noteWarn}>
+                  Please enter a valid email and try again.
+                </Text>
+              )}
+            </>
+          )}
+        </View>
 
         <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>NARRATION VOICE</Text>
         <View style={styles.card}>
@@ -413,6 +490,28 @@ const styles = StyleSheet.create({
   },
   linkRowBorder: { borderTopWidth: 1, borderTopColor: colors.line },
   linkRowText: { ...type.body, fontSize: 16, color: colors.ink, flex: 1, fontFamily: fonts.sansMedium },
+  emailRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
+  emailInput: {
+    flex: 1,
+    ...type.body,
+    fontSize: 16,
+    color: colors.ink,
+    backgroundColor: colors.paper,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+  },
+  emailBtn: {
+    backgroundColor: colors.accent,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 96,
+  },
+  emailBtnText: { fontFamily: fonts.sansBold, fontSize: 15, color: colors.white },
   unlockBtn: {
     backgroundColor: colors.ink,
     borderRadius: radius.lg,

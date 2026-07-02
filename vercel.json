@@ -7,5 +7,6 @@
   "rewrites": [
     { "source": "/liturgy/:id", "destination": "/liturgy/[id]" },
     { "source": "/category/:id", "destination": "/category/[id]" }
-  ]
+  ],
+  "crons": [{ "path": "/api/cron/daily", "schedule": "0 13 * * *" }]
 }
