@@ -55,7 +55,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "audioBaseUrl": "https://servant-liturgies.vercel.app",
+      "audioBaseUrl": "https://app.foundedapp.com",
       "userName": "Dawson",
       "revenueCatApiKeyIos": "",
       "revenueCatApiKeyAndroid": ""
