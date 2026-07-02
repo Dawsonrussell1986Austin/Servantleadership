@@ -25,9 +25,11 @@ import { useEntitlement } from '../src/purchases/Entitlements';
 import { usePersonal } from '../src/lib/personal';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
 
+// Optional personalization: only appended if a name is configured for this
+// build. Left blank for public releases so every user gets a clean greeting.
 const USER_NAME =
   (Constants.expoConfig?.extra as { userName?: string } | undefined)?.userName ??
-  'Dawson';
+  '';
 
 const WEEKDAYS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -35,7 +37,7 @@ const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', '
 function greeting(d: Date): string {
   const h = d.getHours();
   const base = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  return `${base}, ${USER_NAME}`;
+  return USER_NAME ? `${base}, ${USER_NAME}` : base;
 }
 function dateLine(d: Date): string {
   return `${WEEKDAYS[d.getDay()]} · ${MONTHS[d.getMonth()]} ${d.getDate()}`;

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Platform,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -140,6 +141,33 @@ export default function Paywall() {
           <Text style={styles.restore}>Restore purchase</Text>
         </Pressable>
 
+        {Platform.OS !== 'web' && (
+          <>
+            <Text style={styles.legal}>
+              {priceLabel ? `${priceLabel} per period. ` : ''}Payment is charged to
+              your Apple ID at confirmation. The subscription renews automatically
+              unless canceled at least 24 hours before the end of the current
+              period. Manage or cancel anytime in your App Store account settings.
+            </Text>
+            <View style={styles.legalLinks}>
+              <Pressable
+                onPress={() =>
+                  Linking.openURL(
+                    'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                  )
+                }
+                hitSlop={8}
+              >
+                <Text style={styles.legalLink}>Terms of Use</Text>
+              </Pressable>
+              <Text style={styles.legalDot}>·</Text>
+              <Pressable onPress={() => router.push('/privacy')} hitSlop={8}>
+                <Text style={styles.legalLink}>Privacy Policy</Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+
         {Platform.OS === 'web' && (
           <Text style={styles.webNote}>
             Subscriptions are available in the iOS app.
@@ -239,4 +267,26 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     textAlign: 'center',
   },
+  legal: {
+    ...type.caption,
+    fontSize: 11,
+    lineHeight: 16,
+    color: 'rgba(251,250,247,0.4)',
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  legalLinks: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.sm,
+    gap: spacing.sm,
+  },
+  legalLink: {
+    ...type.caption,
+    fontSize: 12,
+    color: 'rgba(251,250,247,0.65)',
+    textDecorationLine: 'underline',
+  },
+  legalDot: { color: 'rgba(251,250,247,0.35)' },
 });
