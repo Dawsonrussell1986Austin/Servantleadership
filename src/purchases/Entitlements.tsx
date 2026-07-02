@@ -24,7 +24,7 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
 // Must match the entitlement identifier in the RevenueCat dashboard EXACTLY.
-export const ENTITLEMENT_ID = 'Founded Pro';
+export const ENTITLEMENT_ID = 'Founded App Pro';
 
 type PackageLike = {
   identifier: string;
