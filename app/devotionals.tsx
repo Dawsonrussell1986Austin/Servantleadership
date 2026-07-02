@@ -1,9 +1,18 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, Pressable, FlatList, ScrollView, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  FlatList,
+  ScrollView,
+  ImageBackground,
+  StyleSheet,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { DEVOTIONALS, getDevotionalById, scheduledDevotionalId } from '../src/content';
+import { DEVOTIONALS, scheduledDevotionalId } from '../src/content';
+import { coverFor } from '../src/content/covers';
 import LiturgyCover from '../src/components/LiturgyCover';
 import { useProgress } from '../src/lib/progress';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
@@ -131,6 +140,7 @@ export default function Devotionals() {
           <View style={styles.grid}>
             {cells.map((c, i) => {
               if (!c) return <View key={`b${i}`} style={styles.cell} />;
+              const done = c.state === 'done';
               return (
                 <Pressable
                   key={c.day}
@@ -139,28 +149,21 @@ export default function Devotionals() {
                   accessibilityRole="button"
                   accessibilityLabel={`${MONTHS[month]} ${c.day}, devotional ${c.state}`}
                 >
-                  <View
-                    style={[
-                      styles.dayInner,
-                      c.state === 'done' && styles.dayDone,
-                      c.state === 'today' && styles.dayToday,
-                      c.state === 'missed' && styles.dayMissed,
-                    ]}
+                  <ImageBackground
+                    source={coverFor(c.id)}
+                    style={styles.thumb}
+                    imageStyle={[styles.thumbImg, !done && styles.thumbImgOff]}
                   >
-                    {c.state === 'done' ? (
-                      <Ionicons name="checkmark" size={16} color={colors.white} />
-                    ) : (
-                      <Text
-                        style={[
-                          styles.dayNum,
-                          c.state === 'future' && styles.dayNumFuture,
-                          c.state === 'today' && styles.dayNumToday,
-                        ]}
-                      >
-                        {c.day}
-                      </Text>
+                    {c.state === 'today' && <View style={styles.todayRing} pointerEvents="none" />}
+                    <View style={[styles.dayBadge, done && styles.dayBadgeOn]}>
+                      <Text style={styles.dayBadgeText}>{c.day}</Text>
+                    </View>
+                    {done && (
+                      <View style={styles.doneTick}>
+                        <Ionicons name="checkmark" size={11} color={colors.white} />
+                      </View>
                     )}
-                  </View>
+                  </ImageBackground>
                 </Pressable>
               );
             })}
@@ -173,16 +176,12 @@ export default function Devotionals() {
             </Text>
             <View style={styles.legend}>
               <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: colors.people }]} />
-                <Text style={styles.legendText}>Done</Text>
+                <View style={[styles.legendDot, { backgroundColor: colors.accent }]} />
+                <Text style={styles.legendText}>Done — in color</Text>
               </View>
               <View style={styles.legendItem}>
                 <View style={[styles.legendDot, styles.legendMissed]} />
-                <Text style={styles.legendText}>Missed</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, styles.legendToday]} />
-                <Text style={styles.legendText}>Today</Text>
+                <Text style={styles.legendText}>Not yet — faded</Text>
               </View>
             </View>
           </View>
@@ -296,23 +295,49 @@ const styles = StyleSheet.create({
   cell: {
     width: `${100 / 7}%`,
     aspectRatio: 1,
+    padding: 3,
+  },
+  thumb: {
+    flex: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: colors.paperDeep,
+  },
+  thumbImg: { borderRadius: 10 },
+  // Not done → faint, desaturated ghost over paper.
+  thumbImgOff: { opacity: 0.16 },
+  dayBadge: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 3,
+    backgroundColor: 'rgba(26,22,19,0.30)',
   },
-  dayInner: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  dayBadgeOn: { backgroundColor: 'rgba(26,22,19,0.55)' },
+  dayBadgeText: { fontFamily: fonts.sansBold, fontSize: 11, color: colors.white },
+  todayRing: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 10,
+    borderWidth: 2.5,
+    borderColor: colors.accent,
+    zIndex: 2,
+  },
+  doneTick: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dayDone: { backgroundColor: colors.people },
-  dayToday: { borderWidth: 2, borderColor: colors.ink },
-  dayMissed: { borderWidth: 1, borderColor: colors.line, backgroundColor: colors.paperRaised },
-  dayNum: { fontFamily: fonts.sansSemibold, fontSize: 15, color: colors.ink },
-  dayNumFuture: { color: colors.inkFaint, fontFamily: fonts.sansMedium },
-  dayNumToday: { color: colors.ink, fontFamily: fonts.sansBold },
 
   summary: {
     marginTop: spacing.xl,
