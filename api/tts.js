@@ -1,19 +1,16 @@
 /**
- * On-demand ElevenLabs narration.
+ * On-demand ElevenLabs narration (plain CommonJS so Vercel runs it without a
+ * TypeScript build step).
  *
  * GET /api/tts?id=<readingId>&voice=<slug>   → MP3 of that reading in that voice
  * GET /api/tts?preview=1&voice=<slug>        → MP3 of a short sample
  *
- * Uses the raw Node request/response API (works regardless of how Vercel wires
- * the function) and edge-caches results (immutable, 1yr) so ElevenLabs is only
- * hit on the first request for a given reading+voice. The API key stays server
- * side.
+ * Edge-cached immutable so ElevenLabs is hit once per reading+voice. Key stays
+ * server-side.
  */
-import NARRATION from './_narration.json';
+const NARRATION = require('./_narration.json');
 
-const BY_ID: Record<string, string> = NARRATION as Record<string, string>;
-
-const VOICES: Record<string, string> = {
+const VOICES = {
   studio: 'onwK4e9ZLuTAKqWW03F9', // Daniel — British male (also the cached one)
   george: 'JBFqnCBsd6RMkjVDRZzb', // British male, mature
   adam: 'pNInz6obpgDQGcFmaJgB', // American male, deep
@@ -24,8 +21,8 @@ const VOICES: Record<string, string> = {
 const PREVIEW_TEXT =
   'This is how your daily reading will sound — a quiet minute to begin the day well.';
 
-export default async function handler(req: any, res: any) {
-  const sendJson = (code: number, obj: unknown) => {
+module.exports = async function handler(req, res) {
+  const sendJson = (code, obj) => {
     res.statusCode = code;
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(obj));
@@ -37,12 +34,12 @@ export default async function handler(req: any, res: any) {
     const voiceId = VOICES[voiceSlug];
     if (!voiceId) return sendJson(400, { error: 'unknown voice' });
 
-    let text: string;
+    let text;
     if (url.searchParams.get('preview')) {
       text = PREVIEW_TEXT;
     } else {
       const id = url.searchParams.get('id') || '';
-      text = BY_ID[id];
+      text = NARRATION[id];
       if (!text) return sendJson(404, { error: 'unknown reading' });
     }
 
@@ -50,7 +47,7 @@ export default async function handler(req: any, res: any) {
     if (!key) return sendJson(503, { error: 'narration not configured' });
 
     const r = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_64`,
+      'https://api.elevenlabs.io/v1/text-to-speech/' + voiceId + '?output_format=mp3_44100_64',
       {
         method: 'POST',
         headers: {
@@ -76,11 +73,11 @@ export default async function handler(req: any, res: any) {
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
     res.end(buf);
-  } catch (e: any) {
+  } catch (e) {
     try {
-      sendJson(500, { error: 'tts_error', detail: String(e && e.stack ? e.stack : e).slice(0, 300) });
-    } catch {
-      // last resort — nothing else we can do
+      sendJson(500, { error: 'tts_error', detail: String((e && e.stack) || e).slice(0, 300) });
+    } catch (e2) {
+      /* nothing else to do */
     }
   }
-}
+};
