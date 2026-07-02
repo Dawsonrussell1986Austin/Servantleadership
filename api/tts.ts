@@ -11,12 +11,11 @@
  * "studio" is served as a pre-generated static file (/audio/<id>.mp3), so it
  * isn't handled here — this endpoint covers the other voices.
  */
-import { DEVOTIONALS } from '../src/content/devotionals';
-import { LITURGIES } from '../src/content/liturgies';
-import { buildNarration } from '../src/content/narration';
+// Precomputed narration text per reading id (generated from the content at
+// build time — see scripts). Keeps this function free of the TS content graph.
+import NARRATION from './_narration.json';
 
-const READINGS = [...DEVOTIONALS, ...LITURGIES];
-const BY_ID = new Map(READINGS.map((r) => [r.id, r]));
+const BY_ID: Record<string, string> = NARRATION as Record<string, string>;
 
 // Voice slug → ElevenLabs voice id. Only these are allowed (keeps the endpoint
 // from being used to generate arbitrary voices).
@@ -44,12 +43,12 @@ export default async function handler(req: any, res: any) {
   if (q.preview) {
     text = PREVIEW_TEXT;
   } else {
-    const reading = BY_ID.get(String(q.id ?? ''));
+    const reading = BY_ID[String(q.id ?? '')];
     if (!reading) {
       res.status(404).json({ error: 'unknown reading' });
       return;
     }
-    text = buildNarration(reading);
+    text = reading;
   }
 
   const key = process.env.ELEVENLABS_API_KEY;

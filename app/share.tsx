@@ -25,8 +25,10 @@ export default function ShareScreen() {
   const [msg, setMsg] = useState<string | null>(null);
 
   const verse = (text ?? '').replace(/^[“"]|[”"]$/g, '');
-  const cardW = Math.min(width - spacing.lg * 2, 420);
-  const cardH = Math.round(cardW * 1.25);
+  const cardW = Math.min(width - spacing.lg * 2, 400);
+  const cardH = Math.round(cardW * 1.12);
+  // Scale the verse down a touch for longer passages.
+  const verseSize = verse.length > 190 ? 21 : verse.length > 120 ? 24 : 27;
 
   const share = async () => {
     setBusy(true);
@@ -75,33 +77,42 @@ export default function ShareScreen() {
       </Pressable>
 
       <View style={styles.center}>
-        {/* The card that gets captured */}
+        {/* The card that gets captured — cream paper, dark serif verse */}
         <View
           ref={cardRef}
           collapsable={false}
           style={[styles.card, { width: cardW, height: cardH }]}
         >
           <LinearGradient
-            colors={['#C6512F', '#BF4A2B', '#A5401F']}
+            colors={['#FCFAF5', '#F1E9DB']}
             style={StyleSheet.absoluteFill}
           />
-          <View style={styles.cairn}>
-            <View style={[styles.stone, { width: 22, backgroundColor: '#E4B29B' }]} />
-            <View style={[styles.stone, { width: 34, backgroundColor: '#EFE6D9' }]} />
-            <View style={[styles.stone, { width: 46, backgroundColor: '#F6F1E9' }]} />
+          <View style={styles.cardInner}>
+            <View style={styles.cairn}>
+              <View style={[styles.stone, { width: 22, backgroundColor: '#E0A98F' }]} />
+              <View style={[styles.stone, { width: 34, backgroundColor: '#CB6A4A' }]} />
+              <View style={[styles.stone, { width: 46, backgroundColor: colors.accent }]} />
+            </View>
+
+            <View style={styles.verseWrap}>
+              <Text
+                style={[styles.verse, { fontSize: verseSize, lineHeight: Math.round(verseSize * 1.32) }]}
+                numberOfLines={9}
+              >
+                {verse}
+              </Text>
+              {reference ? <Text style={styles.reference}>{reference}</Text> : null}
+            </View>
+
+            <View style={styles.footer}>
+              <View style={styles.rule} />
+              <Text style={styles.wordmark}>FOUNDED</Text>
+            </View>
           </View>
-
-          <Text style={styles.verse} adjustsFontSizeToFit numberOfLines={9} minimumFontScale={0.5}>
-            {verse}
-          </Text>
-
-          {reference ? <Text style={styles.reference}>{reference}</Text> : <View />}
-
-          <Text style={styles.wordmark}>FOUNDED</Text>
         </View>
       </View>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.lg }]}>
+      <View style={[styles.footerBar, { paddingBottom: insets.bottom + spacing.lg }]}>
         {msg && <Text style={styles.msg}>{msg}</Text>}
         <Pressable
           onPress={share}
@@ -131,41 +142,47 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radius.lg,
     overflow: 'hidden',
-    padding: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'space-between',
     shadowColor: '#000',
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.16,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 12 },
     elevation: 8,
   },
-  cairn: { alignItems: 'center', gap: 4, marginTop: 0 } as any,
-  stone: { height: 8, borderRadius: 4 },
-  verse: {
+  cardInner: {
     flex: 1,
-    textAlignVertical: 'center',
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+  },
+  cairn: { alignItems: 'center', gap: 4 } as any,
+  stone: { height: 8, borderRadius: 4 },
+  verseWrap: {
+    flex: 1,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verse: {
     fontFamily: fonts.display,
-    fontSize: 26,
-    lineHeight: 34,
-    color: '#F6F1E9',
+    color: colors.ink,
     textAlign: 'center',
-    paddingVertical: spacing.lg,
   },
   reference: {
     fontFamily: fonts.sansBold,
-    fontSize: 13,
-    letterSpacing: 1,
-    color: 'rgba(246,241,233,0.9)',
-    marginBottom: spacing.sm,
-  },
-  wordmark: {
-    fontFamily: fonts.sansBold,
     fontSize: 12,
-    letterSpacing: 3,
-    color: 'rgba(246,241,233,0.7)',
+    letterSpacing: 1.2,
+    color: colors.accent,
+    marginTop: spacing.lg,
   },
   footer: { alignItems: 'center' },
+  rule: { width: 28, height: 2, borderRadius: 1, backgroundColor: colors.accent, marginBottom: spacing.sm },
+  wordmark: {
+    fontFamily: fonts.sansBold,
+    fontSize: 11,
+    letterSpacing: 3,
+    color: colors.inkFaint,
+  },
+  footerBar: { alignItems: 'center' },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
