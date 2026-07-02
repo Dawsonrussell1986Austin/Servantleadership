@@ -9,11 +9,8 @@ import React, {
 import { audioUrl } from './audioUrl';
 import { getReadingById } from '../content';
 import { buildSpeechText } from '../content/narration';
-import {
-  getSelectedVoice,
-  loadSelectedVoice,
-  resolveVoiceIdentifier,
-} from './voices';
+import { getSelectedVoice, loadSelectedVoice } from './voices';
+import { narrationUrl } from './audioUrl';
 
 // expo-av's types — kept loose so we can dynamically import it (and keep it out
 // of the web static-render pass entirely).
@@ -203,16 +200,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       }
       const text = buildSpeechText(reading);
       const words = text.split(/\s+/).filter(Boolean).length;
-      const voice = getSelectedVoice();
-      const rate = SPEECH_RATE * (voice.rate ?? 1);
-      const durationMillis = Math.round((words / (WORDS_PER_SEC * (voice.rate ?? 1))) * 1000);
+      const durationMillis = Math.round((words / WORDS_PER_SEC) * 1000);
       try {
         const Speech = await getSpeech();
-        const voiceId = await resolveVoiceIdentifier(Speech, voice);
         Speech.speak(text, {
-          rate,
-          pitch: voice.pitch ?? 1,
-          voice: voiceId,
+          rate: SPEECH_RATE,
           onDone: () => {
             clearTick();
             patch({ isPlaying: false, positionMillis: stateRef.current.durationMillis });
@@ -299,29 +291,23 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         mode: null,
       });
 
-      // A chosen device voice narrates every reading live; skip the studio MP3.
-      if (getSelectedVoice().kind === 'device') {
-        await speakReading(id);
+      // Play the reading in the selected voice — studio from a static MP3,
+      // the others from the on-demand /api/tts endpoint. Fall back to the
+      // device's built-in speech only if that fails (e.g. offline).
+      const voice = getSelectedVoice();
+      const url = narrationUrl(id, voice.slug, voice.kind);
+      try {
+        const { Audio } = await getAudio();
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: url },
+          { shouldPlay: true },
+          onStatus as never,
+        );
+        soundRef.current = sound as unknown as Sound;
+        patch({ mode: 'file' });
         return;
-      }
-
-      const url = audioUrl(id);
-      const hasFile = await fileExists(url);
-
-      if (hasFile) {
-        try {
-          const { Audio } = await getAudio();
-          const { sound } = await Audio.Sound.createAsync(
-            { uri: url },
-            { shouldPlay: true },
-            onStatus as never,
-          );
-          soundRef.current = sound as unknown as Sound;
-          patch({ mode: 'file' });
-          return;
-        } catch {
-          /* fall through to speech */
-        }
+      } catch {
+        /* fall through to device speech */
       }
       await speakReading(id);
     },

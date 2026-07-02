@@ -15,3 +15,23 @@ export function audioUrl(id: string): string {
   if (Platform.OS === 'web') return `/audio/${id}.mp3`;
   return `${BASE.replace(/\/$/, '')}/audio/${id}.mp3`;
 }
+
+/**
+ * URL for a reading in a given voice. Studio uses the static MP3s; the other
+ * voices are generated on demand by /api/tts (edge-cached).
+ */
+export function narrationUrl(id: string, slug: string, kind: 'studio' | 'eleven'): string {
+  const path =
+    kind === 'studio'
+      ? `/audio/${id}.mp3`
+      : `/api/tts?id=${encodeURIComponent(id)}&voice=${encodeURIComponent(slug)}`;
+  if (Platform.OS === 'web') return path;
+  return `${BASE.replace(/\/$/, '')}${path}`;
+}
+
+/** URL for a short spoken sample of a voice (used by the Settings preview). */
+export function previewUrl(slug: string): string {
+  const path = `/api/tts?preview=1&voice=${encodeURIComponent(slug)}`;
+  if (Platform.OS === 'web') return path;
+  return `${BASE.replace(/\/$/, '')}${path}`;
+}

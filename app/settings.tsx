@@ -24,13 +24,8 @@ import {
 } from '../src/lib/reminders';
 import AppleSignInButton from '../src/components/AppleSignInButton';
 import { useEntitlement } from '../src/purchases/Entitlements';
-import {
-  VOICES,
-  useSelectedVoiceId,
-  setSelectedVoice,
-  resolveVoiceIdentifier,
-  type Voice,
-} from '../src/audio/voices';
+import { VOICES, useSelectedVoiceId, setSelectedVoice, type Voice } from '../src/audio/voices';
+import { previewUrl } from '../src/audio/audioUrl';
 
 const PRESET_TIMES: { label: string; hour: number; minute: number }[] = [
   { label: 'Early · 6:00 AM', hour: 6, minute: 0 },
@@ -94,16 +89,18 @@ export default function Settings() {
 
   const onPickVoice = async (v: Voice) => {
     setSelectedVoice(v.id);
-    if (v.kind !== 'device') return; // studio is pre-recorded — nothing to preview
     try {
-      const Speech = await import('expo-speech');
-      Speech.stop();
-      const id = await resolveVoiceIdentifier(Speech, v);
-      Speech.speak('This is how your daily reading will sound.', {
-        voice: id,
-        pitch: v.pitch ?? 1,
-        rate: 0.9 * (v.rate ?? 1),
-      });
+      const url = previewUrl(v.slug);
+      if (Platform.OS === 'web') {
+        const a = new (window as any).Audio(url);
+        a.play?.();
+      } else {
+        const { Audio } = await import('expo-av');
+        const { sound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
+        setTimeout(() => {
+          sound.unloadAsync().catch(() => {});
+        }, 15000);
+      }
     } catch {
       // preview is best-effort
     }
@@ -221,13 +218,7 @@ export default function Settings() {
                   <Text style={styles.voiceDesc}>{v.description}</Text>
                 </View>
                 <Ionicons
-                  name={
-                    active
-                      ? 'checkmark-circle'
-                      : v.kind === 'device'
-                      ? 'play-circle-outline'
-                      : 'ellipse-outline'
-                  }
+                  name={active ? 'checkmark-circle' : 'play-circle-outline'}
                   size={22}
                   color={active ? colors.ink : colors.inkFaint}
                 />
@@ -236,8 +227,8 @@ export default function Settings() {
           })}
         </View>
         <Text style={styles.caption}>
-          “Studio” is the pre-recorded narration. The other voices read every
-          devotional aloud on your device — tap one to hear a sample.
+          Every voice is a real studio-quality narrator. Tap one to hear a
+          sample.
         </Text>
 
         <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>MEMBERSHIP</Text>
