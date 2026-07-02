@@ -22,6 +22,9 @@ export type Voice = {
   kind: VoiceKind;
   /** Candidate iOS system voice identifiers, best first. */
   ios?: string[];
+  /** Browser voice NAME keywords to match on web (where iOS ids don't exist). */
+  nameHints?: string[];
+  gender?: 'male' | 'female';
   /** Language to fall back to if no candidate identifier is installed. */
   lang?: string;
   pitch?: number;
@@ -43,19 +46,23 @@ export const VOICES: Voice[] = [
     label: 'Daniel',
     description: 'Calm British baritone',
     kind: 'device',
+    gender: 'male',
     lang: 'en-GB',
     ios: ['com.apple.voice.compact.en-GB.Daniel', 'com.apple.ttsbundle.Daniel-compact'],
-    pitch: 0.92,
-    rate: 1,
+    nameHints: ['Daniel', 'Arthur', 'George', 'UK English Male', 'Google UK English Male'],
+    pitch: 0.82,
+    rate: 0.98,
   },
   {
     id: 'aaron',
     label: 'Aaron',
     description: 'Steady American narrator',
     kind: 'device',
+    gender: 'male',
     lang: 'en-US',
-    ios: ['com.apple.voice.compact.en-US.Aaron'],
-    pitch: 1,
+    ios: ['com.apple.voice.compact.en-US.Aaron', 'com.apple.ttsbundle.Alex-compact'],
+    nameHints: ['Aaron', 'Alex', 'Fred', 'David', 'Eric', 'Guy', 'US English Male'],
+    pitch: 0.9,
     rate: 1,
   },
   {
@@ -63,13 +70,15 @@ export const VOICES: Voice[] = [
     label: 'Grace',
     description: 'Warm American voice',
     kind: 'device',
+    gender: 'female',
     lang: 'en-US',
     ios: [
       'com.apple.voice.enhanced.en-US.Ava',
       'com.apple.ttsbundle.Samantha-compact',
       'com.apple.voice.compact.en-US.Samantha',
     ],
-    pitch: 1.0,
+    nameHints: ['Samantha', 'Ava', 'Victoria', 'Jenny', 'Aria', 'Zira', 'US English Female', 'Google US English'],
+    pitch: 1.08,
     rate: 1.0,
   },
   {
@@ -77,14 +86,16 @@ export const VOICES: Voice[] = [
     label: 'Ruth',
     description: 'Gentle British voice',
     kind: 'device',
+    gender: 'female',
     lang: 'en-GB',
     ios: [
       'com.apple.voice.compact.en-GB.Serena',
       'com.apple.ttsbundle.Serena-compact',
       'com.apple.voice.compact.en-GB.Martha',
     ],
-    pitch: 1.02,
-    rate: 0.98,
+    nameHints: ['Serena', 'Kate', 'Martha', 'Hazel', 'Sonia', 'Stephanie', 'UK English Female', 'Google UK English Female'],
+    pitch: 1.14,
+    rate: 0.97,
   },
 ];
 
@@ -133,6 +144,18 @@ export function useSelectedVoiceId(): string {
  * undefined for the studio voice or when nothing suitable is installed (in
  * which case the system default is used, still shaped by pitch/rate).
  */
+const FEMALE_NAME = /(female|samantha|victoria|karen|moira|tessa|fiona|serena|kate|martha|zira|susan|hazel|sonia|ava|allison|nicky|joana|catherine|amelie|anna|ellen|zuzana|paulina|milena|alva|amira|google us english|google uk english female)/i;
+const MALE_NAME = /(\bmale\b|daniel|alex|fred|david|aaron|arthur|george|oliver|thomas|gordon|lee|rishi|eric|guy|reed|rocko|junior|uk english male)/i;
+
+/**
+ * Resolve the actual voice identifier to hand expo-speech.
+ *
+ * On iOS we match the exact system voice ids. On the web (where those ids don't
+ * exist) we match the browser's voice list by NAME keywords and, failing that,
+ * by gender — so a "male" voice actually gets a male browser voice instead of
+ * everything collapsing to the same default. Returns undefined only when
+ * nothing suitable exists (system default is used, still shaped by pitch/rate).
+ */
 export async function resolveVoiceIdentifier(
   Speech: typeof import('expo-speech'),
   voice: Voice,
@@ -141,10 +164,38 @@ export async function resolveVoiceIdentifier(
   try {
     const available = await Speech.getAvailableVoicesAsync();
     const ids = new Set(available.map((v) => v.identifier));
+
+    // 1. Exact iOS identifier.
     for (const cand of voice.ios ?? []) {
       if (ids.has(cand)) return cand;
     }
+
     const prefix = (voice.lang ?? 'en').slice(0, 2);
+    const nameOf = (v: { name?: string; identifier: string }) =>
+      (v.name ?? v.identifier ?? '').toLowerCase();
+
+    // 2. Match by name keyword (works well for browser voices on Mac/desktop).
+    const hints = (voice.nameHints ?? []).map((h) => h.toLowerCase());
+    if (hints.length) {
+      const byName =
+        available.find(
+          (v) => (v.language ?? '').startsWith(prefix) && hints.some((h) => nameOf(v).includes(h)),
+        ) ?? available.find((v) => hints.some((h) => nameOf(v).includes(h)));
+      if (byName) return byName.identifier;
+    }
+
+    // 3. Match by gender within the language, then any language.
+    if (voice.gender) {
+      const want = voice.gender === 'male' ? MALE_NAME : FEMALE_NAME;
+      const avoid = voice.gender === 'male' ? FEMALE_NAME : MALE_NAME;
+      const genderMatch =
+        available.find(
+          (v) => (v.language ?? '').startsWith(prefix) && want.test(nameOf(v)) && !avoid.test(nameOf(v)),
+        ) ?? available.find((v) => want.test(nameOf(v)) && !avoid.test(nameOf(v)));
+      if (genderMatch) return genderMatch.identifier;
+    }
+
+    // 4. Any voice in the language.
     const langMatch = available.find((v) => (v.language ?? '').startsWith(prefix));
     return langMatch?.identifier;
   } catch {
