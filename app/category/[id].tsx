@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, FlatList, StyleSheet, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { CATEGORIES, CategoryId } from '../../src/content/types';
 import { getLiturgiesByCategory } from '../../src/content/liturgies';
@@ -18,19 +18,16 @@ export default function CategoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const category = CATEGORIES.find((c) => c.id === id);
   const liturgies = id ? getLiturgiesByCategory(id) : [];
-  const { isPremium } = useEntitlement();
-  const locked = !isPremium;
+  const { mustSubscribe } = useEntitlement();
   const [query, setQuery] = useState('');
   const searching = query.trim().length >= 2;
 
   const open = (lid: string) => {
     Keyboard.dismiss();
-    if (locked) {
-      router.push('/paywall');
-      return;
-    }
     router.push(`/liturgy/${lid}`);
   };
+
+  if (mustSubscribe) return <Redirect href="/paywall" />;
 
   if (!category) {
     return (
@@ -71,7 +68,7 @@ export default function CategoryScreen() {
       </View>
 
       {searching ? (
-        <SearchResults query={query} onOpen={open} onSuggest={setQuery} locked={locked} />
+        <SearchResults query={query} onOpen={open} onSuggest={setQuery} />
       ) : (
         <FlatList
           data={liturgies}
@@ -88,7 +85,7 @@ export default function CategoryScreen() {
             </Text>
           }
           renderItem={({ item }) => (
-            <LiturgyCard liturgy={item} onPress={() => open(item.id)} locked={locked} />
+            <LiturgyCard liturgy={item} onPress={() => open(item.id)} />
           )}
         />
       )}

@@ -42,14 +42,20 @@ const BENEFITS: { icon: keyof typeof Ionicons.glyphMap; title: string; sub: stri
 export default function Paywall() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { packages, purchase, restore, configured } = useEntitlement();
+  const { packages, purchase, restore, configured, mustSubscribe } = useEntitlement();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [chosen, setChosen] = useState(0);
 
-  const primary = packages[0];
+  const primary = packages[Math.min(chosen, Math.max(0, packages.length - 1))];
   const priceLabel = primary ? primary.product.priceString : '';
+  const trial = primary?.product.trialLabel;
 
-  const close = () => router.back();
+  // When the subscription IS the front door there is nowhere to go "back" to.
+  const done = () => {
+    if (mustSubscribe || !router.canGoBack()) router.replace('/');
+    else router.back();
+  };
 
   const onSubscribe = async () => {
     if (!primary) {
@@ -60,7 +66,7 @@ export default function Paywall() {
     setMessage(null);
     const ok = await purchase(primary);
     setBusy(false);
-    if (ok) close();
+    if (ok) done();
     else setMessage('That didn’t go through. No charge was made.');
   };
 
@@ -69,7 +75,7 @@ export default function Paywall() {
     setMessage(null);
     const ok = await restore();
     setBusy(false);
-    if (ok) close();
+    if (ok) done();
     else setMessage('No previous purchase found on this account.');
   };
 
@@ -87,21 +93,24 @@ export default function Paywall() {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <Pressable
-          onPress={close}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel="Close"
-          style={({ pressed }) => [styles.close, pressed && { opacity: 0.6 }]}
-        >
-          <Ionicons name="close" size={26} color="rgba(255,255,255,0.7)" />
-        </Pressable>
+        {!mustSubscribe && (
+          <Pressable
+            onPress={done}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+            style={({ pressed }) => [styles.close, pressed && { opacity: 0.6 }]}
+          >
+            <Ionicons name="close" size={26} color="rgba(255,255,255,0.7)" />
+          </Pressable>
+        )}
 
         <Text style={styles.kicker}>FOUNDED · FULL ACCESS</Text>
         <Text style={styles.title}>Every liturgy,{'\n'}for every moment of the work.</Text>
         <Text style={styles.lede}>
-          The daily devotional is always free. Unlock the full library and audio
-          for the days that need more.
+          {trial
+            ? `Start free — ${trial}. Then one simple plan for everything: the daily devotional, the full library, and audio.`
+            : 'One simple plan for everything: the daily devotional, the full library, and audio.'}
         </Text>
 
         <View style={styles.benefits}>
@@ -118,6 +127,33 @@ export default function Paywall() {
           ))}
         </View>
 
+        {packages.length > 1 && (
+          <View style={styles.plans}>
+            {packages.map((p, i) => {
+              const active = i === chosen;
+              return (
+                <Pressable
+                  key={p.identifier}
+                  onPress={() => setChosen(i)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Choose ${p.product.title}`}
+                  style={[styles.plan, active && styles.planActive]}
+                >
+                  <Text style={[styles.planTitle, active && styles.planTitleActive]}>
+                    {p.product.title}
+                  </Text>
+                  <Text style={[styles.planPrice, active && styles.planTitleActive]}>
+                    {p.product.priceString}
+                  </Text>
+                  {p.product.trialLabel && (
+                    <Text style={styles.planTrial}>{p.product.trialLabel}</Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
         {message && <Text style={styles.message}>{message}</Text>}
       </ScrollView>
 
@@ -132,7 +168,11 @@ export default function Paywall() {
             <ActivityIndicator color={colors.ink} />
           ) : (
             <Text style={styles.ctaText}>
-              {priceLabel ? `Subscribe · ${priceLabel}` : 'Subscribe'}
+              {trial
+                ? `Start free trial · then ${priceLabel}`
+                : priceLabel
+                  ? `Subscribe · ${priceLabel}`
+                  : 'Subscribe'}
             </Text>
           )}
         </Pressable>
@@ -232,6 +272,36 @@ const styles = StyleSheet.create({
     color: colors.accentSoft,
     marginTop: spacing.lg,
     textAlign: 'center',
+  },
+  plans: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xl },
+  plan: {
+    flex: 1,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.18)',
+    padding: spacing.md,
+  },
+  planActive: {
+    borderColor: colors.accentSoft,
+    backgroundColor: 'rgba(201,167,126,0.10)',
+  },
+  planTitle: {
+    fontFamily: fonts.sansSemibold,
+    fontSize: 14,
+    color: 'rgba(251,250,247,0.75)',
+  },
+  planPrice: {
+    fontFamily: fonts.sansBold,
+    fontSize: 17,
+    color: 'rgba(251,250,247,0.75)',
+    marginTop: 2,
+  },
+  planTitleActive: { color: '#FBFAF7' },
+  planTrial: {
+    ...type.caption,
+    fontSize: 12,
+    color: colors.accentSoft,
+    marginTop: 4,
   },
   footer: {
     position: 'absolute',

@@ -100,15 +100,27 @@ export function useProgress() {
 }
 
 /**
- * Invisible bridge: watches the audio player and marks a reading as "listened"
- * the moment it starts playing. Rendered once, inside both the Audio and
- * Progress providers. markListened is idempotent, so repeated plays are cheap.
+ * Invisible bridge: watches the audio player and marks a reading as
+ * "listened" only once playback actually reaches the end (>= 95%, so the
+ * closing breath doesn't have to fully run out). Rendered once, inside both
+ * the Audio and Progress providers. markListened is idempotent.
+ *
+ * Device-speech fallback exposes no playback position, so those (rare) plays
+ * still count from the start — better than never counting at all.
  */
 export function ListenTracker() {
   const audio = useAudio();
   const { markListened } = useProgress();
+
+  const finished =
+    audio.currentId != null &&
+    audio.durationMillis > 0 &&
+    audio.positionMillis >= audio.durationMillis * 0.95;
+  const speechPlay =
+    audio.currentId != null && audio.isPlaying && audio.mode === 'speech';
+
   useEffect(() => {
-    if (audio.isPlaying && audio.currentId) markListened(audio.currentId);
-  }, [audio.isPlaying, audio.currentId, markListened]);
+    if ((finished || speechPlay) && audio.currentId) markListened(audio.currentId);
+  }, [finished, speechPlay, audio.currentId, markListened]);
   return null;
 }

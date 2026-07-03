@@ -10,6 +10,8 @@ import {
   Modal,
   TextInput,
   Keyboard,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -86,7 +88,7 @@ export default function LiturgyScreen() {
   const audio = useAudio();
   const { id } = useLocalSearchParams<{ id: string }>();
   const reading = id ? getReadingById(id) : undefined;
-  const { isPremium } = useEntitlement();
+  const { mustSubscribe } = useEntitlement();
   const { markRead } = useProgress();
   const { addSaved, addPrayer } = usePersonal();
   const [fontStep, setFontStep] = useState(1);
@@ -99,16 +101,21 @@ export default function LiturgyScreen() {
     setTimeout(() => setToast(null), 1900);
   };
 
-  // Mark this reading as read once it's open (and allowed to be shown).
+  // "Read" is earned, not granted on open: it's marked only when the reader
+  // scrolls to the bottom of the page. (Finishing the audio marks "listened"
+  // separately — see ListenTracker.)
   const readingId = reading?.id;
-  const canMark = !!reading && (reading.kind === 'devotional' || isPremium);
-  useEffect(() => {
-    if (readingId && canMark) markRead(readingId);
-  }, [readingId, canMark, markRead]);
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (!readingId) return;
+    const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
+    if (contentOffset.y + layoutMeasurement.height >= contentSize.height - 80) {
+      markRead(readingId);
+    }
+  };
 
-  // Safety net for deep links: a premium reading opened while locked
-  // (e.g. a shared URL) bounces to the paywall instead of the reader.
-  const gated = !!reading && reading.kind !== 'devotional' && !isPremium;
+  // Safety net for deep links: with no active subscription (and billing live),
+  // a shared URL bounces to the paywall instead of the reader.
+  const gated = mustSubscribe;
   useEffect(() => {
     if (gated) router.replace('/paywall');
   }, [gated, router]);
@@ -165,6 +172,8 @@ export default function LiturgyScreen() {
       <ScrollView
         contentContainerStyle={{ paddingBottom: 200 }}
         showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={250}
       >
         {/* Hero image with the title on top */}
         <ImageBackground

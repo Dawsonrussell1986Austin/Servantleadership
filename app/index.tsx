@@ -8,7 +8,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { getDailyDevotional } from '../src/content/devotionals';
@@ -48,9 +48,8 @@ const SUGGESTIONS = ['Angry client', 'Can’t make payroll', 'Closing a deal', '
 export default function Home() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { isPremium } = useEntitlement();
+  const { mustSubscribe } = useEntitlement();
   const { resurfacedPrayer } = usePersonal();
-  const locked = !isPremium;
   const now = new Date();
   const devotional = getDailyDevotional(now);
   const resurface = resurfacedPrayer();
@@ -71,16 +70,14 @@ export default function Home() {
     [],
   );
 
-  // The daily devotional is always free; the library is premium. Tapping a
-  // locked reading opens the paywall instead of the reader.
-  const open = (id: string, free = false) => {
+  const open = (id: string) => {
     Keyboard.dismiss();
-    if (locked && !free) {
-      router.push('/paywall');
-      return;
-    }
     router.push(`/liturgy/${id}`);
   };
+
+  // Subscription-only app: without an active (or trial) subscription, the
+  // paywall IS the front door.
+  if (mustSubscribe) return <Redirect href="/paywall" />;
 
   return (
     <ScrollView
@@ -153,7 +150,7 @@ export default function Home() {
         </View>
         <View style={styles.hero}>
           <Pressable
-            onPress={() => open(devotional.id, true)}
+            onPress={() => open(devotional.id)}
             accessibilityRole="button"
             accessibilityLabel={`Read today’s devotional: ${devotional.title}`}
             style={({ pressed }) => [styles.heroTop, pressed && { opacity: 0.85 }]}
@@ -185,23 +182,6 @@ export default function Home() {
           A liturgy for the moment you’re in — search it, or browse the shelves.
         </Text>
 
-        {locked && (
-          <Pressable
-            onPress={() => router.push('/paywall')}
-            accessibilityRole="button"
-            accessibilityLabel="Unlock the full library"
-            style={({ pressed }) => [styles.unlockBanner, pressed && { opacity: 0.9 }]}
-          >
-            <View style={styles.unlockIcon}>
-              <Ionicons name="lock-open-outline" size={16} color={colors.paper} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.unlockTitle}>Unlock the full library</Text>
-              <Text style={styles.unlockSub}>Every liturgy and audio narration.</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.inkFaint} />
-          </Pressable>
-        )}
 
         <SearchBar value={query} onChangeText={setQuery} />
 
@@ -213,7 +193,7 @@ export default function Home() {
                   {results.length} {results.length === 1 ? 'liturgy' : 'liturgies'} for “{query.trim()}”
                 </Text>
                 {results.map((r) => (
-                  <LiturgyCard key={r.liturgy.id} liturgy={r.liturgy} onPress={() => open(r.liturgy.id)} locked={locked} />
+                  <LiturgyCard key={r.liturgy.id} liturgy={r.liturgy} onPress={() => open(r.liturgy.id)} />
                 ))}
               </>
             ) : (
@@ -275,7 +255,7 @@ export default function Home() {
             ) : (
               <View style={styles.allList}>
                 {allLiturgies.map((l) => (
-                  <LiturgyCard key={l.id} liturgy={l} onPress={() => open(l.id)} locked={locked} />
+                  <LiturgyCard key={l.id} liturgy={l} onPress={() => open(l.id)} />
                 ))}
               </View>
             )}

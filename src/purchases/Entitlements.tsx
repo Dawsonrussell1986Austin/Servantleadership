@@ -28,7 +28,12 @@ export const ENTITLEMENT_ID = 'Founded App Pro';
 
 type PackageLike = {
   identifier: string;
-  product: { priceString: string; title: string };
+  product: {
+    priceString: string;
+    title: string;
+    /** e.g. "7 days free" when the store offers an introductory free trial. */
+    trialLabel?: string;
+  };
 };
 
 type EntitlementState = {
@@ -39,6 +44,12 @@ type EntitlementState = {
   configured: boolean;
   /** Available purchase packages (empty until configured on native). */
   packages: PackageLike[];
+  /**
+   * The whole app is subscription-only (free trial, then full access).
+   * True only when billing is fully working AND the user has no entitlement —
+   * if products can't be fetched, we fail open rather than lock people out.
+   */
+  mustSubscribe: boolean;
   refresh: () => Promise<void>;
   restore: () => Promise<boolean>;
   purchase: (pkg: PackageLike) => Promise<boolean>;
@@ -51,10 +62,21 @@ const EntitlementContext = createContext<EntitlementState>({
   isPremium: true,
   configured: false,
   packages: [],
+  mustSubscribe: false,
   refresh: noop,
   restore: async () => false,
   purchase: async () => false,
 });
+
+/** "7 days free" from a store product's introductory free-trial offer, if any. */
+function trialLabel(product: any): string | undefined {
+  const intro = product?.introPrice;
+  if (!intro || intro.price !== 0) return undefined;
+  const n = intro.periodNumberOfUnits ?? 0;
+  const unit = String(intro.periodUnit ?? '').toLowerCase();
+  if (!n || !unit) return undefined;
+  return `${n} ${unit}${n === 1 ? '' : 's'} free`;
+}
 
 function apiKey(): string | null {
   const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, unknown>;
@@ -97,6 +119,7 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
               product: {
                 priceString: p.product.priceString,
                 title: p.product.title,
+                trialLabel: trialLabel(p.product),
               },
             })),
           );
@@ -151,9 +174,20 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
     [configured],
   );
 
+  const mustSubscribe = ready && configured && !isPremium && packages.length > 0;
+
   const value = useMemo<EntitlementState>(
-    () => ({ ready, isPremium, configured, packages, refresh: loadPurchases, restore, purchase }),
-    [ready, isPremium, configured, packages, loadPurchases, restore, purchase],
+    () => ({
+      ready,
+      isPremium,
+      configured,
+      packages,
+      mustSubscribe,
+      refresh: loadPurchases,
+      restore,
+      purchase,
+    }),
+    [ready, isPremium, configured, packages, mustSubscribe, loadPurchases, restore, purchase],
   );
 
   return (
