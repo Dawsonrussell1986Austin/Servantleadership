@@ -56,16 +56,21 @@ export default function PlayerBar({
       <Pressable
         onPress={onTrackPress}
         style={styles.track}
+        hitSlop={{ top: 8, bottom: 8 }}
         onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
       >
-        <View style={styles.trackBg} />
+        {/* Decorations must not intercept touches — otherwise a tap near the
+            thumb reports coordinates relative to the thumb and seeks to ~0. */}
+        <View pointerEvents="none" style={styles.trackBg} />
         <LinearGradient
+          pointerEvents="none"
           colors={SCRUB_COLORS}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={[styles.trackFill, { width: `${Math.max(0, Math.min(1, fraction)) * 100}%` }]}
         />
         <View
+          pointerEvents="none"
           style={[
             styles.thumb,
             { left: Math.max(0, Math.min(trackWidth - 14, fraction * trackWidth - 7)) },
