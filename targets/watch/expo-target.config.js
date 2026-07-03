@@ -2,6 +2,7 @@
 module.exports = {
   type: 'watch',
   name: 'FoundedWatch',
+  icon: '../../assets/icon.png',
   bundleIdentifier: 'com.servantleadership.liturgies.watchkitapp',
   deploymentTarget: '10.0',
   colors: {
