@@ -33,7 +33,8 @@ export default function Saved() {
           <Ionicons name="bookmark-outline" size={30} color={colors.inkFaint} />
           <Text style={styles.emptyTitle}>Nothing saved yet.</Text>
           <Text style={styles.emptyBody}>
-            While reading, press and hold any line to keep it here.
+            While reading, tap a word and then the end of a line to highlight
+            it — then Save to keep it here.
           </Text>
         </View>
       ) : (

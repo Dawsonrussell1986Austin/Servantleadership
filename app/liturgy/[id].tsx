@@ -28,7 +28,11 @@ import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { coverFor } from '../../src/content/covers';
 import { lengthLabel } from '../../src/content/lengths';
 import { categoryColor } from '../../src/theme/categories';
-import LiturgyView, { splitSentences } from '../../src/components/LiturgyView';
+import LiturgyView, {
+  splitSentences,
+  nextHighlight,
+  type Highlight,
+} from '../../src/components/LiturgyView';
 import FadeInUp from '../../src/components/FadeInUp';
 import PlayerBar from '../../src/components/PlayerBar';
 import { useAudio } from '../../src/audio/AudioProvider';
@@ -97,6 +101,9 @@ export default function LiturgyScreen() {
   const [toast, setToast] = useState<string | null>(null);
   const [prayerOpen, setPrayerOpen] = useState(false);
   const [prayerText, setPrayerText] = useState('');
+  // Tap-to-highlight: which words the reader has selected, to save a specific
+  // line to "Words That Held Me" instead of the whole section.
+  const [highlight, setHighlight] = useState<Highlight | null>(null);
 
   const flash = (m: string) => {
     setToast(m);
@@ -212,9 +219,22 @@ export default function LiturgyScreen() {
         reference: scripture?.reference ?? '',
       },
     });
-  const saveLine = (text: string, reference?: string) => {
-    addSaved({ readingId: reading.id, readingTitle: reading.title, text, reference });
-    flash('Saved to your collection');
+  const onWordPress = (section: number, word: { start: number; end: number }) =>
+    setHighlight((prev) => nextHighlight(prev, section, word));
+  const highlightText = highlight
+    ? (reading.sections[highlight.section]?.body.slice(highlight.start, highlight.end) ?? '').trim()
+    : '';
+  const saveHighlight = () => {
+    if (!highlight || !highlightText) return;
+    const section = reading.sections[highlight.section];
+    addSaved({
+      readingId: reading.id,
+      readingTitle: reading.title,
+      text: highlightText,
+      reference: section?.type === 'scripture' ? section.reference : undefined,
+    });
+    setHighlight(null);
+    flash('Saved to Words That Held Me');
   };
   const savePrayer = () => {
     const t = prayerText.trim();
@@ -287,13 +307,17 @@ export default function LiturgyScreen() {
         <FadeInUp>
           <View style={styles.body}>
             <View style={[styles.accentRule, { backgroundColor: accent }]} />
+            <Text style={styles.highlightHint}>
+              Tap a word, then the last word of a line, to highlight and save it.
+            </Text>
             <LiturgyView
               liturgy={reading}
               fontScale={fontStep}
               showHeader={false}
-              onSaveLine={saveLine}
               activeIndex={activeIndex}
               activeSentence={activeSentence}
+              highlight={highlight}
+              onWordPress={onWordPress}
               onSectionLayout={(i, y) => {
                 sectionYs.current[i] = y;
               }}
@@ -358,8 +382,31 @@ export default function LiturgyScreen() {
         </View>
       </View>
 
-      {/* Pinned player */}
+      {/* Pinned player, with the highlight save bar stacked above it */}
       <View style={[styles.player, { paddingBottom: insets.bottom + spacing.md }]}>
+        {highlight && highlightText !== '' && (
+          <View style={styles.saveBar}>
+            <Text style={styles.savePreview} numberOfLines={2}>
+              “{highlightText}”
+            </Text>
+            <View style={styles.saveActions}>
+              <Pressable
+                onPress={() => setHighlight(null)}
+                hitSlop={8}
+                style={({ pressed }) => [styles.saveClear, pressed && { opacity: 0.6 }]}
+              >
+                <Ionicons name="close" size={20} color={colors.inkSoft} />
+              </Pressable>
+              <Pressable
+                onPress={saveHighlight}
+                style={({ pressed }) => [styles.saveBtn, pressed && { opacity: 0.9 }]}
+              >
+                <Ionicons name="bookmark" size={16} color={colors.white} />
+                <Text style={styles.saveBtnText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
         <PlayerBar readingId={reading.id} />
       </View>
 
@@ -547,6 +594,45 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.sm,
   },
+  highlightHint: {
+    ...type.caption,
+    fontSize: 12,
+    color: colors.inkFaint,
+    fontStyle: 'italic',
+    marginBottom: spacing.lg,
+  },
+  saveBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingBottom: spacing.md,
+    marginBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  savePreview: {
+    ...type.body,
+    flex: 1,
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: colors.inkSoft,
+  },
+  saveActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  saveClear: { padding: 2 },
+  saveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.accent,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+  },
+  saveBtnText: { fontFamily: fonts.sansBold, fontSize: 14, color: colors.white },
   actionRow: {
     flexDirection: 'row',
     gap: spacing.md,
