@@ -17,7 +17,7 @@ private enum Brand {
 // shared storage, no network. The rotation is deterministic by day, so the same
 // day always shows the same line.
 
-private struct DailyLine {
+struct DailyLine {
     let text: String
     let reference: String
 }
