@@ -11,6 +11,11 @@ import { getReadingById } from '../content';
 import { buildSpeechText } from '../content/narration';
 import { getSelectedVoice, loadSelectedVoice } from './voices';
 import { narrationUrl } from './audioUrl';
+import {
+  getBackgroundSound,
+  loadBackgroundSound,
+  BACKGROUND_VOLUME,
+} from './background';
 
 // expo-av's types — kept loose so we can dynamically import it (and keep it out
 // of the web static-render pass entirely).
@@ -315,7 +320,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         const { Audio } = await getAudio();
         const { sound } = await Audio.Sound.createAsync(
           { uri: url },
-          { shouldPlay: true },
+          // Explicit progress interval: without it some platforms deliver
+          // position updates too rarely for the scrubber to visibly move.
+          { shouldPlay: true, progressUpdateIntervalMillis: 250 },
           onStatus as never,
         );
         soundRef.current = sound as unknown as Sound;
@@ -363,12 +370,76 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     setState(initialState);
   }, [stopAll]);
 
+  // ---- ambient bed (optional, under the narration) ----
+  // Driven by observing playback state, so every path — file, speech, pause,
+  // finish, stop — keeps the bed in sync without touching each code path.
+  const bgRef = useRef<any>(null);
+  const bgSlugRef = useRef<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const want = state.isPlaying ? getBackgroundSound().slug : null;
+      if (!want) {
+        const bg = bgRef.current;
+        if (!bg) return;
+        if (state.currentId) {
+          // Narration paused — hold the bed (resumes at the same spot).
+          try {
+            await bg.pauseAsync();
+          } catch {}
+        } else {
+          bgRef.current = null;
+          bgSlugRef.current = null;
+          try {
+            await bg.unloadAsync();
+          } catch {}
+        }
+        return;
+      }
+      if (bgRef.current && bgSlugRef.current === want) {
+        try {
+          await bgRef.current.playAsync();
+        } catch {}
+        return;
+      }
+      const old = bgRef.current;
+      bgRef.current = null;
+      if (old) {
+        try {
+          await old.unloadAsync();
+        } catch {}
+      }
+      try {
+        const { Audio } = await getAudio();
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: audioUrl(want) },
+          { shouldPlay: true, isLooping: true, volume: BACKGROUND_VOLUME },
+        );
+        if (cancelled) {
+          (sound as any).unloadAsync().catch(() => {});
+          return;
+        }
+        bgRef.current = sound;
+        bgSlugRef.current = want;
+      } catch {
+        // the bed is a nicety — narration must never fail because of it
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [state.isPlaying, state.currentId, getAudio]);
+
   useEffect(() => {
     void loadSelectedVoice();
+    void loadBackgroundSound();
     return () => {
       clearTick();
       void unloadFile();
       void stopSpeech();
+      const bg = bgRef.current;
+      bgRef.current = null;
+      if (bg) bg.unloadAsync().catch(() => {});
     };
   }, [clearTick, unloadFile, stopSpeech]);
 

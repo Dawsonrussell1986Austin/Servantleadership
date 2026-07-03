@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ScrollView,
   View,
@@ -115,6 +115,55 @@ export default function LiturgyScreen() {
     }
   };
 
+  // --- Follow the narration: estimate which section is being read from the
+  // audio position (weighted by text length), dim the rest, and scroll along.
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionYs = useRef<Record<number, number>>({});
+  const bodyY = useRef(0);
+  const followPaused = useRef(false); // user grabbed the page — stop steering
+  const sectionStarts = useMemo(() => {
+    if (!reading) return [];
+    const weights = reading.sections.map(
+      (s) => s.body.length + (s.reference?.length ?? 0) + 60, // + inter-section pause
+    );
+    const total = weights.reduce((a, b) => a + b, reading.title.length + 40);
+    let acc = reading.title.length + 40;
+    return weights.map((w) => {
+      const start = acc / total;
+      acc += w;
+      return start;
+    });
+  }, [reading]);
+
+  const isActiveAudio = !!reading && audio.currentId === reading.id;
+  const playingThis = isActiveAudio && audio.isPlaying && audio.mode === 'file';
+  const fraction =
+    isActiveAudio && audio.durationMillis > 0
+      ? audio.positionMillis / audio.durationMillis
+      : 0;
+  let activeIndex: number | null = null;
+  if (playingThis) {
+    activeIndex = 0;
+    for (let i = 0; i < sectionStarts.length; i++) {
+      if (fraction >= sectionStarts[i]) activeIndex = i;
+    }
+  }
+
+  useEffect(() => {
+    if (activeIndex == null || followPaused.current) return;
+    const y = sectionYs.current[activeIndex];
+    if (y == null) return;
+    scrollRef.current?.scrollTo({
+      y: Math.max(0, bodyY.current + y - 140),
+      animated: true,
+    });
+  }, [activeIndex]);
+
+  // Resume steering when playback is toggled anew.
+  useEffect(() => {
+    if (playingThis) followPaused.current = false;
+  }, [playingThis]);
+
   // Safety net for deep links: with no active subscription (and billing live),
   // a shared URL bounces to the paywall instead of the reader.
   const gated = mustSubscribe;
@@ -176,9 +225,13 @@ export default function LiturgyScreen() {
       <StatusBar style="light" />
 
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={{ paddingBottom: 200 }}
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
+        onScrollBeginDrag={() => {
+          followPaused.current = true;
+        }}
         scrollEventThrottle={250}
       >
         {/* Hero image with the title on top */}
@@ -213,13 +266,22 @@ export default function LiturgyScreen() {
 
         {/* Reading */}
         <FadeInUp>
-          <View style={styles.body}>
+          <View
+            style={styles.body}
+            onLayout={(e) => {
+              bodyY.current = e.nativeEvent.layout.y;
+            }}
+          >
             <View style={[styles.accentRule, { backgroundColor: accent }]} />
             <LiturgyView
               liturgy={reading}
               fontScale={fontStep}
               showHeader={false}
               onSaveLine={saveLine}
+              activeIndex={activeIndex}
+              onSectionLayout={(i, y) => {
+                sectionYs.current[i] = y;
+              }}
             />
 
             {/* Actions */}

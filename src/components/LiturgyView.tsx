@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Liturgy, LiturgySection } from '../content/types';
-import { colors, fonts, spacing, type, radius } from '../theme/theme';
+import { colors, spacing, type, radius } from '../theme/theme';
 import { sectionLabel } from '../theme/categories';
 
 type Props = {
@@ -12,6 +12,10 @@ type Props = {
   showHeader?: boolean;
   /** Press-and-hold a line to save it. */
   onSaveLine?: (text: string, reference?: string) => void;
+  /** Index of the section the narration is currently reading (dims the rest). */
+  activeIndex?: number | null;
+  /** Reports each section's y-offset within this view, for follow-scrolling. */
+  onSectionLayout?: (index: number, y: number) => void;
 };
 
 /**
@@ -38,12 +42,10 @@ function Section({
   section,
   accent,
   scale,
-  dropCap,
 }: {
   section: LiturgySection;
   accent: string;
   scale: number;
-  dropCap?: boolean;
 }) {
   const label = section.label ?? sectionLabel[section.type] ?? '';
 
@@ -84,22 +86,9 @@ function Section({
     );
   }
 
-  // call, reflection, prayer
+  // call, reflection, prayer — the drop cap was retired: its oversized line
+  // box made the opening paragraph's spacing read wrong on iOS.
   const bodyStyle = { fontSize: 19 * scale, lineHeight: 31 * scale };
-  if (dropCap && section.body.length > 1) {
-    const first = section.body.charAt(0);
-    const rest = section.body.slice(1);
-    return (
-      <View style={styles.block}>
-        <Text style={[styles.eyebrow, { color: accent }]}>{label.toUpperCase()}</Text>
-        <Text style={[styles.body, bodyStyle]}>
-          <Text style={[styles.dropCap, { color: accent }]}>{first}</Text>
-          {rest}
-        </Text>
-      </View>
-    );
-  }
-
   const paras = toParagraphs(section.body);
   return (
     <View style={styles.block}>
@@ -121,8 +110,11 @@ export default function LiturgyView({
   fontScale = 1,
   showHeader = true,
   onSaveLine,
+  activeIndex = null,
+  onSectionLayout,
 }: Props) {
   const accent = colors.accent;
+  const following = activeIndex != null;
   return (
     <View>
       {showHeader && (
@@ -141,8 +133,14 @@ export default function LiturgyView({
           key={`${liturgy.id}-${i}`}
           onLongPress={onSaveLine ? () => onSaveLine(s.body, s.reference) : undefined}
           delayLongPress={300}
+          onLayout={
+            onSectionLayout
+              ? (e) => onSectionLayout(i, e.nativeEvent.layout.y)
+              : undefined
+          }
+          style={following && i !== activeIndex ? styles.dimmed : undefined}
         >
-          <Section section={s} accent={accent} scale={fontScale} dropCap={i === 0} />
+          <Section section={s} accent={accent} scale={fontScale} />
         </Pressable>
       ))}
     </View>
@@ -180,16 +178,12 @@ const styles = StyleSheet.create({
   paragraph: {
     marginBottom: spacing.md,
   },
+  dimmed: {
+    opacity: 0.4,
+  },
   body: {
     ...type.body,
     color: colors.ink,
-  },
-  dropCap: {
-    // Must carry its own lineHeight >= fontSize or iOS clips the glyph's top
-    // (the parent paragraph's 31px line box wins otherwise).
-    fontFamily: fonts.displayExtra,
-    fontSize: 44,
-    lineHeight: 46,
   },
   scriptureBlock: {
     borderLeftWidth: 3,

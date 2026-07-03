@@ -27,6 +27,11 @@ import AppleSignInButton from '../src/components/AppleSignInButton';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import { VOICES, useSelectedVoiceId, setSelectedVoice, type Voice } from '../src/audio/voices';
 import { previewUrl } from '../src/audio/audioUrl';
+import {
+  BACKGROUND_SOUNDS,
+  setBackgroundSound,
+  useBackgroundSoundId,
+} from '../src/audio/background';
 
 const PRESET_TIMES: { label: string; hour: number; minute: number }[] = [
   { label: 'Early · 6:00 AM', hour: 6, minute: 0 },
@@ -43,6 +48,7 @@ export default function Settings() {
 
   const { isPremium, configured } = useEntitlement();
   const voiceId = useSelectedVoiceId();
+  const bgId = useBackgroundSoundId();
   const [prefs, setPrefs] = useState<ReminderPrefs>(DEFAULT_PREFS);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -332,6 +338,39 @@ export default function Settings() {
         <Text style={styles.caption}>
           Every voice is a real studio-quality narrator. Tap one to hear a
           sample.
+        </Text>
+
+        <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>BACKGROUND SOUND</Text>
+        <View style={styles.card}>
+          {BACKGROUND_SOUNDS.map((b, i) => {
+            const active = bgId === b.id;
+            return (
+              <Pressable
+                key={b.id}
+                onPress={() => setBackgroundSound(b.id)}
+                style={({ pressed }) => [
+                  styles.voiceRow,
+                  i > 0 && styles.timeRowBorder,
+                  pressed && { opacity: 0.7 },
+                ]}
+              >
+                <View style={{ flex: 1, paddingRight: spacing.sm }}>
+                  <Text style={[styles.voiceLabel, active && styles.timeLabelActive]}>
+                    {b.label}
+                  </Text>
+                </View>
+                <Ionicons
+                  name={active ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={22}
+                  color={active ? colors.ink : colors.inkFaint}
+                />
+              </Pressable>
+            );
+          })}
+        </View>
+        <Text style={styles.caption}>
+          A quiet musical bed under the narration — like a companion in the
+          room, never louder than the voice.
         </Text>
 
         <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>MEMBERSHIP</Text>

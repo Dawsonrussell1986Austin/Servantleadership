@@ -21,6 +21,7 @@ import CategoryTile from '../src/components/CategoryTile';
 import PlayerBar from '../src/components/PlayerBar';
 import FadeInUp from '../src/components/FadeInUp';
 import SearchBar from '../src/components/SearchBar';
+import WelcomeEmail from '../src/components/WelcomeEmail';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import { usePersonal } from '../src/lib/personal';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
@@ -90,6 +91,8 @@ export default function Home() {
         paddingBottom: insets.bottom + spacing.xxl,
       }}
     >
+      <WelcomeEmail />
+
       {/* Greeting */}
       <FadeInUp>
         <View style={styles.topRow}>
