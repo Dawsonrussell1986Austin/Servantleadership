@@ -33,7 +33,12 @@ export default function CategoryTile({
           style={styles.tileOverlay}
         >
           <Text style={styles.tileCount}>{count} DEVOTIONALS</Text>
-          <Text style={styles.tileLabel} numberOfLines={3}>
+          <Text
+            style={styles.tileLabel}
+            numberOfLines={3}
+            adjustsFontSizeToFit
+            minimumFontScale={0.72}
+          >
             {category.label}
           </Text>
         </LinearGradient>
