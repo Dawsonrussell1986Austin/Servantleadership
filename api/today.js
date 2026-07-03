@@ -4,6 +4,8 @@
  * Same schedule logic as the daily email cron.
  */
 const DATA = require('./_email.json');
+// Full text of every scheduled devotional (generated: scripts/gen-api-today.ts).
+const FULL = require('./_today.json');
 
 function dayOfYear(date) {
   const start = Date.UTC(date.getUTCFullYear(), 0, 0);
@@ -39,6 +41,9 @@ module.exports = function handler(req, res) {
             verse: reading.verse,
             prayer: reading.prayer || '',
             benediction: reading.benediction || '',
+            minutes: (FULL.content[id] || {}).minutes || 0,
+            // The complete reading, section by section (the watch shows it all).
+            sections: (FULL.content[id] || {}).sections || [],
           }
         : { error: 'no_reading', id },
     ),

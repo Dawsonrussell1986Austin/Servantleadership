@@ -1,12 +1,19 @@
 import SwiftUI
-import AVFoundation
 
-// Founded for Apple Watch — today's devotional, whole and listenable.
+// Founded for Apple Watch — the complete daily devotional at a glance.
 //
-// Fetches the day's reading from the app's own API and shows every part of it
-// (verse, prayer, benediction) in one scroll. A play button streams the same
-// narration the phone app uses. If the network is away, falls back to a
-// bundled verse chosen deterministically by date, so the watch is never empty.
+// Fetches the day's reading from the app's own API and renders every section
+// (call, scripture, reflection, prayer, response, benediction) in one scroll.
+// Listening happens on the phone, where the audio experience is good — the
+// watch just points there. If the network is away, falls back to a bundled
+// verse chosen deterministically by date, so the watch is never empty.
+
+struct TodaySection: Decodable {
+    let type: String
+    let label: String?
+    let body: String
+    let reference: String?
+}
 
 struct Today: Decodable {
     let id: String
@@ -16,6 +23,7 @@ struct Today: Decodable {
     let verse: String
     let prayer: String?
     let benediction: String?
+    let sections: [TodaySection]?
 }
 
 struct FallbackLine {
@@ -38,6 +46,20 @@ private func fallbackFor(_ date: Date) -> FallbackLine {
     return FALLBACKS[day % FALLBACKS.count]
 }
 
+// Same section headings the phone app uses.
+private func headingFor(_ section: TodaySection) -> String {
+    if let label = section.label, !label.isEmpty { return label.uppercased() }
+    switch section.type {
+    case "call": return "BE STILL"
+    case "scripture": return "THE WORD"
+    case "reflection": return "REFLECTION"
+    case "prayer": return "LET’S PRAY"
+    case "response": return "PRAY THIS BACK"
+    case "benediction": return "GO IN PEACE"
+    default: return section.type.uppercased()
+    }
+}
+
 @MainActor
 final class TodayModel: ObservableObject {
     @Published var today: Today?
@@ -55,44 +77,45 @@ final class TodayModel: ObservableObject {
     }
 }
 
-final class AudioModel: ObservableObject {
-    @Published var playing = false
-    private var player: AVPlayer?
-    private var currentId: String?
-    private var endObserver: NSObjectProtocol?
+struct SectionView: View {
+    let section: TodaySection
 
-    func toggle(id: String) {
-        if playing {
-            player?.pause()
-            playing = false
-            return
-        }
-        if currentId != id || player == nil {
-            guard let url = URL(string: "https://app.foundedapp.com/audio/\(id).mp3") else { return }
-            if let o = endObserver { NotificationCenter.default.removeObserver(o) }
-            let session = AVAudioSession.sharedInstance()
-            try? session.setCategory(.playback, mode: .default)
-            try? session.setActive(true)
-            let p = AVPlayer(url: url)
-            player = p
-            currentId = id
-            endObserver = NotificationCenter.default.addObserver(
-                forName: .AVPlayerItemDidPlayToEndTime,
-                object: p.currentItem,
-                queue: .main
-            ) { [weak self] _ in
-                self?.playing = false
-                self?.player?.seek(to: .zero)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(headingFor(section))
+                .font(.system(size: 10, weight: .bold))
+                .kerning(1.1)
+                .foregroundStyle(section.type == "scripture" ? Color.accentColor : Color.secondary)
+                .padding(.top, 10)
+
+            switch section.type {
+            case "scripture":
+                Text("“\(section.body)”")
+                    .font(.system(.body, design: .serif))
+                if let ref = section.reference, !ref.isEmpty {
+                    Text("— \(ref)")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color.accentColor)
+                }
+            case "response":
+                Text(section.body)
+                    .font(.system(.body, design: .serif))
+                    .fontWeight(.semibold)
+            case "benediction":
+                Text(section.body)
+                    .font(.system(.body, design: .serif))
+                    .italic()
+                    .foregroundStyle(.secondary)
+            default:
+                Text(section.body)
+                    .font(.system(.body, design: .serif))
             }
         }
-        player?.play()
-        playing = true
     }
 }
 
 struct ContentView: View {
     @StateObject private var model = TodayModel()
-    @StateObject private var audio = AudioModel()
 
     var body: some View {
         ScrollView {
@@ -110,36 +133,43 @@ struct ContentView: View {
                         .italic()
                         .foregroundStyle(.secondary)
 
-                    Button {
-                        audio.toggle(id: t.id)
-                    } label: {
-                        Label(audio.playing ? "Pause" : "Listen", systemImage: audio.playing ? "pause.fill" : "play.fill")
-                            .font(.system(size: 14, weight: .semibold))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.accentColor)
-                    .padding(.vertical, 4)
-
-                    sectionLabel("SCRIPTURE")
-                    Text("“\(t.verse)”")
-                        .font(.system(.body, design: .serif))
-                    Text(t.ref)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Color.accentColor)
-
-                    if let prayer = t.prayer, !prayer.isEmpty {
-                        sectionLabel("PRAYER")
-                        Text(prayer)
+                    if let sections = t.sections, !sections.isEmpty {
+                        // The complete reading, section by section.
+                        ForEach(sections.indices, id: \.self) { i in
+                            SectionView(section: sections[i])
+                        }
+                    } else {
+                        // Older API without sections — the daily summary.
+                        Divider().padding(.vertical, 2)
+                        Text("“\(t.verse)”")
                             .font(.system(.body, design: .serif))
+                        Text(t.ref)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(Color.accentColor)
+                        if let prayer = t.prayer, !prayer.isEmpty {
+                            Text(prayer)
+                                .font(.system(.body, design: .serif))
+                                .padding(.top, 6)
+                        }
+                        if let benediction = t.benediction, !benediction.isEmpty {
+                            Text(benediction)
+                                .font(.system(.body, design: .serif))
+                                .italic()
+                                .foregroundStyle(.secondary)
+                                .padding(.top, 6)
+                        }
                     }
 
-                    if let benediction = t.benediction, !benediction.isEmpty {
-                        sectionLabel("BENEDICTION")
-                        Text(benediction)
-                            .font(.system(.body, design: .serif))
-                            .italic()
+                    // Listening lives on the phone, where it sounds right.
+                    HStack(spacing: 6) {
+                        Image(systemName: "iphone")
+                            .font(.system(size: 12))
+                        Text("Listen in Founded on your iPhone")
+                            .font(.system(size: 12, weight: .medium))
                     }
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 14)
                 } else if model.loading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -156,14 +186,6 @@ struct ContentView: View {
             .padding(.horizontal, 4)
         }
         .task { await model.load() }
-    }
-
-    private func sectionLabel(_ title: String) -> some View {
-        Text(title)
-            .font(.system(size: 10, weight: .bold))
-            .kerning(1.1)
-            .foregroundStyle(.secondary)
-            .padding(.top, 8)
     }
 }
 
