@@ -22,6 +22,7 @@ import { AudioProvider } from '../src/audio/AudioProvider';
 import { EntitlementProvider } from '../src/purchases/Entitlements';
 import { ProgressProvider, ListenTracker } from '../src/lib/progress';
 import { PersonalProvider } from '../src/lib/personal';
+import { ScheduleProvider } from '../src/lib/scheduleOverrides';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -51,6 +52,7 @@ export default function RootLayout() {
         <AudioProvider>
         <ProgressProvider>
         <PersonalProvider>
+        <ScheduleProvider>
         <StatusBar style="dark" />
         <ListenTracker />
         <Stack
@@ -92,6 +94,7 @@ export default function RootLayout() {
             options={{ presentation: 'card', animation: 'slide_from_right' }}
           />
         </Stack>
+        </ScheduleProvider>
         </PersonalProvider>
         </ProgressProvider>
         </AudioProvider>

@@ -7,10 +7,12 @@ export default function SearchBar({
   value,
   onChangeText,
   placeholder = 'Describe what you’re going through…',
+  onFocus,
 }: {
   value: string;
   onChangeText: (t: string) => void;
   placeholder?: string;
+  onFocus?: () => void;
 }) {
   return (
     <View style={styles.searchBar}>
@@ -24,6 +26,7 @@ export default function SearchBar({
         returnKeyType="search"
         autoCorrect={false}
         autoCapitalize="none"
+        onFocus={onFocus}
       />
       {value.length > 0 && (
         <Pressable

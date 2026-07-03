@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   ScrollView,
   View,
@@ -6,12 +6,15 @@ import {
   Pressable,
   StyleSheet,
   Keyboard,
+  Animated,
+  PanResponder,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Redirect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { getDailyDevotional } from '../src/content/devotionals';
+import { getReadingById } from '../src/content';
+import { useSchedule } from '../src/lib/scheduleOverrides';
 import { LITURGIES, getLiturgiesByCategory } from '../src/content/liturgies';
 import { CATEGORIES } from '../src/content/types';
 import { searchLiturgies } from '../src/content/search';
@@ -51,9 +54,48 @@ export default function Home() {
   const router = useRouter();
   const { mustSubscribe } = useEntitlement();
   const { resurfacedPrayer } = usePersonal();
+  const { resolveId, swapToday } = useSchedule();
   const now = new Date();
-  const devotional = getDailyDevotional(now);
+  const [todayId, setTodayId] = useState<string | null>(null);
+  const devotional = getReadingById(todayId ?? resolveId(now)) ?? getReadingById(resolveId(now))!;
   const resurface = resurfacedPrayer();
+
+  // Swipe the card away to trade today's devotional for an upcoming one.
+  const slideX = useRef(new Animated.Value(0)).current;
+  const swapCard = (dir: 1 | -1) => {
+    Animated.timing(slideX, {
+      toValue: dir * 420,
+      duration: 180,
+      useNativeDriver: true,
+    }).start(() => {
+      const nextId = swapToday();
+      setTodayId(nextId);
+      slideX.setValue(dir * -420);
+      Animated.spring(slideX, {
+        toValue: 0,
+        friction: 8,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+  const pan = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_e, g) =>
+        Math.abs(g.dx) > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 1.6,
+      onPanResponderMove: (_e, g) => slideX.setValue(g.dx),
+      onPanResponderRelease: (_e, g) => {
+        if (Math.abs(g.dx) > 90) swapCard(g.dx > 0 ? 1 : -1);
+        else
+          Animated.spring(slideX, {
+            toValue: 0,
+            friction: 7,
+            useNativeDriver: true,
+          }).start();
+      },
+      onPanResponderTerminate: () =>
+        Animated.spring(slideX, { toValue: 0, friction: 7, useNativeDriver: true }).start(),
+    }),
+  ).current;
 
   const [query, setQuery] = useState('');
   const [view, setView] = useState<'shelves' | 'all'>('shelves');
@@ -84,6 +126,7 @@ export default function Home() {
     <ScrollView
       style={styles.screen}
       keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         paddingTop: insets.top + spacing.lg,
@@ -152,6 +195,7 @@ export default function Home() {
           </Pressable>
         </View>
         <View style={styles.hero}>
+          <Animated.View {...pan.panHandlers} style={{ transform: [{ translateX: slideX }] }}>
           <Pressable
             onPress={() => open(devotional.id)}
             accessibilityRole="button"
@@ -172,8 +216,12 @@ export default function Home() {
               </View>
             </View>
           </Pressable>
+          </Animated.View>
           <View style={styles.heroDivider} />
           <PlayerBar readingId={devotional.id} />
+          <Text style={styles.swapHint}>
+            Not the word you need today? Swipe the card for another.
+          </Text>
         </View>
       </FadeInUp>
 
@@ -349,6 +397,13 @@ const styles = StyleSheet.create({
   readRow: { flexDirection: 'row', alignItems: 'center' },
   readLink: { ...type.caption, color: colors.ink, fontWeight: '700', marginRight: 4 },
   heroDivider: { height: 1, backgroundColor: colors.line, marginVertical: spacing.lg },
+  swapHint: {
+    ...type.caption,
+    fontSize: 12,
+    color: colors.inkFaint,
+    textAlign: 'center',
+    marginTop: spacing.md,
+  },
   libIntro: { ...type.caption, color: colors.inkSoft, marginTop: -spacing.sm, marginBottom: spacing.md },
 
   resurface: {

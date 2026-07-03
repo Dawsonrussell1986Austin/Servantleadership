@@ -11,7 +11,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { DEVOTIONALS, scheduledDevotionalId } from '../src/content';
+import { DEVOTIONALS } from '../src/content';
+import { useSchedule } from '../src/lib/scheduleOverrides';
 import { coverFor } from '../src/content/covers';
 import LiturgyCover from '../src/components/LiturgyCover';
 import { useProgress } from '../src/lib/progress';
@@ -28,6 +29,7 @@ function startOfDay(d: Date) {
 }
 
 export default function Devotionals() {
+  const { resolveId } = useSchedule();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { hasRead, hasListened, read, listened } = useProgress();
@@ -51,7 +53,7 @@ export default function Devotionals() {
     let missedN = 0;
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const id = scheduledDevotionalId(date);
+      const id = resolveId(date);
       const d = isDone(id);
       const isToday = date.getTime() === today.getTime();
       const isPast = date.getTime() < today.getTime();
