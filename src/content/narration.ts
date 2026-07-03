@@ -14,6 +14,10 @@ export function buildNarration(reading: Liturgy): string {
   parts.push(LONG_PAUSE);
 
   for (const section of reading.sections) {
+    if (section.type === 'prayer') {
+      // A breath, an invitation, another breath — then the prayer itself.
+      parts.push(`${PAUSE}Let’s pray.${LONG_PAUSE}`);
+    }
     parts.push(section.body);
     if (section.type === 'scripture' && section.reference) {
       parts.push(`${PAUSE}${section.reference}.`);
@@ -32,6 +36,7 @@ export function buildNarration(reading: Liturgy): string {
 export function buildSpeechText(reading: Liturgy): string {
   const parts: string[] = [`${reading.title}.`];
   for (const section of reading.sections) {
+    if (section.type === 'prayer') parts.push('Let’s pray.');
     parts.push(section.body);
     if (section.type === 'scripture' && section.reference) {
       parts.push(`${section.reference}.`);

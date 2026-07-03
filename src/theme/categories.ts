@@ -39,7 +39,7 @@ export const sectionLabel: Record<string, string> = {
   call: 'Be Still',
   scripture: 'The Word',
   reflection: 'Reflection',
-  prayer: 'Prayer',
+  prayer: 'Let\u2019s Pray',
   response: 'Pray This Back',
   benediction: 'Go in Peace',
 };
