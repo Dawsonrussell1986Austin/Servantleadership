@@ -27,15 +27,18 @@ function shortTitle(l: Liturgy): string {
 export default function LiturgyCover({
   liturgy,
   size = 'md',
+  text,
 }: {
   liturgy: Liturgy;
   size?: Size;
+  /** Override the text overlay — pass false for a clean photo (e.g. when the title sits beside the cover). */
+  text?: boolean;
 }) {
   const d = DIMS[size];
   const cat = categoryOf(liturgy.id);
   const source = coverFor(liturgy.id);
   const catLabel = shortCategoryLabel[cat] ?? '';
-  const showText = size !== 'sm';
+  const showText = text ?? size !== 'sm';
 
   return (
     <View style={[styles.shadow, { width: d.w, height: d.h, borderRadius: d.r }]}>
@@ -51,14 +54,16 @@ export default function LiturgyCover({
           style={[styles.overlay, { borderRadius: d.r, padding: d.pad }]}
         >
           <View style={styles.top}>
-            <Ionicons
-              name={ICONS[cat] ?? 'book-outline'}
-              size={size === 'sm' ? 13 : 16}
-              color="rgba(255,255,255,0.95)"
-            />
             {showText && (
+              <Ionicons
+                name={ICONS[cat] ?? 'book-outline'}
+                size={size === 'sm' ? 13 : 16}
+                color="rgba(255,255,255,0.95)"
+              />
+            )}
+            {showText && liturgy.kind !== 'devotional' && (
               <Text style={[styles.label, { fontSize: d.label }]} numberOfLines={1}>
-                {liturgy.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase()}
+                {catLabel.toUpperCase()}
               </Text>
             )}
           </View>

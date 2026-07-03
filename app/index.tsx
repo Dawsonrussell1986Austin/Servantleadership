@@ -155,9 +155,8 @@ export default function Home() {
             accessibilityLabel={`Read today’s devotional: ${devotional.title}`}
             style={({ pressed }) => [styles.heroTop, pressed && { opacity: 0.85 }]}
           >
-            <LiturgyCover liturgy={devotional} size="md" />
+            <LiturgyCover liturgy={devotional} size="md" text={false} />
             <View style={styles.heroText}>
-              <Text style={styles.heroKind}>DEVOTIONAL</Text>
               <Text style={styles.heroTitle} numberOfLines={2}>
                 {devotional.title}
               </Text>

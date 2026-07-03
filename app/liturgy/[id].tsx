@@ -137,7 +137,7 @@ export default function LiturgyScreen() {
   const cat = categoryOf(reading.id);
   const accent = colors.accent;
   const catLabel = CATEGORIES.find((c) => c.id === cat)?.label ?? '';
-  const kindLabel = reading.kind === 'devotional' ? 'DEVOTIONAL' : catLabel.toUpperCase();
+  const kindLabel = reading.kind === 'devotional' ? '' : catLabel.toUpperCase();
 
   const scripture = reading.sections.find((s) => s.type === 'scripture');
   const shareVerse = () =>
@@ -192,9 +192,11 @@ export default function LiturgyScreen() {
               { paddingTop: insets.top + 72, paddingBottom: spacing.xl },
             ]}
           >
-            <Text style={[styles.heroKind, { color: colors.white }]}>
-              {kindLabel}
-            </Text>
+            {kindLabel !== '' && (
+              <Text style={[styles.heroKind, { color: colors.white }]}>
+                {kindLabel}
+              </Text>
+            )}
             <Text style={styles.heroTitle}>{reading.title}</Text>
             <Text style={styles.heroSituation} numberOfLines={2}>
               {reading.situation}
