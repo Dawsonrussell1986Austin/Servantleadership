@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Liturgy, LiturgySection } from '../content/types';
-import { colors, spacing, type, radius } from '../theme/theme';
+import { colors, fonts, spacing, type, radius } from '../theme/theme';
 import { sectionLabel } from '../theme/categories';
 
 type Props = {
@@ -154,9 +154,11 @@ const styles = StyleSheet.create({
     color: colors.ink,
   },
   dropCap: {
-    fontFamily: type.body.fontFamily,
-    fontSize: 52,
-    fontWeight: '700',
+    // Must carry its own lineHeight >= fontSize or iOS clips the glyph's top
+    // (the parent paragraph's 31px line box wins otherwise).
+    fontFamily: fonts.displayExtra,
+    fontSize: 44,
+    lineHeight: 46,
   },
   scriptureBlock: {
     borderLeftWidth: 3,
