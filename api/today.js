@@ -31,7 +31,15 @@ module.exports = function handler(req, res) {
   res.end(
     JSON.stringify(
       reading
-        ? { id, title: reading.title, situation: reading.situation, ref: reading.ref, verse: reading.verse }
+        ? {
+            id,
+            title: reading.title,
+            situation: reading.situation,
+            ref: reading.ref,
+            verse: reading.verse,
+            prayer: reading.prayer || '',
+            benediction: reading.benediction || '',
+          }
         : { error: 'no_reading', id },
     ),
   );
