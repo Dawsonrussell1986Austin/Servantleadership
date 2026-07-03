@@ -89,7 +89,10 @@ export default function Paywall() {
         contentContainerStyle={{
           paddingHorizontal: spacing.lg,
           paddingTop: insets.top + spacing.md,
-          paddingBottom: insets.bottom + 140,
+          // The pinned footer (CTA + restore + legal + links) is tall; the
+          // scroll content needs enough clearance that the plan picker can
+          // scroll fully above it.
+          paddingBottom: insets.bottom + 340,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -113,20 +116,6 @@ export default function Paywall() {
             : 'One simple plan for everything: the daily devotional, the full library, and audio.'}
         </Text>
 
-        <View style={styles.benefits}>
-          {BENEFITS.map((b) => (
-            <View key={b.title} style={styles.benefitRow}>
-              <View style={styles.benefitIcon}>
-                <Ionicons name={b.icon} size={20} color={colors.accentSoft} />
-              </View>
-              <View style={styles.benefitText}>
-                <Text style={styles.benefitTitle}>{b.title}</Text>
-                <Text style={styles.benefitSub}>{b.sub}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
         {packages.length > 1 && (
           <View style={styles.plans}>
             {packages.map((p, i) => {
@@ -148,6 +137,21 @@ export default function Paywall() {
                   {p.product.trialLabel && (
                     <Text style={styles.planTrial}>{p.product.trialLabel}</Text>
                   )}
+
+        <View style={styles.benefits}>
+          {BENEFITS.map((b) => (
+            <View key={b.title} style={styles.benefitRow}>
+              <View style={styles.benefitIcon}>
+                <Ionicons name={b.icon} size={20} color={colors.accentSoft} />
+              </View>
+              <View style={styles.benefitText}>
+                <Text style={styles.benefitTitle}>{b.title}</Text>
+                <Text style={styles.benefitSub}>{b.sub}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
                 </Pressable>
               );
             })}
