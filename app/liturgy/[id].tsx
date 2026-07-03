@@ -28,7 +28,7 @@ import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { coverFor } from '../../src/content/covers';
 import { lengthLabel } from '../../src/content/lengths';
 import { categoryColor } from '../../src/theme/categories';
-import LiturgyView from '../../src/components/LiturgyView';
+import LiturgyView, { splitSentences } from '../../src/components/LiturgyView';
 import FadeInUp from '../../src/components/FadeInUp';
 import PlayerBar from '../../src/components/PlayerBar';
 import { useAudio } from '../../src/audio/AudioProvider';
@@ -115,24 +115,33 @@ export default function LiturgyScreen() {
     }
   };
 
-  // --- Follow the narration: estimate which section is being read from the
-  // audio position (weighted by text length), dim the rest, and scroll along.
+  // --- Follow the narration: estimate which sentence is being read from the
+  // audio position (weighted by text length), highlight it, dim the other
+  // sections, and scroll along.
   const scrollRef = useRef<ScrollView>(null);
   const sectionYs = useRef<Record<number, number>>({});
   const bodyY = useRef(0);
   const followPaused = useRef(false); // user grabbed the page — stop steering
-  const sectionStarts = useMemo(() => {
-    if (!reading) return [];
-    const weights = reading.sections.map(
-      (s) => s.body.length + (s.reference?.length ?? 0) + 60, // + inter-section pause
-    );
-    const total = weights.reduce((a, b) => a + b, reading.title.length + 40);
-    let acc = reading.title.length + 40;
-    return weights.map((w) => {
+  const sentenceTimeline = useMemo(() => {
+    if (!reading) return null;
+    const lead = reading.title.length + 40; // spoken title before section one
+    const units: { section: number; index: number; weight: number }[] = [];
+    reading.sections.forEach((s, si) => {
+      const parts = splitSentences(s.body);
+      parts.forEach((t, k) => {
+        // The section's reference + inter-section pause ride on its last sentence.
+        const tail = k === parts.length - 1 ? (s.reference?.length ?? 0) + 60 : 0;
+        units.push({ section: si, index: k, weight: t.length + tail });
+      });
+    });
+    const total = units.reduce((a, u) => a + u.weight, lead);
+    let acc = lead;
+    const starts = units.map((u) => {
       const start = acc / total;
-      acc += w;
+      acc += u.weight;
       return start;
     });
+    return { units, starts };
   }, [reading]);
 
   const isActiveAudio = !!reading && audio.currentId === reading.id;
@@ -141,13 +150,16 @@ export default function LiturgyScreen() {
     isActiveAudio && audio.durationMillis > 0
       ? audio.positionMillis / audio.durationMillis
       : 0;
-  let activeIndex: number | null = null;
-  if (playingThis) {
-    activeIndex = 0;
-    for (let i = 0; i < sectionStarts.length; i++) {
-      if (fraction >= sectionStarts[i]) activeIndex = i;
+  let activeSentence: { section: number; index: number } | null = null;
+  if (playingThis && sentenceTimeline && sentenceTimeline.units.length > 0) {
+    let at = 0;
+    for (let i = 0; i < sentenceTimeline.starts.length; i++) {
+      if (fraction >= sentenceTimeline.starts[i]) at = i;
     }
+    const u = sentenceTimeline.units[at];
+    activeSentence = { section: u.section, index: u.index };
   }
+  const activeIndex = activeSentence?.section ?? null;
 
   useEffect(() => {
     if (activeIndex == null || followPaused.current) return;
@@ -264,14 +276,16 @@ export default function LiturgyScreen() {
           </View>
         </ImageBackground>
 
-        {/* Reading */}
+        {/* Reading. The onLayout lives on this outer wrapper — NOT inside
+            FadeInUp, whose Animated.View would report y=0 — so bodyY is in
+            real scroll-content coordinates and follow-scrolling lands right. */}
+        <View
+          onLayout={(e) => {
+            bodyY.current = e.nativeEvent.layout.y;
+          }}
+        >
         <FadeInUp>
-          <View
-            style={styles.body}
-            onLayout={(e) => {
-              bodyY.current = e.nativeEvent.layout.y;
-            }}
-          >
+          <View style={styles.body}>
             <View style={[styles.accentRule, { backgroundColor: accent }]} />
             <LiturgyView
               liturgy={reading}
@@ -279,6 +293,7 @@ export default function LiturgyScreen() {
               showHeader={false}
               onSaveLine={saveLine}
               activeIndex={activeIndex}
+              activeSentence={activeSentence}
               onSectionLayout={(i, y) => {
                 sectionYs.current[i] = y;
               }}
@@ -311,6 +326,7 @@ export default function LiturgyScreen() {
             </Text>
           </View>
         </FadeInUp>
+        </View>
       </ScrollView>
 
       {/* Floating controls over the hero */}

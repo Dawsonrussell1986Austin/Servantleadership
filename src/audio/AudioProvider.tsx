@@ -104,7 +104,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       try {
         await audioModuleRef.current.Audio.setAudioModeAsync({
           playsInSilentModeIOS: true,
-          staysActiveInBackground: false,
+          // Keep the narration going when the screen locks or the user goes
+          // home. Requires the UIBackgroundModes=audio entry in app.json.
+          staysActiveInBackground: true,
         });
       } catch {
         /* non-fatal */

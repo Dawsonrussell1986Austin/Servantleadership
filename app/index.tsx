@@ -222,12 +222,14 @@ export default function Home() {
               </View>
             </View>
           </Pressable>
-          </Animated.View>
-          <View style={styles.heroDivider} />
-          <PlayerBar readingId={devotional.id} openOnPlay />
+          {/* Inside the swipeable area on purpose: the hint sits on the part
+              of the card that actually responds, and slides away with it. */}
           <Text style={styles.swapHint} numberOfLines={1}>
             Not the word you need? Swipe for another.
           </Text>
+          </Animated.View>
+          <View style={styles.heroDivider} />
+          <PlayerBar readingId={devotional.id} openOnPlay />
         </View>
       </FadeInUp>
 
