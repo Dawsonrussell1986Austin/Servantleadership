@@ -218,7 +218,7 @@ export default function Home() {
           </Pressable>
           </Animated.View>
           <View style={styles.heroDivider} />
-          <PlayerBar readingId={devotional.id} />
+          <PlayerBar readingId={devotional.id} openOnPlay />
           <Text style={styles.swapHint}>
             Not the word you need today? Swipe the card for another.
           </Text>

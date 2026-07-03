@@ -127,6 +127,11 @@ const MAP: Record<string, ImageSourcePropType> = {
   "d-w-margin": require('../../assets/covers/biz-6177589.jpg'),
   "d-w-from-rest": require('../../assets/covers/biz-5824540.jpg'),
   "d-w-today": require('../../assets/covers/biz-5843437.jpg'),
+  "d-l-weight": require('../../assets/covers/biz-9300769.jpg'),
+  "d-l-conflict": require('../../assets/covers/biz-36007720.jpg'),
+  "d-l-feedback": require('../../assets/covers/biz-9300771.jpg'),
+  "d-l-developing": require('../../assets/covers/biz-712401.jpg'),
+  "d-l-culture": require('../../assets/covers/biz-36287488.jpg'),
 };
 
 const FALLBACK: ImageSourcePropType[] = [

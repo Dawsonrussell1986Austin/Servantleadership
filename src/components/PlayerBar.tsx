@@ -9,13 +9,23 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useAudio, formatMillis } from '../audio/AudioProvider';
 import { colors, spacing, fonts, type } from '../theme/theme';
 
 const SCRUB_COLORS = [colors.accent, colors.accent] as const;
 
-export default function PlayerBar({ readingId }: { readingId: string }) {
+export default function PlayerBar({
+  readingId,
+  openOnPlay = false,
+}: {
+  readingId: string;
+  /** When pressing play starts narration, also open the reader so the
+   * follow-along (highlight + auto-scroll) can do its thing. */
+  openOnPlay?: boolean;
+}) {
   const audio = useAudio();
+  const router = useRouter();
   const [trackWidth, setTrackWidth] = useState(0);
 
   const isActive = audio.currentId === readingId;
@@ -35,8 +45,10 @@ export default function PlayerBar({ readingId }: { readingId: string }) {
   };
 
   const onPlayPress = () => {
+    const willStart = !(isActive && audio.isPlaying);
     if (isActive) audio.togglePlayPause();
     else audio.toggleReading(readingId);
+    if (openOnPlay && willStart) router.push(`/liturgy/${readingId}`);
   };
 
   return (
