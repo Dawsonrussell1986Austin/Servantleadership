@@ -71,7 +71,7 @@
             "ios": {
               "appExtensions": [
                 {
-                  "targetName": "Founded",
+                  "targetName": "FoundedWidget",
                   "bundleIdentifier": "com.servantleadership.liturgies.widget"
                 },
                 {

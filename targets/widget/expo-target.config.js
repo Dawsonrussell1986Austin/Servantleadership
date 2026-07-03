@@ -1,7 +1,8 @@
 /** @type {import('@bacons/apple-targets').Config} */
 module.exports = {
   type: 'widget',
-  name: 'Founded',
+  name: 'FoundedWidget',
+  bundleIdentifier: 'com.servantleadership.liturgies.widget',
   // Brand accent, exposed to SwiftUI as Color("AccentColor")/asset catalog.
   colors: {
     $accent: '#C65A33',
