@@ -67,6 +67,7 @@
       "revenueCatApiKeyIos": "appl_GctPKSRjkQiBZZLAboGZylgvlWr",
       "revenueCatApiKeyAndroid": "",
       "eas": {
+        "projectId": "97c396f4-1cb8-46d6-8913-25c06d9451d1",
         "build": {
           "experimental": {
             "ios": {
