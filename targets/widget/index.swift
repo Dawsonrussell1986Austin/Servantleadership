@@ -53,31 +53,44 @@ private func lineFor(_ date: Date) -> DailyLine {
 
 // MARK: - Timeline
 
+struct TodayDevotional: Decodable {
+    let id: String
+    let title: String
+    let situation: String
+    let ref: String
+    let verse: String
+}
+
 struct ServantEntry: TimelineEntry {
     let date: Date
     let line: DailyLine
+    /// Today's actual devotional, when the network was reachable.
+    let devotional: TodayDevotional?
 }
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> ServantEntry {
-        ServantEntry(date: Date(), line: lineFor(Date()))
+        ServantEntry(date: Date(), line: lineFor(Date()), devotional: nil)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (ServantEntry) -> Void) {
-        completion(ServantEntry(date: Date(), line: lineFor(Date())))
+        completion(ServantEntry(date: Date(), line: lineFor(Date()), devotional: nil))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<ServantEntry>) -> Void) {
-        let cal = Calendar.current
-        let startOfToday = cal.startOfDay(for: Date())
-        var entries: [ServantEntry] = []
-        // One entry per day for the coming week; iOS refreshes at each midnight.
-        for offset in 0..<7 {
-            if let day = cal.date(byAdding: .day, value: offset, to: startOfToday) {
-                entries.append(ServantEntry(date: day, line: lineFor(day)))
+        // Fetch today's devotional; fall back to the bundled verse rotation
+        // offline. Refresh again in a few hours (and at the next request).
+        let url = URL(string: "https://app.foundedapp.com/api/today")!
+        let task = URLSession.shared.dataTask(with: url) { data, _, _ in
+            var devotional: TodayDevotional? = nil
+            if let data = data {
+                devotional = try? JSONDecoder().decode(TodayDevotional.self, from: data)
             }
+            let entry = ServantEntry(date: Date(), line: lineFor(Date()), devotional: devotional)
+            let refresh = Calendar.current.date(byAdding: .hour, value: 4, to: Date())!
+            completion(Timeline(entries: [entry], policy: .after(refresh)))
         }
-        completion(Timeline(entries: entries, policy: .atEnd))
+        task.resume()
     }
 }
 
@@ -106,39 +119,74 @@ struct ServantWidgetView: View {
                 Circle()
                     .fill(Brand.accent)
                     .frame(width: 6, height: 6)
-                Text("FOUNDED")
-                    .font(.system(size: 11, weight: .bold))
-                    .tracking(1.6)
+                Text(entry.devotional == nil ? "FOUNDED" : "FOUNDED · TODAY")
+                    .font(.system(size: 10, weight: .bold))
+                    .tracking(1.4)
                     .foregroundColor(Brand.accent)
             }
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 6)
 
-            Text(entry.line.text)
-                .font(.system(size: isSmall ? 15 : 19, weight: .semibold, design: .serif))
-                .foregroundColor(Brand.ink)
-                .lineSpacing(2)
-                .minimumScaleFactor(0.7)
-                .lineLimit(isSmall ? 4 : 4)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Spacer(minLength: 8)
-
-            HStack {
-                Text(entry.line.reference)
-                    .font(.system(size: isSmall ? 11 : 12, weight: .semibold))
-                    .foregroundColor(Brand.accent)
-                Spacer()
+            if let d = entry.devotional {
+                // Today's devotional — the widget is a doorway, not the meal.
+                Text(d.title)
+                    .font(.system(size: isSmall ? 15 : 19, weight: .semibold, design: .serif))
+                    .foregroundColor(Brand.ink)
+                    .lineSpacing(1)
+                    .minimumScaleFactor(0.75)
+                    .lineLimit(isSmall ? 3 : 2)
+                    .fixedSize(horizontal: false, vertical: true)
                 if !isSmall {
-                    Text(dateLine)
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(1.0)
-                        .foregroundColor(Brand.inkSoft.opacity(0.7))
+                    Text(d.situation)
+                        .font(.system(size: 13, design: .serif))
+                        .italic()
+                        .foregroundColor(Brand.inkSoft)
+                        .lineLimit(2)
+                        .padding(.top, 2)
+                }
+
+                Spacer(minLength: 6)
+
+                HStack {
+                    Text(isSmall ? "Read →" : "Tap to read or listen →")
+                        .font(.system(size: isSmall ? 11 : 12, weight: .bold))
+                        .foregroundColor(Brand.accent)
+                    Spacer()
+                    if !isSmall {
+                        Text(d.ref)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(Brand.inkSoft.opacity(0.8))
+                    }
+                }
+            } else {
+                // Offline fallback: the daily verse rotation.
+                Text(entry.line.text)
+                    .font(.system(size: isSmall ? 15 : 19, weight: .semibold, design: .serif))
+                    .foregroundColor(Brand.ink)
+                    .lineSpacing(2)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(4)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 8)
+
+                HStack {
+                    Text(entry.line.reference)
+                        .font(.system(size: isSmall ? 11 : 12, weight: .semibold))
+                        .foregroundColor(Brand.accent)
+                    Spacer()
+                    if !isSmall {
+                        Text(dateLine)
+                            .font(.system(size: 10, weight: .bold))
+                            .tracking(1.0)
+                            .foregroundColor(Brand.inkSoft.opacity(0.7))
+                    }
                 }
             }
         }
         .padding(isSmall ? 14 : 18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .widgetURL(URL(string: entry.devotional.map { "servant:///liturgy/\($0.id)" } ?? "servant:///"))
     }
 }
 
@@ -157,8 +205,8 @@ struct ServantWidget: Widget {
                     .background(WidgetBackground())
             }
         }
-        .configurationDisplayName("Today's Verse")
-        .description("A quiet line of Scripture for the work ahead, refreshed each day.")
+        .configurationDisplayName("Today's Devotional")
+        .description("Today's devotional - tap to read or listen in Founded.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

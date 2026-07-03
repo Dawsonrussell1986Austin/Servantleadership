@@ -13,6 +13,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { Platform } from 'react-native';
 import { getItem, setItem } from './storage';
 
 export type SavedLine = {
@@ -35,6 +36,45 @@ export type Prayer = {
 
 const SAVED_KEY = 'founded.saved';
 const PRAYERS_KEY = 'founded.prayers';
+
+/**
+ * Scheduled follow-up for a saved prayer, RESURFACE_AFTER_DAYS out. Delivered
+ * as a local notification, so a paired Apple Watch gets it on the wrist too.
+ */
+async function schedulePrayerFollowUp(prayer: { id: string; text: string }): Promise<void> {
+  if (Platform.OS === 'web') return;
+  try {
+    const Notifications = await import('expo-notifications');
+    const perms = await Notifications.getPermissionsAsync();
+    if (!perms.granted) return; // never prompt from here; reminders own the ask
+    const snippet =
+      prayer.text.length > 90 ? `${prayer.text.slice(0, 90)}…` : prayer.text;
+    await Notifications.scheduleNotificationAsync({
+      identifier: `prayer-${prayer.id}`,
+      content: {
+        title: 'A while ago, you prayed',
+        body: `“${snippet}” — how is it going?`,
+        data: { url: '/prayers' },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: RESURFACE_AFTER_DAYS * 86400,
+      },
+    });
+  } catch {
+    /* follow-up is a nicety */
+  }
+}
+
+async function cancelPrayerFollowUp(id: string): Promise<void> {
+  if (Platform.OS === 'web') return;
+  try {
+    const Notifications = await import('expo-notifications');
+    await Notifications.cancelScheduledNotificationAsync(`prayer-${id}`);
+  } catch {
+    /* ignore */
+  }
+}
 
 /** Prayers older than this (and not answered) get gently resurfaced. */
 export const RESURFACE_AFTER_DAYS = 12;
@@ -124,14 +164,15 @@ export function PersonalProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addPrayer = useCallback((v: Omit<Prayer, 'id' | 'createdAt' | 'answered'>) => {
+    const prayer = { ...v, id: makeId(), createdAt: Date.now(), answered: false };
     setPrayers((prev) => {
-      const next = [
-        { ...v, id: makeId(), createdAt: Date.now(), answered: false },
-        ...prev,
-      ];
+      const next = [prayer, ...prev];
       setItem(PRAYERS_KEY, next);
       return next;
     });
+    // Follow up as a real notification (mirrors to Apple Watch), not just the
+    // in-app card. Best-effort: quietly skipped on web or without permission.
+    void schedulePrayerFollowUp(prayer);
   }, []);
 
   const setPrayerAnswered = useCallback((id: string, answered: boolean) => {
@@ -140,6 +181,7 @@ export function PersonalProvider({ children }: { children: React.ReactNode }) {
       setItem(PRAYERS_KEY, next);
       return next;
     });
+    if (answered) void cancelPrayerFollowUp(id);
   }, []);
 
   const removePrayer = useCallback((id: string) => {
@@ -148,6 +190,7 @@ export function PersonalProvider({ children }: { children: React.ReactNode }) {
       setItem(PRAYERS_KEY, next);
       return next;
     });
+    void cancelPrayerFollowUp(id);
   }, []);
 
   const resurfacedPrayer = useCallback((): Prayer | null => {
