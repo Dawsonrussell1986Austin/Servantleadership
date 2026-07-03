@@ -44,13 +44,11 @@ export default function Devotionals() {
 
   const isDone = (id: string) => read.has(id) || listened.has(id);
 
-  const { cells, done, missed } = useMemo(() => {
+  const cells = useMemo(() => {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstWeekday = new Date(year, month, 1).getDay();
     const out: ({ day: number; date: Date; id: string; state: string } | null)[] = [];
     for (let i = 0; i < firstWeekday; i++) out.push(null);
-    let doneN = 0;
-    let missedN = 0;
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const id = resolveId(date);
@@ -61,11 +59,9 @@ export default function Devotionals() {
       if (d) state = 'done';
       else if (isToday) state = 'today';
       else if (isPast) state = 'missed';
-      if (d) doneN++;
-      if (state === 'missed') missedN++;
       out.push({ day, date, id, state });
     }
-    return { cells: out, done: doneN, missed: missedN };
+    return out;
   }, [year, month, read, listened, today]);
 
   const open = (id: string) => router.push(`/liturgy/${id}`);
@@ -171,22 +167,6 @@ export default function Devotionals() {
             })}
           </View>
 
-          {/* Summary + legend */}
-          <View style={styles.summary}>
-            <Text style={styles.summaryText}>
-              {done} done{missed > 0 ? ` · ${missed} missed` : ''} this month
-            </Text>
-            <View style={styles.legend}>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: colors.accent }]} />
-                <Text style={styles.legendText}>Done — in color</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, styles.legendMissed]} />
-                <Text style={styles.legendText}>Not yet — faded</Text>
-              </View>
-            </View>
-          </View>
         </ScrollView>
       ) : (
         <FlatList
@@ -340,20 +320,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  summary: {
-    marginTop: spacing.xl,
-    padding: spacing.lg,
-    backgroundColor: colors.paperRaised,
-    borderRadius: radius.md,
-  },
-  summaryText: { ...type.heading, fontSize: 16, color: colors.ink, marginBottom: spacing.md },
-  legend: { flexDirection: 'row', gap: spacing.lg },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  legendDot: { width: 14, height: 14, borderRadius: 7 },
-  legendMissed: { backgroundColor: colors.paperRaised, borderWidth: 1, borderColor: colors.line },
-  legendToday: { backgroundColor: colors.paper, borderWidth: 2, borderColor: colors.ink },
-  legendText: { ...type.caption, fontSize: 12, color: colors.inkSoft },
 
   // List
   row: {

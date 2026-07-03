@@ -78,10 +78,16 @@ export default function Home() {
       }).start();
     });
   };
+  // Claim horizontal drags in the capture phase (before the ScrollView or the
+  // card's Pressable can take them) and refuse termination requests, or the
+  // vertical ScrollView steals the gesture and the swipe never registers.
+  const isHorizontalDrag = (_e: unknown, g: { dx: number; dy: number }) =>
+    Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2;
   const pan = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_e, g) =>
-        Math.abs(g.dx) > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 1.6,
+      onMoveShouldSetPanResponder: isHorizontalDrag,
+      onMoveShouldSetPanResponderCapture: isHorizontalDrag,
+      onPanResponderTerminationRequest: () => false,
       onPanResponderMove: (_e, g) => slideX.setValue(g.dx),
       onPanResponderRelease: (_e, g) => {
         if (Math.abs(g.dx) > 90) swapCard(g.dx > 0 ? 1 : -1);
@@ -219,8 +225,8 @@ export default function Home() {
           </Animated.View>
           <View style={styles.heroDivider} />
           <PlayerBar readingId={devotional.id} openOnPlay />
-          <Text style={styles.swapHint}>
-            Not the word you need today? Swipe the card for another.
+          <Text style={styles.swapHint} numberOfLines={1}>
+            Not the word you need? Swipe for another.
           </Text>
         </View>
       </FadeInUp>
@@ -480,11 +486,11 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: spacing.sm + 4,
+    rowGap: spacing.md,
   },
-  tileWrap: { width: 104 },
+  tileWrap: { width: '48%' },
   allList: {},
 
   resultsWrap: { marginTop: spacing.lg },
