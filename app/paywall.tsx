@@ -137,6 +137,11 @@ export default function Paywall() {
                   {p.product.trialLabel && (
                     <Text style={styles.planTrial}>{p.product.trialLabel}</Text>
                   )}
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
 
         <View style={styles.benefits}>
           {BENEFITS.map((b) => (
@@ -151,12 +156,6 @@ export default function Paywall() {
             </View>
           ))}
         </View>
-
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
 
         {message && <Text style={styles.message}>{message}</Text>}
       </ScrollView>
