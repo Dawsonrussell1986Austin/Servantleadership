@@ -4,10 +4,10 @@ module.exports = {
   name: 'Founded',
   // Brand accent, exposed to SwiftUI as Color("AccentColor")/asset catalog.
   colors: {
-    $accent: '#9C6B3F',
-    paper: '#FBFAF7',
-    ink: '#201C17',
-    inkSoft: '#6E655A',
+    $accent: '#C65A33',
+    paper: '#FAF6EF',
+    ink: '#211D16',
+    inkSoft: '#5C554A',
   },
   deploymentTarget: '17.0',
 };

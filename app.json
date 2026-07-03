@@ -49,6 +49,12 @@
         {
           "color": "#BF4A2B"
         }
+      ],
+      [
+        "@bacons/apple-targets",
+        {
+          "appleTeamId": "V87Q26T9TS"
+        }
       ]
     ],
     "experiments": {
@@ -58,7 +64,28 @@
       "audioBaseUrl": "https://app.foundedapp.com",
       "userName": "",
       "revenueCatApiKeyIos": "appl_GctPKSRjkQiBZZLAboGZylgvlWr",
-      "revenueCatApiKeyAndroid": ""
+      "revenueCatApiKeyAndroid": "",
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "Founded",
+                  "bundleIdentifier": "com.servantleadership.liturgies.widget"
+                },
+                {
+                  "targetName": "FoundedWatch",
+                  "bundleIdentifier": "com.servantleadership.liturgies.watchkitapp"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

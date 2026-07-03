@@ -4,10 +4,10 @@ import SwiftUI
 // MARK: - Brand
 
 private enum Brand {
-    static let paper = Color(red: 0.984, green: 0.980, blue: 0.969) // #FBFAF7
-    static let ink = Color(red: 0.125, green: 0.110, blue: 0.090)   // #201C17
-    static let inkSoft = Color(red: 0.431, green: 0.396, blue: 0.353) // #6E655A
-    static let accent = Color(red: 0.612, green: 0.420, blue: 0.247)  // #9C6B3F
+    static let paper = Color(red: 0.980, green: 0.965, blue: 0.937) // #FAF6EF
+    static let ink = Color(red: 0.129, green: 0.114, blue: 0.086)   // #211D16
+    static let inkSoft = Color(red: 0.361, green: 0.333, blue: 0.290) // #5C554A
+    static let accent = Color(red: 0.776, green: 0.353, blue: 0.200)  // #C65A33
 }
 
 // MARK: - Daily content
