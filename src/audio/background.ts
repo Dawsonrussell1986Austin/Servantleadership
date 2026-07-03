@@ -24,7 +24,9 @@ export const BACKGROUND_VOLUME = 0.16;
 
 const KEY = 'founded:background-sound';
 
-let current: BackgroundSound = BACKGROUND_SOUNDS[0];
+// Ambient by default — a quiet bed under the voice unless the user opts out.
+let current: BackgroundSound =
+  BACKGROUND_SOUNDS.find((s) => s.id === 'ambient') ?? BACKGROUND_SOUNDS[0];
 const listeners = new Set<(s: BackgroundSound) => void>();
 
 export async function loadBackgroundSound(): Promise<BackgroundSound> {
