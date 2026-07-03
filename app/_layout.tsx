@@ -4,18 +4,19 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
-import { useFonts } from '@expo-google-fonts/archivo';
+import { useFonts } from '@expo-google-fonts/instrument-sans';
 import {
-  Archivo_400Regular,
-  Archivo_500Medium,
-  Archivo_600SemiBold,
-  Archivo_700Bold,
-  Archivo_800ExtraBold,
-} from '@expo-google-fonts/archivo';
+  InstrumentSans_400Regular,
+  InstrumentSans_500Medium,
+  InstrumentSans_600SemiBold,
+  InstrumentSans_700Bold,
+} from '@expo-google-fonts/instrument-sans';
 import {
-  DMSerifDisplay_400Regular,
-  DMSerifDisplay_400Regular_Italic,
-} from '@expo-google-fonts/dm-serif-display';
+  SourceSerif4_400Regular,
+  SourceSerif4_400Regular_Italic,
+  SourceSerif4_600SemiBold,
+  SourceSerif4_700Bold,
+} from '@expo-google-fonts/source-serif-4';
 import { colors } from '../src/theme/theme';
 import { AudioProvider } from '../src/audio/AudioProvider';
 import { EntitlementProvider } from '../src/purchases/Entitlements';
@@ -26,13 +27,14 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Archivo_400Regular,
-    Archivo_500Medium,
-    Archivo_600SemiBold,
-    Archivo_700Bold,
-    Archivo_800ExtraBold,
-    DMSerifDisplay_400Regular,
-    DMSerifDisplay_400Regular_Italic,
+    InstrumentSans_400Regular,
+    InstrumentSans_500Medium,
+    InstrumentSans_600SemiBold,
+    InstrumentSans_700Bold,
+    SourceSerif4_400Regular,
+    SourceSerif4_400Regular_Italic,
+    SourceSerif4_600SemiBold,
+    SourceSerif4_700Bold,
   });
 
   useEffect(() => {

@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAudio, formatMillis } from '../audio/AudioProvider';
 import { colors, spacing, fonts, type } from '../theme/theme';
 
-const SCRUB_COLORS = ['#2B2722', '#A8503E', '#C08A4F'] as const;
+const SCRUB_COLORS = [colors.accent, colors.accent] as const;
 
 export default function PlayerBar({ readingId }: { readingId: string }) {
   const audio = useAudio();
@@ -112,22 +112,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: 6,
-    borderRadius: 3,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: colors.paperDeep,
   },
   trackFill: {
     position: 'absolute',
     left: 0,
-    height: 6,
-    borderRadius: 3,
+    height: 4,
+    borderRadius: 2,
   },
   thumb: {
     position: 'absolute',
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: colors.wins,
+    backgroundColor: colors.accent,
     borderWidth: 2,
     borderColor: colors.white,
   },
