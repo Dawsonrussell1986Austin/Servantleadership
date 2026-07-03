@@ -31,7 +31,7 @@ submit credentials in `eas.json`:
 | Value | Yours | Where it's used |
 | ----- | ----- | --------------- |
 | Apple Team ID | `V87Q26T9TS` | code signing (app + widget) |
-| App Store Connect App ID | `87988350` | `eas submit` target |
+| App Store Connect App ID | `6787081296` ("Founded - Daily Devotionals") | `eas submit` target |
 | API Key ID | `98MK8JGSXV` | `eas submit` auth |
 | API Issuer ID | `c7d2d1ce-…` | `eas submit` auth |
 
@@ -76,7 +76,7 @@ Until a key is present, `isPremium` is forced `true` so nothing is locked.
 > in a v1.1 update once the steps below are done and your products are approved.
 
 1. Create a RevenueCat account → https://app.revenuecat.com
-2. Add an **iOS app**, connect it to your App Store Connect app (App ID `87988350`)
+2. Add an **iOS app**, connect it to your App Store Connect app (App ID `6787081296`)
    using the **In-App Purchase key** (`ApiKey_S2U8RD15Q2H8.p8` + Key ID
    `S2U8RD15Q2H8` + your Issuer ID) under RevenueCat → Project Settings → Apple.
 3. In App Store Connect, create the subscription/IAP products
