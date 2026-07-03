@@ -117,6 +117,16 @@ const MAP: Record<string, ImageSourcePropType> = {
   "d-r-finish": require('../../assets/covers/biz-29538381.jpg'),
   "d-r-small-beginnings": require('../../assets/covers/biz-6177604.jpg'),
   "d-r-why": require('../../assets/covers/biz-37836799.jpg'),
+  "d-w-focus": require('../../assets/covers/biz-6177563.jpg'),
+  "d-w-busyness": require('../../assets/covers/biz-28461044.jpg'),
+  "d-w-procrastination": require('../../assets/covers/biz-28772547.jpg'),
+  "d-w-priorities": require('../../assets/covers/biz-4087399.jpg'),
+  "d-w-time": require('../../assets/covers/biz-5208876.jpg'),
+  "d-w-hustle": require('../../assets/covers/biz-5386725.jpg'),
+  "d-w-finishing": require('../../assets/covers/biz-6177568.jpg'),
+  "d-w-margin": require('../../assets/covers/biz-6177589.jpg'),
+  "d-w-from-rest": require('../../assets/covers/biz-5824540.jpg'),
+  "d-w-today": require('../../assets/covers/biz-5843437.jpg'),
 };
 
 const FALLBACK: ImageSourcePropType[] = [
