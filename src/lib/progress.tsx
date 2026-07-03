@@ -112,15 +112,19 @@ export function ListenTracker() {
   const audio = useAudio();
   const { markListened } = useProgress();
 
-  const finished =
+  // Primary: the provider's explicit end-of-playback signal. The position
+  // check stays as a belt-and-braces fallback (e.g. seeking to the end).
+  const nearEnd =
     audio.currentId != null &&
     audio.durationMillis > 0 &&
     audio.positionMillis >= audio.durationMillis * 0.95;
-  const speechPlay =
-    audio.currentId != null && audio.isPlaying && audio.mode === 'speech';
 
   useEffect(() => {
-    if ((finished || speechPlay) && audio.currentId) markListened(audio.currentId);
-  }, [finished, speechPlay, audio.currentId, markListened]);
+    if (audio.finishedId) markListened(audio.finishedId);
+  }, [audio.finishedId, markListened]);
+
+  useEffect(() => {
+    if (nearEnd && audio.currentId) markListened(audio.currentId);
+  }, [nearEnd, audio.currentId, markListened]);
   return null;
 }

@@ -10,6 +10,8 @@ import {
   Modal,
   TextInput,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
@@ -143,7 +145,11 @@ export default function LiturgyScreen() {
   const shareVerse = () =>
     router.push({
       pathname: '/share',
-      params: { text: scripture?.body ?? reading.title, reference: scripture?.reference ?? '' },
+      params: {
+        id: reading.id,
+        text: scripture?.body ?? reading.title,
+        reference: scripture?.reference ?? '',
+      },
     });
   const saveLine = (text: string, reference?: string) => {
     addSaved({ readingId: reading.id, readingTitle: reading.title, text, reference });
@@ -216,15 +222,12 @@ export default function LiturgyScreen() {
               onSaveLine={saveLine}
             />
 
-            <Text style={styles.saveHint}>Press and hold any line to save it.</Text>
-
             {/* Actions */}
             <View style={styles.actionRow}>
               <Pressable
                 onPress={() => setPrayerOpen(true)}
                 style={({ pressed }) => [styles.actionPrimary, pressed && { opacity: 0.9 }]}
               >
-                <Ionicons name="heart-outline" size={18} color={colors.white} />
                 <Text style={styles.actionPrimaryText}>Pray about this</Text>
               </Pressable>
               <Pressable
@@ -298,6 +301,11 @@ export default function LiturgyScreen() {
         onRequestClose={() => setPrayerOpen(false)}
       >
         <Pressable style={styles.modalBackdrop} onPress={() => setPrayerOpen(false)} />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalAvoider}
+          pointerEvents="box-none"
+        >
         <View style={[styles.modalCard, { paddingBottom: insets.bottom + spacing.lg }]}>
           <Text style={styles.modalKicker}>PRAY ABOUT THIS</Text>
           <Text style={styles.modalTitle}>What’s on your heart?</Text>
@@ -326,6 +334,7 @@ export default function LiturgyScreen() {
             </Pressable>
           </View>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -501,6 +510,7 @@ const styles = StyleSheet.create({
   },
   toastText: { fontFamily: fonts.sansSemibold, fontSize: 14, color: colors.white },
 
+  modalAvoider: { flex: 1, justifyContent: 'flex-end' },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(26,22,19,0.45)' },
   modalCard: {
     position: 'absolute',

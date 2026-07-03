@@ -81,7 +81,7 @@ export default function CategoryScreen() {
           }}
           ListHeaderComponent={
             <Text style={styles.count}>
-              {liturgies.length} {liturgies.length === 1 ? 'liturgy' : 'liturgies'}
+              {liturgies.length} {liturgies.length === 1 ? 'devotional' : 'devotionals'}
             </Text>
           }
           renderItem={({ item }) => (

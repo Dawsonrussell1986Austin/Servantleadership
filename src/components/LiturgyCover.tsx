@@ -21,6 +21,7 @@ const ICONS = CATEGORY_ICON;
 function shortTitle(l: Liturgy): string {
   return l.title
     .replace(/^An? (Morning |Evening )?(Liturgy|Devotional)( of| for( the)?)? /i, '')
+    .replace(/^(For|Before) (the |a |an )?/i, '')
     .replace(/^On /, '');
 }
 

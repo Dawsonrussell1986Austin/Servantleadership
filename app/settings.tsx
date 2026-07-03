@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -114,17 +114,43 @@ export default function Settings() {
     }
   };
 
+  const previewRef = useRef<
+    { kind: 'web'; el: any } | { kind: 'native'; sound: any } | null
+  >(null);
+
+  const stopPreview = useCallback(() => {
+    const p = previewRef.current;
+    previewRef.current = null;
+    if (!p) return;
+    if (p.kind === 'web') {
+      try {
+        p.el.pause();
+      } catch {}
+    } else {
+      p.sound.unloadAsync().catch(() => {});
+    }
+  }, []);
+
+  // Never let two previews play on top of each other; also stop when leaving.
+  useEffect(() => stopPreview, [stopPreview]);
+
   const onPickVoice = async (v: Voice) => {
     setSelectedVoice(v.id);
+    stopPreview();
     try {
       const url = previewUrl(v.slug);
       if (Platform.OS === 'web') {
         const a = new (window as any).Audio(url);
+        previewRef.current = { kind: 'web', el: a };
         a.play?.();
       } else {
         const { Audio } = await import('expo-av');
         const { sound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
+        previewRef.current = { kind: 'native', sound };
         setTimeout(() => {
+          if (previewRef.current?.kind === 'native' && previewRef.current.sound === sound) {
+            previewRef.current = null;
+          }
           sound.unloadAsync().catch(() => {});
         }, 15000);
       }

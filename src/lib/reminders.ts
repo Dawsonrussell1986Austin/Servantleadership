@@ -26,7 +26,7 @@ const CHANNEL_ID = 'daily-devotional';
 const PROMPTS: { title: string; body: string }[] = [
   { title: 'A few quiet minutes', body: 'Today’s devotional is ready when you are.' },
   { title: 'Begin the day well', body: 'Five minutes before the noise starts.' },
-  { title: 'Today’s reading', body: 'A short liturgy for the work ahead.' },
+  { title: 'Today’s reading', body: 'A short devotional for the work ahead.' },
   { title: 'Steady your heart', body: 'A quiet moment before the day’s demands.' },
 ];
 

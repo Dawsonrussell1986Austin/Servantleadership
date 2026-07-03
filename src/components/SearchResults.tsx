@@ -54,7 +54,7 @@ export default function SearchResults({
       contentContainerStyle={styles.listBody}
       ListHeaderComponent={
         <Text style={styles.resultsHead}>
-          {results.length} {results.length === 1 ? 'liturgy' : 'liturgies'} for “{trimmed}”
+          {results.length} {results.length === 1 ? 'devotional' : 'devotionals'} for “{trimmed}”
         </Text>
       }
       renderItem={({ item }) => (

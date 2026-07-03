@@ -178,7 +178,8 @@ export default function Home() {
       <FadeInUp delay={170}>
         <Text style={styles.sectionLabel}>THE LIBRARY</Text>
         <Text style={styles.libIntro}>
-          A liturgy for the moment you’re in — search it, or browse the shelves.
+          A 5-min-or-less devotional for the moment you’re in — search it, or
+          browse the shelves.
         </Text>
 
 
@@ -189,7 +190,7 @@ export default function Home() {
             {results.length > 0 ? (
               <>
                 <Text style={styles.resultsHead}>
-                  {results.length} {results.length === 1 ? 'liturgy' : 'liturgies'} for “{query.trim()}”
+                  {results.length} {results.length === 1 ? 'devotional' : 'devotionals'} for “{query.trim()}”
                 </Text>
                 {results.map((r) => (
                   <LiturgyCard key={r.liturgy.id} liturgy={r.liturgy} onPress={() => open(r.liturgy.id)} />

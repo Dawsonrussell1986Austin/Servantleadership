@@ -44,6 +44,12 @@ type AudioState = {
   durationMillis: number;
   /** 'file' = streamed MP3, 'speech' = device text-to-speech fallback. */
   mode: Mode;
+  /**
+   * The last reading whose narration played to the very end. Explicit signal
+   * for listen-tracking: position updates are throttled, so "reached the end"
+   * can otherwise be missed entirely when playback finishes and resets.
+   */
+  finishedId: string | null;
 };
 
 type AudioContextValue = AudioState & {
@@ -62,6 +68,7 @@ const initialState: AudioState = {
   positionMillis: 0,
   durationMillis: 0,
   mode: null,
+  finishedId: null,
 };
 
 const AudioContext = createContext<AudioContextValue | null>(null);
@@ -173,7 +180,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isLoading: false,
       });
       if (status.didJustFinish) {
-        patch({ isPlaying: false, positionMillis: 0 });
+        patch({
+          isPlaying: false,
+          positionMillis: 0,
+          finishedId: stateRef.current.currentId,
+        });
         soundRef.current?.setPositionAsync(0).catch(() => {});
       }
     },
@@ -207,7 +218,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           rate: SPEECH_RATE,
           onDone: () => {
             clearTick();
-            patch({ isPlaying: false, positionMillis: stateRef.current.durationMillis });
+            patch({
+              isPlaying: false,
+              positionMillis: stateRef.current.durationMillis,
+              finishedId: stateRef.current.currentId,
+            });
           },
           onStopped: () => clearTick(),
           onError: () => {

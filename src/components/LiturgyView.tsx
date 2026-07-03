@@ -14,6 +14,26 @@ type Props = {
   onSaveLine?: (text: string, reference?: string) => void;
 };
 
+/**
+ * Long sections read as a wall of text, so split them into paragraphs of a
+ * few sentences each. Content authors write single blocks; this keeps the
+ * data simple while the page stays readable.
+ */
+function toParagraphs(body: string, sentencesPer = 3): string[] {
+  const sentences = body.split(/(?<=[.!?…]["”']?)\s+(?=["“']?[A-Z])/);
+  if (sentences.length <= sentencesPer + 1) return [body];
+  const out: string[] = [];
+  for (let i = 0; i < sentences.length; i += sentencesPer) {
+    out.push(sentences.slice(i, i + sentencesPer).join(' '));
+  }
+  // Avoid a lonely one-sentence trailing paragraph.
+  if (out.length > 1 && !/[.!?…]/.test(out[out.length - 1].slice(0, -1))) {
+    const last = out.pop()!;
+    out[out.length - 1] = `${out[out.length - 1]} ${last}`;
+  }
+  return out;
+}
+
 function Section({
   section,
   accent,
@@ -80,10 +100,18 @@ function Section({
     );
   }
 
+  const paras = toParagraphs(section.body);
   return (
     <View style={styles.block}>
       <Text style={[styles.eyebrow, { color: accent }]}>{label.toUpperCase()}</Text>
-      <Text style={[styles.body, bodyStyle]}>{section.body}</Text>
+      {paras.map((p, i) => (
+        <Text
+          key={i}
+          style={[styles.body, bodyStyle, i < paras.length - 1 && styles.paragraph]}
+        >
+          {p}
+        </Text>
+      ))}
     </View>
   );
 }
@@ -100,7 +128,7 @@ export default function LiturgyView({
       {showHeader && (
         <>
           <Text style={[styles.eyebrow, styles.topEyebrow, { color: accent }]}>
-            {`${liturgy.minutes} MIN  ·  A LITURGY`}
+            {`${liturgy.minutes} MIN  ·  A DEVOTIONAL`}
           </Text>
           <Text style={styles.title}>{liturgy.title.replace(/^A Liturgy for /, '')}</Text>
           <Text style={styles.situation}>{liturgy.situation}</Text>
@@ -148,6 +176,9 @@ const styles = StyleSheet.create({
   },
   block: {
     marginBottom: spacing.xl,
+  },
+  paragraph: {
+    marginBottom: spacing.md,
   },
   body: {
     ...type.body,

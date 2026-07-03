@@ -20,7 +20,7 @@ const BENEFITS: { icon: keyof typeof Ionicons.glyphMap; title: string; sub: stri
   {
     icon: 'library-outline',
     title: 'The full library',
-    sub: 'Every liturgy — for payroll, hard clients, launches, partners, and more.',
+    sub: 'Every devotional — for payroll, hard clients, launches, partners, and more.',
   },
   {
     icon: 'headset-outline',
@@ -30,7 +30,7 @@ const BENEFITS: { icon: keyof typeof Ionicons.glyphMap; title: string; sub: stri
   {
     icon: 'search-outline',
     title: 'Find your moment',
-    sub: 'Describe what you’re walking through and get the liturgy that meets it.',
+    sub: 'Describe what you’re walking through and get the devotional that meets it.',
   },
   {
     icon: 'infinite-outline',
@@ -106,7 +106,7 @@ export default function Paywall() {
         )}
 
         <Text style={styles.kicker}>FOUNDED · FULL ACCESS</Text>
-        <Text style={styles.title}>Every liturgy,{'\n'}for every moment of the work.</Text>
+        <Text style={styles.title}>Every devotional,{'\n'}for every moment of the work.</Text>
         <Text style={styles.lede}>
           {trial
             ? `Start free — ${trial}. Then one simple plan for everything: the daily devotional, the full library, and audio.`

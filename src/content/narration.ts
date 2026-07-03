@@ -25,7 +25,10 @@ export function buildNarration(reading: Liturgy): string {
     parts.push(PAUSE);
   }
 
-  parts.push(`${LONG_PAUSE}Amen.`);
+  // Trailing break: ElevenLabs sometimes rushes or clips the final word when
+  // it's the last token — padding after "Amen." makes any clipping eat
+  // silence instead of the word itself.
+  parts.push(`${LONG_PAUSE}Amen.${PAUSE}`);
   return parts.join(' ');
 }
 

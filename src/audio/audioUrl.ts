@@ -21,12 +21,12 @@ export function audioUrl(id: string): string {
  * voices are generated on demand by /api/tts (edge-cached).
  */
 export function narrationUrl(id: string, slug: string, kind: 'studio' | 'eleven'): string {
-  // v=2: narration script gained "Let's pray" — new URL busts the immutable
+  // v=3: narration script gained "Let's pray" — new URL busts the immutable
   // edge cache so old audio isn't served forever. Bump when the script changes.
   const path =
     kind === 'studio'
       ? `/audio/${id}.mp3`
-      : `/api/tts?id=${encodeURIComponent(id)}&voice=${encodeURIComponent(slug)}&v=2`;
+      : `/api/tts?id=${encodeURIComponent(id)}&voice=${encodeURIComponent(slug)}&v=3`;
   if (Platform.OS === 'web') return path;
   return `${BASE.replace(/\/$/, '')}${path}`;
 }

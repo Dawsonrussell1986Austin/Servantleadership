@@ -1,14 +1,9 @@
 import React from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
+import { Text, Pressable, StyleSheet, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Category, CATEGORIES } from '../content/types';
-import { colors, fonts, radius, tileGradients } from '../theme/theme';
-
-// Rotate through the palette in shelf order so neighboring tiles differ.
-function gradientFor(id: string): [string, string] {
-  const i = CATEGORIES.findIndex((c) => c.id === id);
-  return tileGradients[(i < 0 ? 0 : i) % tileGradients.length];
-}
+import { Category } from '../content/types';
+import { CATEGORY_COVER } from '../content/categoryCovers';
+import { colors, fonts, radius } from '../theme/theme';
 
 export default function CategoryTile({
   category,
@@ -23,20 +18,26 @@ export default function CategoryTile({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${category.label}, ${count} liturgies`}
+      accessibilityLabel={`${category.label}, ${count} devotionals`}
       style={({ pressed }) => [styles.tile, pressed && { opacity: 0.9 }]}
     >
-      <LinearGradient
-        colors={gradientFor(category.id)}
-        start={{ x: 0.2, y: 0 }}
-        end={{ x: 0.8, y: 1 }}
-        style={styles.tileFill}
+      <ImageBackground
+        source={CATEGORY_COVER[category.id]}
+        style={styles.tileImg}
+        imageStyle={styles.tileImgRadius}
+        resizeMode="cover"
       >
-        <Text style={styles.tileCount}>{count} LITURGIES</Text>
-        <Text style={styles.tileLabel} numberOfLines={3}>
-          {category.label}
-        </Text>
-      </LinearGradient>
+        <LinearGradient
+          colors={['rgba(15,12,9,0.35)', 'rgba(15,12,9,0.18)', 'rgba(15,12,9,0.82)']}
+          locations={[0, 0.4, 1]}
+          style={styles.tileOverlay}
+        >
+          <Text style={styles.tileCount}>{count} DEVOTIONALS</Text>
+          <Text style={styles.tileLabel} numberOfLines={3}>
+            {category.label}
+          </Text>
+        </LinearGradient>
+      </ImageBackground>
     </Pressable>
   );
 }
@@ -52,7 +53,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
   },
-  tileFill: {
+  tileImg: { width: 104, height: 150 },
+  tileImgRadius: { borderRadius: radius.md },
+  tileOverlay: {
     flex: 1,
     borderRadius: radius.md,
     padding: 12,
@@ -63,7 +66,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.sansBold,
     fontSize: 8,
     letterSpacing: 1,
-    color: 'rgba(255,255,255,0.55)',
+    color: 'rgba(255,255,255,0.75)',
   },
   tileLabel: {
     fontFamily: fonts.display,

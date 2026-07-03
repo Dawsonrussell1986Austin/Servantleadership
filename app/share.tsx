@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -13,22 +13,81 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { captureRef } from 'react-native-view-shot';
+import { getReadingById } from '../src/content';
 import { colors, spacing, type, fonts, radius } from '../src/theme/theme';
+
+type Variant = { key: string; label: string; text: string; reference?: string };
+type Bg = 'cream' | 'clay' | 'dark';
+
+const BG_GRADIENTS: Record<Bg, [string, string]> = {
+  cream: ['#FCFAF5', '#F1E9DB'],
+  clay: ['#C65A33', '#9E4322'],
+  dark: ['#26211B', '#0F0C09'],
+};
+
+/** A share-worthy line from the reflection: the first sentence that isn't too
+ * short to mean anything or too long to fit a card. */
+function pickQuote(body: string): string | null {
+  const sentences = body.split(/(?<=[.!?…]["”']?)\s+/);
+  const fit = sentences.find((s) => s.length >= 60 && s.length <= 200);
+  return fit ?? sentences.sort((a, b) => b.length - a.length)[0] ?? null;
+}
 
 export default function ShareScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const { text, reference } = useLocalSearchParams<{ text: string; reference?: string }>();
+  const { text, reference, id } = useLocalSearchParams<{
+    text?: string;
+    reference?: string;
+    id?: string;
+  }>();
   const cardRef = useRef<View>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [variantKey, setVariantKey] = useState('verse');
+  const [bg, setBg] = useState<Bg>('cream');
 
-  const verse = (text ?? '').replace(/^[“"]|[”"]$/g, '');
+  const variants = useMemo<Variant[]>(() => {
+    const out: Variant[] = [];
+    const reading = id ? getReadingById(id) : undefined;
+    const scripture = reading?.sections.find((s) => s.type === 'scripture');
+    const verseText = scripture?.body ?? text ?? '';
+    if (verseText) {
+      out.push({
+        key: 'verse',
+        label: 'Verse',
+        text: verseText,
+        reference: scripture?.reference ?? reference,
+      });
+    }
+    const benediction = reading?.sections.find((s) => s.type === 'benediction');
+    if (benediction) {
+      out.push({ key: 'blessing', label: 'Blessing', text: benediction.body });
+    }
+    const reflection = reading?.sections.find((s) => s.type === 'reflection');
+    const quote = reflection ? pickQuote(reflection.body) : null;
+    if (quote) {
+      out.push({ key: 'quote', label: 'Quote', text: quote });
+    }
+    return out;
+  }, [id, text, reference]);
+
+  const variant = variants.find((v) => v.key === variantKey) ?? variants[0];
+  const body = (variant?.text ?? '').replace(/^[“"]|[”"]$/g, '');
   const cardW = Math.min(width - spacing.lg * 2, 400);
   const cardH = Math.round(cardW * 1.12);
-  // Scale the verse down a touch for longer passages.
-  const verseSize = verse.length > 190 ? 21 : verse.length > 120 ? 24 : 27;
+  // Scale the text down a touch for longer passages.
+  const verseSize = body.length > 190 ? 21 : body.length > 120 ? 24 : 27;
+
+  const onDark = bg !== 'cream';
+  const inkColor = onDark ? '#FBFAF7' : colors.ink;
+  const accentColor = bg === 'clay' ? '#FBE9DF' : colors.accent;
+  const faintColor = onDark ? 'rgba(251,250,247,0.6)' : colors.inkFaint;
+  const stones: [string, string, string] =
+    bg === 'clay'
+      ? ['rgba(251,250,247,0.55)', 'rgba(251,250,247,0.8)', '#FBFAF7']
+      : ['#E0A98F', '#CB6A4A', colors.accent];
 
   const share = async () => {
     setBusy(true);
@@ -77,38 +136,84 @@ export default function ShareScreen() {
       </Pressable>
 
       <View style={styles.center}>
-        {/* The card that gets captured — cream paper, dark serif verse */}
+        {/* The card that gets captured */}
         <View
           ref={cardRef}
           collapsable={false}
           style={[styles.card, { width: cardW, height: cardH }]}
         >
-          <LinearGradient
-            colors={['#FCFAF5', '#F1E9DB']}
-            style={StyleSheet.absoluteFill}
-          />
+          <LinearGradient colors={BG_GRADIENTS[bg]} style={StyleSheet.absoluteFill} />
           <View style={styles.cardInner}>
             <View style={styles.cairn}>
-              <View style={[styles.stone, { width: 22, backgroundColor: '#E0A98F' }]} />
-              <View style={[styles.stone, { width: 34, backgroundColor: '#CB6A4A' }]} />
-              <View style={[styles.stone, { width: 46, backgroundColor: colors.accent }]} />
+              <View style={[styles.stone, { width: 22, backgroundColor: stones[0] }]} />
+              <View style={[styles.stone, { width: 34, backgroundColor: stones[1] }]} />
+              <View style={[styles.stone, { width: 46, backgroundColor: stones[2] }]} />
             </View>
 
             <View style={styles.verseWrap}>
               <Text
-                style={[styles.verse, { fontSize: verseSize, lineHeight: Math.round(verseSize * 1.32) }]}
+                style={[
+                  styles.verse,
+                  {
+                    color: inkColor,
+                    fontSize: verseSize,
+                    lineHeight: Math.round(verseSize * 1.32),
+                  },
+                ]}
                 numberOfLines={9}
               >
-                {verse}
+                {body}
               </Text>
-              {reference ? <Text style={styles.reference}>{reference}</Text> : null}
+              {variant?.reference ? (
+                <Text style={[styles.reference, { color: accentColor }]}>
+                  {variant.reference}
+                </Text>
+              ) : null}
             </View>
 
             <View style={styles.footer}>
-              <View style={styles.rule} />
-              <Text style={styles.wordmark}>FOUNDED</Text>
+              <View style={[styles.rule, { backgroundColor: accentColor }]} />
+              <Text style={[styles.wordmark, { color: faintColor }]}>
+                FOUNDEDAPP.COM
+              </Text>
             </View>
           </View>
+        </View>
+
+        {/* What to share */}
+        {variants.length > 1 && (
+          <View style={styles.chips}>
+            {variants.map((v) => {
+              const active = v.key === variant?.key;
+              return (
+                <Pressable
+                  key={v.key}
+                  onPress={() => setVariantKey(v.key)}
+                  accessibilityRole="button"
+                  style={[styles.chip, active && styles.chipActive]}
+                >
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                    {v.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Card color */}
+        <View style={styles.swatches}>
+          {(['cream', 'clay', 'dark'] as Bg[]).map((b) => (
+            <Pressable
+              key={b}
+              onPress={() => setBg(b)}
+              accessibilityRole="button"
+              accessibilityLabel={`${b} background`}
+              style={[styles.swatchWrap, bg === b && styles.swatchActive]}
+            >
+              <LinearGradient colors={BG_GRADIENTS[b]} style={styles.swatch} />
+            </Pressable>
+          ))}
         </View>
       </View>
 
@@ -125,7 +230,7 @@ export default function ShareScreen() {
           ) : (
             <>
               <Ionicons name="share-outline" size={18} color={colors.white} />
-              <Text style={styles.ctaText}>Share this verse</Text>
+              <Text style={styles.ctaText}>Share this</Text>
             </>
           )}
         </Pressable>
@@ -164,24 +269,40 @@ const styles = StyleSheet.create({
   },
   verse: {
     fontFamily: fonts.display,
-    color: colors.ink,
     textAlign: 'center',
   },
   reference: {
     fontFamily: fonts.sansBold,
     fontSize: 12,
     letterSpacing: 1.2,
-    color: colors.accent,
     marginTop: spacing.lg,
   },
   footer: { alignItems: 'center' },
-  rule: { width: 28, height: 2, borderRadius: 1, backgroundColor: colors.accent, marginBottom: spacing.sm },
+  rule: { width: 28, height: 2, borderRadius: 1, marginBottom: spacing.sm },
   wordmark: {
     fontFamily: fonts.sansBold,
     fontSize: 11,
     letterSpacing: 3,
-    color: colors.inkFaint,
   },
+  chips: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg },
+  chip: {
+    paddingVertical: 8,
+    paddingHorizontal: spacing.md,
+    borderRadius: 999,
+    backgroundColor: colors.paperDeep,
+  },
+  chipActive: { backgroundColor: colors.ink },
+  chipText: { fontFamily: fonts.sansSemibold, fontSize: 13, color: colors.inkSoft },
+  chipTextActive: { color: colors.white },
+  swatches: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.md },
+  swatchWrap: {
+    borderRadius: 999,
+    padding: 2,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  swatchActive: { borderColor: colors.accent },
+  swatch: { width: 28, height: 28, borderRadius: 999 },
   footerBar: { alignItems: 'center' },
   cta: {
     flexDirection: 'row',
