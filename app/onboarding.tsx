@@ -20,8 +20,10 @@ import { getLiturgiesByCategory, getReadingById } from '../src/content';
 import { coverFor } from '../src/content/covers';
 import { useSchedule } from '../src/lib/scheduleOverrides';
 import { useOnboarding } from '../src/lib/onboarding';
+import { useAccount } from '../src/lib/account';
 import { scheduleDailyReminder, formatTime } from '../src/lib/reminders';
 import { useEntitlement } from '../src/purchases/Entitlements';
+import AppleSignInButton from '../src/components/AppleSignInButton';
 import { fonts, radius } from '../src/theme/theme';
 
 // A warm, dark palette for onboarding — bridges the cream app and the dark
@@ -53,8 +55,9 @@ const EVENING_TIMES = [
   { hour: 21, minute: 30 },
 ];
 
-// The ordered list of steps. 'remindTime' is skipped when the rhythm is "later".
-const STEPS = ['welcome', 'interests', 'value', 'rhythm', 'remindTime', 'commit', 'trial', 'ready'] as const;
+// The ordered list of steps. 'remindTime' is skipped when the rhythm is
+// "later"; 'account' is skipped when Sign in with Apple isn't available.
+const STEPS = ['welcome', 'interests', 'value', 'rhythm', 'remindTime', 'commit', 'trial', 'account', 'ready'] as const;
 type Step = (typeof STEPS)[number];
 
 export default function Onboarding() {
@@ -63,6 +66,8 @@ export default function Onboarding() {
   const { complete } = useOnboarding();
   const { resolveId } = useSchedule();
   const { packages } = useEntitlement();
+  const { available: appleAvailable, user: account } = useAccount();
+  const skipAccount = !appleAvailable || account != null;
 
   const [stepIndex, setStepIndex] = useState(0);
   const [interests, setInterests] = useState<CategoryId[]>([]);
@@ -72,15 +77,18 @@ export default function Onboarding() {
 
   const step: Step = STEPS[stepIndex];
 
-  // Skip the time picker if they don't want a set rhythm.
+  // Skip the time picker if they don't want a set rhythm, and the account
+  // step if Sign in with Apple isn't available (or they're already in).
+  const shouldSkip = (s: Step) =>
+    (s === 'remindTime' && rhythm === 'later') || (s === 'account' && skipAccount);
   const advance = () => {
     let next = stepIndex + 1;
-    if (STEPS[next] === 'remindTime' && rhythm === 'later') next += 1;
+    while (next < STEPS.length - 1 && shouldSkip(STEPS[next])) next += 1;
     setStepIndex(Math.min(next, STEPS.length - 1));
   };
   const back = () => {
     let prev = stepIndex - 1;
-    if (STEPS[prev] === 'remindTime' && rhythm === 'later') prev -= 1;
+    while (prev > 0 && shouldSkip(STEPS[prev])) prev -= 1;
     setStepIndex(Math.max(prev, 0));
   };
 
@@ -337,6 +345,27 @@ export default function Onboarding() {
           <View style={{ flex: 1 }} />
           <Text style={styles.finePrint}>On the next screen you can start your trial.</Text>
           <Primary label="Continue" onPress={advance} />
+          <View style={{ height: insets.bottom + 8 }} />
+        </View>
+      )}
+
+      {/* ACCOUNT — optional Sign in with Apple */}
+      {step === 'account' && (
+        <View style={styles.centerWrap}>
+          <View style={styles.bell}>
+            <Ionicons name="cloud-outline" size={30} color={C.accent} />
+          </View>
+          <Text style={styles.h1}>Keep your access</Text>
+          <Text style={styles.sub}>
+            Optional. Sign in with Apple so your subscription follows you to a
+            new phone or iPad. Founded stores nothing but an anonymous Apple ID —
+            no email list, no password.
+          </Text>
+          <View style={{ flex: 1 }} />
+          <AppleSignInButton variant="dark" onSignedIn={advance} />
+          <Pressable onPress={advance} hitSlop={8} style={{ marginTop: 16, alignSelf: 'center' }}>
+            <Text style={styles.textLink}>Maybe later</Text>
+          </Pressable>
           <View style={{ height: insets.bottom + 8 }} />
         </View>
       )}

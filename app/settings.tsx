@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Platform,
   TextInput,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -24,6 +25,7 @@ import {
   type ReminderPrefs,
 } from '../src/lib/reminders';
 import AppleSignInButton from '../src/components/AppleSignInButton';
+import { useAccount } from '../src/lib/account';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import { VOICES, useSelectedVoiceId, setSelectedVoice, type Voice } from '../src/audio/voices';
 import { previewUrl } from '../src/audio/audioUrl';
@@ -47,6 +49,7 @@ export default function Settings() {
   const isWeb = Platform.OS === 'web';
 
   const { isPremium, configured } = useEntitlement();
+  const { user: account, deleteAccount } = useAccount();
   const voiceId = useSelectedVoiceId();
   const bgId = useBackgroundSoundId();
   const [prefs, setPrefs] = useState<ReminderPrefs>(DEFAULT_PREFS);
@@ -415,6 +418,27 @@ export default function Settings() {
               <View style={{ marginTop: spacing.md }}>
                 <AppleSignInButton />
               </View>
+              {account && (
+                <Pressable
+                  onPress={() =>
+                    Alert.alert(
+                      'Delete account',
+                      'This signs you out and removes your saved sign-in from this device. Your on-device readings and prayers stay. Subscriptions are managed by Apple and can be cancelled in your App Store settings.',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: 'Delete account',
+                          style: 'destructive',
+                          onPress: () => void deleteAccount(),
+                        },
+                      ],
+                    )
+                  }
+                  style={({ pressed }) => [styles.deleteRow, pressed && { opacity: 0.6 }]}
+                >
+                  <Text style={styles.deleteText}>Delete account</Text>
+                </Pressable>
+              )}
             </View>
           </>
         )}
@@ -547,6 +571,13 @@ const styles = StyleSheet.create({
   },
   privacyLink: { ...type.body, fontSize: 15, color: colors.ink, fontFamily: fonts.sansMedium },
   accountBlurb: { ...type.caption, color: colors.inkSoft },
+  deleteRow: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+  },
+  deleteText: { ...type.body, fontSize: 15, color: colors.pressure, fontFamily: fonts.sansSemibold },
   linkRow: {
     flexDirection: 'row',
     alignItems: 'center',
