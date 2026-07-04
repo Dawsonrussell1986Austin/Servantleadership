@@ -43,6 +43,12 @@ function greeting(d: Date): string {
   const base = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   return USER_NAME ? `${base}, ${USER_NAME}` : base;
 }
+function subtitleFor(d: Date): string {
+  const h = d.getHours();
+  if (h < 12) return 'A few quiet minutes to begin the day well.';
+  if (h < 17) return 'A few quiet minutes to steady the middle of the day.';
+  return 'A few quiet minutes to lay the day down well.';
+}
 function dateLine(d: Date): string {
   return `${WEEKDAYS[d.getDay()]} · ${MONTHS[d.getMonth()]} ${d.getDate()}`;
 }
@@ -159,7 +165,7 @@ export default function Home() {
         <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
           {greeting(now)}
         </Text>
-        <Text style={styles.subtitle}>A few quiet minutes to begin the day well.</Text>
+        <Text style={styles.subtitle}>{subtitleFor(now)}</Text>
       </FadeInUp>
 
       {/* A prayer, gently resurfaced */}
