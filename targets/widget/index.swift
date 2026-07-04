@@ -17,7 +17,7 @@ private enum Brand {
 // shared storage, no network. The rotation is deterministic by day, so the same
 // day always shows the same line.
 
-private struct DailyLine {
+struct DailyLine {
     let text: String
     let reference: String
 }
@@ -116,9 +116,11 @@ struct ServantWidgetView: View {
         let isSmall = family == .systemSmall
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 6) {
-                Circle()
-                    .fill(Brand.accent)
-                    .frame(width: 6, height: 6)
+                Image("logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 16, height: 16)
+                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                 Text(entry.devotional == nil ? "FOUNDED" : "FOUNDED · TODAY")
                     .font(.system(size: 10, weight: .bold))
                     .tracking(1.4)

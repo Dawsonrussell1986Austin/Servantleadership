@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.servantleadership.liturgies",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {
@@ -66,12 +67,13 @@
       "revenueCatApiKeyIos": "appl_GctPKSRjkQiBZZLAboGZylgvlWr",
       "revenueCatApiKeyAndroid": "",
       "eas": {
+        "projectId": "97c396f4-1cb8-46d6-8913-25c06d9451d1",
         "build": {
           "experimental": {
             "ios": {
               "appExtensions": [
                 {
-                  "targetName": "Founded",
+                  "targetName": "FoundedWidget",
                   "bundleIdentifier": "com.servantleadership.liturgies.widget"
                 },
                 {

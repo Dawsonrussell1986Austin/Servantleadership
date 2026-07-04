@@ -23,6 +23,8 @@ import { EntitlementProvider } from '../src/purchases/Entitlements';
 import { ProgressProvider, ListenTracker } from '../src/lib/progress';
 import { PersonalProvider } from '../src/lib/personal';
 import { ScheduleProvider } from '../src/lib/scheduleOverrides';
+import { OnboardingProvider } from '../src/lib/onboarding';
+import { AccountProvider } from '../src/lib/account';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -52,6 +54,8 @@ export default function RootLayout() {
         <AudioProvider>
         <ProgressProvider>
         <PersonalProvider>
+        <AccountProvider>
+        <OnboardingProvider>
         <ScheduleProvider>
         <StatusBar style="dark" />
         <ListenTracker />
@@ -63,6 +67,7 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
           <Stack.Screen
             name="settings"
             options={{ animation: 'slide_from_right' }}
@@ -95,6 +100,8 @@ export default function RootLayout() {
           />
         </Stack>
         </ScheduleProvider>
+        </OnboardingProvider>
+        </AccountProvider>
         </PersonalProvider>
         </ProgressProvider>
         </AudioProvider>

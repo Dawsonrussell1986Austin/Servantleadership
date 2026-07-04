@@ -1,10 +1,19 @@
 import SwiftUI
 
-// Founded for Apple Watch — today's devotional at a glance.
+// Founded for Apple Watch — the complete daily devotional at a glance.
 //
-// Fetches the day's reading from the app's own API; if the network is away,
-// falls back to a bundled verse chosen deterministically by date (same idea
-// as the home-screen widget, so the watch is never empty).
+// Fetches the day's reading from the app's own API and renders every section
+// (call, scripture, reflection, prayer, response, benediction) in one scroll.
+// Listening happens on the phone, where the audio experience is good — the
+// watch just points there. If the network is away, falls back to a bundled
+// verse chosen deterministically by date, so the watch is never empty.
+
+struct TodaySection: Decodable {
+    let type: String
+    let label: String?
+    let body: String
+    let reference: String?
+}
 
 struct Today: Decodable {
     let id: String
@@ -12,9 +21,12 @@ struct Today: Decodable {
     let situation: String
     let ref: String
     let verse: String
+    let prayer: String?
+    let benediction: String?
+    let sections: [TodaySection]?
 }
 
-private struct FallbackLine {
+struct FallbackLine {
     let text: String
     let reference: String
 }
@@ -34,6 +46,20 @@ private func fallbackFor(_ date: Date) -> FallbackLine {
     return FALLBACKS[day % FALLBACKS.count]
 }
 
+// Same section headings the phone app uses.
+private func headingFor(_ section: TodaySection) -> String {
+    if let label = section.label, !label.isEmpty { return label.uppercased() }
+    switch section.type {
+    case "call": return "BE STILL"
+    case "scripture": return "THE WORD"
+    case "reflection": return "REFLECTION"
+    case "prayer": return "LET’S PRAY"
+    case "response": return "PRAY THIS BACK"
+    case "benediction": return "GO IN PEACE"
+    default: return section.type.uppercased()
+    }
+}
+
 @MainActor
 final class TodayModel: ObservableObject {
     @Published var today: Today?
@@ -47,6 +73,43 @@ final class TodayModel: ObservableObject {
             today = try JSONDecoder().decode(Today.self, from: data)
         } catch {
             today = nil // view falls back to the bundled line
+        }
+    }
+}
+
+struct SectionView: View {
+    let section: TodaySection
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(headingFor(section))
+                .font(.system(size: 10, weight: .bold))
+                .kerning(1.1)
+                .foregroundStyle(section.type == "scripture" ? Color.accentColor : Color.secondary)
+                .padding(.top, 10)
+
+            switch section.type {
+            case "scripture":
+                Text("“\(section.body)”")
+                    .font(.system(.body, design: .serif))
+                if let ref = section.reference, !ref.isEmpty {
+                    Text("— \(ref)")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color.accentColor)
+                }
+            case "response":
+                Text(section.body)
+                    .font(.system(.body, design: .serif))
+                    .fontWeight(.semibold)
+            case "benediction":
+                Text(section.body)
+                    .font(.system(.body, design: .serif))
+                    .italic()
+                    .foregroundStyle(.secondary)
+            default:
+                Text(section.body)
+                    .font(.system(.body, design: .serif))
+            }
         }
     }
 }
@@ -69,13 +132,44 @@ struct ContentView: View {
                         .font(.system(.footnote, design: .serif))
                         .italic()
                         .foregroundStyle(.secondary)
-                    Divider().padding(.vertical, 2)
-                    Text("“\(t.verse)”")
-                        .font(.system(.body, design: .serif))
-                    Text(t.ref)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(Color.accentColor)
-                        .padding(.top, 2)
+
+                    if let sections = t.sections, !sections.isEmpty {
+                        // The complete reading, section by section.
+                        ForEach(sections.indices, id: \.self) { i in
+                            SectionView(section: sections[i])
+                        }
+                    } else {
+                        // Older API without sections — the daily summary.
+                        Divider().padding(.vertical, 2)
+                        Text("“\(t.verse)”")
+                            .font(.system(.body, design: .serif))
+                        Text(t.ref)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(Color.accentColor)
+                        if let prayer = t.prayer, !prayer.isEmpty {
+                            Text(prayer)
+                                .font(.system(.body, design: .serif))
+                                .padding(.top, 6)
+                        }
+                        if let benediction = t.benediction, !benediction.isEmpty {
+                            Text(benediction)
+                                .font(.system(.body, design: .serif))
+                                .italic()
+                                .foregroundStyle(.secondary)
+                                .padding(.top, 6)
+                        }
+                    }
+
+                    // Listening lives on the phone, where it sounds right.
+                    HStack(spacing: 6) {
+                        Image(systemName: "iphone")
+                            .font(.system(size: 12))
+                        Text("Listen in Founded on your iPhone")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 14)
                 } else if model.loading {
                     ProgressView()
                         .frame(maxWidth: .infinity)

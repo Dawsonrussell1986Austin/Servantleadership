@@ -27,6 +27,7 @@ import SearchBar from '../src/components/SearchBar';
 import WelcomeEmail from '../src/components/WelcomeEmail';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import { usePersonal } from '../src/lib/personal';
+import { useOnboarding } from '../src/lib/onboarding';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
 
 // Optional personalization: only appended if a name is configured for this
@@ -43,6 +44,12 @@ function greeting(d: Date): string {
   const base = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
   return USER_NAME ? `${base}, ${USER_NAME}` : base;
 }
+function subtitleFor(d: Date): string {
+  const h = d.getHours();
+  if (h < 12) return 'A few quiet minutes to begin the day well.';
+  if (h < 17) return 'A few quiet minutes to steady the middle of the day.';
+  return 'A few quiet minutes to lay the day down well.';
+}
 function dateLine(d: Date): string {
   return `${WEEKDAYS[d.getDay()]} · ${MONTHS[d.getMonth()]} ${d.getDate()}`;
 }
@@ -54,6 +61,7 @@ export default function Home() {
   const router = useRouter();
   const { mustSubscribe } = useEntitlement();
   const { resurfacedPrayer } = usePersonal();
+  const { ready: onboardingReady, onboarded } = useOnboarding();
   const { resolveId, swapToday } = useSchedule();
   const now = new Date();
   const [todayId, setTodayId] = useState<string | null>(null);
@@ -78,10 +86,16 @@ export default function Home() {
       }).start();
     });
   };
+  // Claim horizontal drags in the capture phase (before the ScrollView or the
+  // card's Pressable can take them) and refuse termination requests, or the
+  // vertical ScrollView steals the gesture and the swipe never registers.
+  const isHorizontalDrag = (_e: unknown, g: { dx: number; dy: number }) =>
+    Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2;
   const pan = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_e, g) =>
-        Math.abs(g.dx) > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 1.6,
+      onMoveShouldSetPanResponder: isHorizontalDrag,
+      onMoveShouldSetPanResponderCapture: isHorizontalDrag,
+      onPanResponderTerminationRequest: () => false,
       onPanResponderMove: (_e, g) => slideX.setValue(g.dx),
       onPanResponderRelease: (_e, g) => {
         if (Math.abs(g.dx) > 90) swapCard(g.dx > 0 ? 1 : -1);
@@ -118,6 +132,12 @@ export default function Home() {
     router.push(`/liturgy/${id}`);
   };
 
+  // First run: send new users through onboarding before anything else (it
+  // shows value before the paywall). Wait until the flag has loaded so we
+  // don't flash the home screen.
+  if (!onboardingReady) return <View style={styles.screen} />;
+  if (!onboarded) return <Redirect href="/onboarding" />;
+
   // Subscription-only app: without an active (or trial) subscription, the
   // paywall IS the front door.
   if (mustSubscribe) return <Redirect href="/paywall" />;
@@ -153,7 +173,7 @@ export default function Home() {
         <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
           {greeting(now)}
         </Text>
-        <Text style={styles.subtitle}>A few quiet minutes to begin the day well.</Text>
+        <Text style={styles.subtitle}>{subtitleFor(now)}</Text>
       </FadeInUp>
 
       {/* A prayer, gently resurfaced */}
@@ -216,12 +236,14 @@ export default function Home() {
               </View>
             </View>
           </Pressable>
+          {/* Inside the swipeable area on purpose: the hint sits on the part
+              of the card that actually responds, and slides away with it. */}
+          <Text style={styles.swapHint} numberOfLines={1}>
+            Not the word you need? Swipe for another.
+          </Text>
           </Animated.View>
           <View style={styles.heroDivider} />
           <PlayerBar readingId={devotional.id} openOnPlay />
-          <Text style={styles.swapHint}>
-            Not the word you need today? Swipe the card for another.
-          </Text>
         </View>
       </FadeInUp>
 
@@ -480,11 +502,11 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: spacing.sm + 4,
+    rowGap: spacing.md,
   },
-  tileWrap: { width: 104 },
+  tileWrap: { width: '48%' },
   allList: {},
 
   resultsWrap: { marginTop: spacing.lg },

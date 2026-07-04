@@ -28,7 +28,11 @@ import { CATEGORIES, categoryOf } from '../../src/content/types';
 import { coverFor } from '../../src/content/covers';
 import { lengthLabel } from '../../src/content/lengths';
 import { categoryColor } from '../../src/theme/categories';
-import LiturgyView from '../../src/components/LiturgyView';
+import LiturgyView, {
+  splitSentences,
+  nextHighlight,
+  type Highlight,
+} from '../../src/components/LiturgyView';
 import FadeInUp from '../../src/components/FadeInUp';
 import PlayerBar from '../../src/components/PlayerBar';
 import { useAudio } from '../../src/audio/AudioProvider';
@@ -97,6 +101,9 @@ export default function LiturgyScreen() {
   const [toast, setToast] = useState<string | null>(null);
   const [prayerOpen, setPrayerOpen] = useState(false);
   const [prayerText, setPrayerText] = useState('');
+  // Tap-to-highlight: which words the reader has selected, to save a specific
+  // line to "Words That Held Me" instead of the whole section.
+  const [highlight, setHighlight] = useState<Highlight | null>(null);
 
   const flash = (m: string) => {
     setToast(m);
@@ -115,24 +122,33 @@ export default function LiturgyScreen() {
     }
   };
 
-  // --- Follow the narration: estimate which section is being read from the
-  // audio position (weighted by text length), dim the rest, and scroll along.
+  // --- Follow the narration: estimate which sentence is being read from the
+  // audio position (weighted by text length), highlight it, dim the other
+  // sections, and scroll along.
   const scrollRef = useRef<ScrollView>(null);
   const sectionYs = useRef<Record<number, number>>({});
   const bodyY = useRef(0);
   const followPaused = useRef(false); // user grabbed the page — stop steering
-  const sectionStarts = useMemo(() => {
-    if (!reading) return [];
-    const weights = reading.sections.map(
-      (s) => s.body.length + (s.reference?.length ?? 0) + 60, // + inter-section pause
-    );
-    const total = weights.reduce((a, b) => a + b, reading.title.length + 40);
-    let acc = reading.title.length + 40;
-    return weights.map((w) => {
+  const sentenceTimeline = useMemo(() => {
+    if (!reading) return null;
+    const lead = reading.title.length + 40; // spoken title before section one
+    const units: { section: number; index: number; weight: number }[] = [];
+    reading.sections.forEach((s, si) => {
+      const parts = splitSentences(s.body);
+      parts.forEach((t, k) => {
+        // The section's reference + inter-section pause ride on its last sentence.
+        const tail = k === parts.length - 1 ? (s.reference?.length ?? 0) + 60 : 0;
+        units.push({ section: si, index: k, weight: t.length + tail });
+      });
+    });
+    const total = units.reduce((a, u) => a + u.weight, lead);
+    let acc = lead;
+    const starts = units.map((u) => {
       const start = acc / total;
-      acc += w;
+      acc += u.weight;
       return start;
     });
+    return { units, starts };
   }, [reading]);
 
   const isActiveAudio = !!reading && audio.currentId === reading.id;
@@ -141,13 +157,16 @@ export default function LiturgyScreen() {
     isActiveAudio && audio.durationMillis > 0
       ? audio.positionMillis / audio.durationMillis
       : 0;
-  let activeIndex: number | null = null;
-  if (playingThis) {
-    activeIndex = 0;
-    for (let i = 0; i < sectionStarts.length; i++) {
-      if (fraction >= sectionStarts[i]) activeIndex = i;
+  let activeSentence: { section: number; index: number } | null = null;
+  if (playingThis && sentenceTimeline && sentenceTimeline.units.length > 0) {
+    let at = 0;
+    for (let i = 0; i < sentenceTimeline.starts.length; i++) {
+      if (fraction >= sentenceTimeline.starts[i]) at = i;
     }
+    const u = sentenceTimeline.units[at];
+    activeSentence = { section: u.section, index: u.index };
   }
+  const activeIndex = activeSentence?.section ?? null;
 
   useEffect(() => {
     if (activeIndex == null || followPaused.current) return;
@@ -200,9 +219,22 @@ export default function LiturgyScreen() {
         reference: scripture?.reference ?? '',
       },
     });
-  const saveLine = (text: string, reference?: string) => {
-    addSaved({ readingId: reading.id, readingTitle: reading.title, text, reference });
-    flash('Saved to your collection');
+  const onWordPress = (section: number, word: { start: number; end: number }) =>
+    setHighlight((prev) => nextHighlight(prev, section, word));
+  const highlightText = highlight
+    ? (reading.sections[highlight.section]?.body.slice(highlight.start, highlight.end) ?? '').trim()
+    : '';
+  const saveHighlight = () => {
+    if (!highlight || !highlightText) return;
+    const section = reading.sections[highlight.section];
+    addSaved({
+      readingId: reading.id,
+      readingTitle: reading.title,
+      text: highlightText,
+      reference: section?.type === 'scripture' ? section.reference : undefined,
+    });
+    setHighlight(null);
+    flash('Saved to Words That Held Me');
   };
   const savePrayer = () => {
     const t = prayerText.trim();
@@ -264,21 +296,28 @@ export default function LiturgyScreen() {
           </View>
         </ImageBackground>
 
-        {/* Reading */}
+        {/* Reading. The onLayout lives on this outer wrapper — NOT inside
+            FadeInUp, whose Animated.View would report y=0 — so bodyY is in
+            real scroll-content coordinates and follow-scrolling lands right. */}
+        <View
+          onLayout={(e) => {
+            bodyY.current = e.nativeEvent.layout.y;
+          }}
+        >
         <FadeInUp>
-          <View
-            style={styles.body}
-            onLayout={(e) => {
-              bodyY.current = e.nativeEvent.layout.y;
-            }}
-          >
+          <View style={styles.body}>
             <View style={[styles.accentRule, { backgroundColor: accent }]} />
+            <Text style={styles.highlightHint}>
+              Tap a word, then the last word of a line, to highlight and save it.
+            </Text>
             <LiturgyView
               liturgy={reading}
               fontScale={fontStep}
               showHeader={false}
-              onSaveLine={saveLine}
               activeIndex={activeIndex}
+              activeSentence={activeSentence}
+              highlight={highlight}
+              onWordPress={onWordPress}
               onSectionLayout={(i, y) => {
                 sectionYs.current[i] = y;
               }}
@@ -311,6 +350,7 @@ export default function LiturgyScreen() {
             </Text>
           </View>
         </FadeInUp>
+        </View>
       </ScrollView>
 
       {/* Floating controls over the hero */}
@@ -342,8 +382,31 @@ export default function LiturgyScreen() {
         </View>
       </View>
 
-      {/* Pinned player */}
+      {/* Pinned player, with the highlight save bar stacked above it */}
       <View style={[styles.player, { paddingBottom: insets.bottom + spacing.md }]}>
+        {highlight && highlightText !== '' && (
+          <View style={styles.saveBar}>
+            <Text style={styles.savePreview} numberOfLines={2}>
+              “{highlightText}”
+            </Text>
+            <View style={styles.saveActions}>
+              <Pressable
+                onPress={() => setHighlight(null)}
+                hitSlop={8}
+                style={({ pressed }) => [styles.saveClear, pressed && { opacity: 0.6 }]}
+              >
+                <Ionicons name="close" size={20} color={colors.inkSoft} />
+              </Pressable>
+              <Pressable
+                onPress={saveHighlight}
+                style={({ pressed }) => [styles.saveBtn, pressed && { opacity: 0.9 }]}
+              >
+                <Ionicons name="bookmark" size={16} color={colors.white} />
+                <Text style={styles.saveBtnText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
         <PlayerBar readingId={reading.id} />
       </View>
 
@@ -531,6 +594,45 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.sm,
   },
+  highlightHint: {
+    ...type.caption,
+    fontSize: 12,
+    color: colors.inkFaint,
+    fontStyle: 'italic',
+    marginBottom: spacing.lg,
+  },
+  saveBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingBottom: spacing.md,
+    marginBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  savePreview: {
+    ...type.body,
+    flex: 1,
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: colors.inkSoft,
+  },
+  saveActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  saveClear: { padding: 2 },
+  saveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.accent,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+  },
+  saveBtnText: { fontFamily: fonts.sansBold, fontSize: 14, color: colors.white },
   actionRow: {
     flexDirection: 'row',
     gap: spacing.md,

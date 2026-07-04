@@ -49,8 +49,8 @@ export default function CategoryTile({
 
 const styles = StyleSheet.create({
   tile: {
-    width: 104,
-    height: 150,
+    width: '100%',
+    aspectRatio: 0.78,
     borderRadius: radius.md,
     shadowColor: '#1A1206',
     shadowOpacity: 0.22,
@@ -58,25 +58,25 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
   },
-  tileImg: { width: 104, height: 150 },
+  tileImg: { width: '100%', height: '100%' },
   tileImgRadius: { borderRadius: radius.md },
   tileOverlay: {
     flex: 1,
     borderRadius: radius.md,
-    padding: 12,
+    padding: 14,
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
   tileCount: {
     fontFamily: fonts.sansBold,
-    fontSize: 8,
+    fontSize: 10,
     letterSpacing: 1,
     color: 'rgba(255,255,255,0.75)',
   },
   tileLabel: {
     fontFamily: fonts.display,
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 19,
+    lineHeight: 24,
     color: colors.white,
   },
 });
