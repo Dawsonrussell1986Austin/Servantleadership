@@ -24,8 +24,28 @@ type Sound = {
   playAsync: () => Promise<unknown>;
   pauseAsync: () => Promise<unknown>;
   setPositionAsync: (millis: number) => Promise<unknown>;
+  setVolumeAsync: (volume: number) => Promise<unknown>;
   setOnPlaybackStatusUpdate: (cb: (status: PlaybackStatus) => void) => void;
 };
+
+/**
+ * Ramp a sound's volume from `from` to `to` over `ms`, so playback eases in and
+ * out instead of clicking on/off. Best-effort — a failed step never throws.
+ */
+async function fadeVolume(sound: Sound, from: number, to: number, ms: number): Promise<void> {
+  const steps = 10;
+  for (let i = 1; i <= steps; i++) {
+    const v = from + (to - from) * (i / steps);
+    try {
+      await sound.setVolumeAsync(v);
+    } catch {
+      return;
+    }
+    await new Promise((r) => setTimeout(r, ms / steps));
+  }
+}
+
+const FADE_MS = 320;
 
 type PlaybackStatus = {
   isLoaded: boolean;
@@ -92,6 +112,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const audioModuleRef = useRef<typeof import('expo-av') | null>(null);
   const speechModuleRef = useRef<typeof import('expo-speech') | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const endFadingRef = useRef(false); // guards the one-shot fade near the end
 
   const patch = useCallback((p: Partial<AudioState>) => {
     setState((s) => ({ ...s, ...p }));
@@ -186,13 +207,27 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         durationMillis: status.durationMillis ?? 0,
         isLoading: false,
       });
+
+      // Ease the narration out over its final moments instead of clicking off.
+      const pos = status.positionMillis ?? 0;
+      const dur = status.durationMillis ?? 0;
+      if (status.isPlaying && dur > 2000 && pos >= dur - FADE_MS - 80 && !endFadingRef.current) {
+        endFadingRef.current = true;
+        const sound = soundRef.current;
+        if (sound) void fadeVolume(sound, 1, 0, FADE_MS);
+      } else if (pos < dur - 1200) {
+        endFadingRef.current = false; // user scrubbed back — allow fading again
+      }
+
       if (status.didJustFinish) {
         patch({
           isPlaying: false,
           positionMillis: 0,
           finishedId: stateRef.current.currentId,
         });
+        endFadingRef.current = false;
         soundRef.current?.setPositionAsync(0).catch(() => {});
+        soundRef.current?.setVolumeAsync(1).catch(() => {}); // restore for next play
       }
     },
     [patch],
@@ -257,8 +292,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (s.mode === 'file') {
       const sound = soundRef.current;
       if (!sound) return;
-      if (s.isPlaying) await sound.pauseAsync();
-      else await sound.playAsync();
+      if (s.isPlaying) {
+        // Fade down, then pause — no hard cut.
+        await fadeVolume(sound, 1, 0, FADE_MS);
+        await sound.pauseAsync();
+        await sound.setVolumeAsync(1);
+      } else {
+        // Start silent and fade up.
+        await sound.setVolumeAsync(0);
+        await sound.playAsync();
+        await fadeVolume(sound, 0, 1, FADE_MS);
+      }
       return;
     }
     if (s.mode === 'speech') {
@@ -384,6 +428,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (!want) {
         const bg = bgRef.current;
         if (!bg) return;
+        // Ease the bed out rather than cutting it.
+        try {
+          await fadeVolume(bg, BACKGROUND_VOLUME, 0, FADE_MS);
+        } catch {}
         if (state.currentId) {
           // Narration paused — hold the bed (resumes at the same spot).
           try {
@@ -399,8 +447,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       if (bgRef.current && bgSlugRef.current === want) {
+        // Resume the held bed, restoring its volume and easing back in.
         try {
+          await bgRef.current.setVolumeAsync(0);
           await bgRef.current.playAsync();
+          await fadeVolume(bgRef.current, 0, BACKGROUND_VOLUME, FADE_MS);
         } catch {}
         return;
       }
