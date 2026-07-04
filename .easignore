@@ -1,0 +1,37 @@
+# Files excluded from the EAS Build upload tarball.
+#
+# NOTE: when this file exists, EAS uses it INSTEAD of .gitignore, so it must
+# re-list everything .gitignore excludes (node_modules, etc.) or those get
+# uploaded. Keep the two in sync.
+
+# --- same as .gitignore ---
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+/credentials/
+.metro-health-check*
+.DS_Store
+.env*.local
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.idea/
+.vscode/
+.vercel
+.env*
+
+# --- web/server-only: not part of the native iOS app ---
+# 230 MB of narration MP3s streamed from the API at runtime, plus the static
+# web output, the serverless API, docs, and screenshots. None are bundled.
+public/
+api/
+docs/
+screenshots/
