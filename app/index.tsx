@@ -25,6 +25,7 @@ import PlayerBar from '../src/components/PlayerBar';
 import FadeInUp from '../src/components/FadeInUp';
 import SearchBar from '../src/components/SearchBar';
 import WelcomeEmail from '../src/components/WelcomeEmail';
+import Bounded, { useWide } from '../src/components/Bounded';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import { usePersonal } from '../src/lib/personal';
 import { useOnboarding } from '../src/lib/onboarding';
@@ -63,6 +64,7 @@ export default function Home() {
   const { resurfacedPrayer } = usePersonal();
   const { ready: onboardingReady, onboarded } = useOnboarding();
   const { resolveId, swapToday } = useSchedule();
+  const wide = useWide();
   const now = new Date();
   const [todayId, setTodayId] = useState<string | null>(null);
   const devotional = getReadingById(todayId ?? resolveId(now)) ?? getReadingById(resolveId(now))!;
@@ -150,11 +152,11 @@ export default function Home() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
         paddingTop: insets.top + spacing.lg,
-        paddingHorizontal: spacing.lg,
         paddingBottom: insets.bottom + spacing.xxl,
       }}
     >
       <WelcomeEmail />
+      <Bounded max={840} style={{ paddingHorizontal: wide ? spacing.xl : spacing.lg }}>
 
       {/* Greeting */}
       <FadeInUp>
@@ -314,9 +316,9 @@ export default function Home() {
             </View>
 
             {view === 'shelves' ? (
-              <View style={styles.grid}>
+              <View style={[styles.grid, wide && styles.gridWide]}>
                 {CATEGORIES.map((c, i) => (
-                  <FadeInUp key={c.id} delay={i * 45} style={styles.tileWrap}>
+                  <FadeInUp key={c.id} delay={i * 45} style={wide ? styles.tileWrapWide : styles.tileWrap}>
                     <CategoryTile
                       category={c}
                       count={getLiturgiesByCategory(c.id).length}
@@ -326,15 +328,18 @@ export default function Home() {
                 ))}
               </View>
             ) : (
-              <View style={styles.allList}>
+              <View style={[styles.allList, wide && styles.allListWide]}>
                 {allLiturgies.map((l) => (
-                  <LiturgyCard key={l.id} liturgy={l} onPress={() => open(l.id)} />
+                  <View key={l.id} style={wide ? styles.listItemWide : undefined}>
+                    <LiturgyCard liturgy={l} onPress={() => open(l.id)} />
+                  </View>
                 ))}
               </View>
             )}
           </>
         )}
       </FadeInUp>
+      </Bounded>
     </ScrollView>
   );
 }
@@ -506,8 +511,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     rowGap: spacing.md,
   },
+  gridWide: { justifyContent: 'flex-start', gap: spacing.lg },
   tileWrap: { width: '48%' },
+  tileWrapWide: { width: 168 },
   allList: {},
+  allListWide: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    columnGap: spacing.lg,
+  },
+  listItemWide: { width: '48%' },
 
   resultsWrap: { marginTop: spacing.lg },
   resultsHead: { ...type.label, color: colors.inkFaint, marginBottom: spacing.md },

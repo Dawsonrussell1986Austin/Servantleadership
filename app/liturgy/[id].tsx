@@ -33,6 +33,7 @@ import LiturgyView, {
   nextHighlight,
   type Highlight,
 } from '../../src/components/LiturgyView';
+import { useWide } from '../../src/components/Bounded';
 import FadeInUp from '../../src/components/FadeInUp';
 import PlayerBar from '../../src/components/PlayerBar';
 import { useAudio } from '../../src/audio/AudioProvider';
@@ -90,6 +91,7 @@ function RoundButton({
 export default function LiturgyScreen() {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
+  const wide = useWide();
   const router = useRouter();
   const audio = useAudio();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -305,7 +307,7 @@ export default function LiturgyScreen() {
           }}
         >
         <FadeInUp>
-          <View style={styles.body}>
+          <View style={[styles.body, wide && styles.bodyWide]}>
             <View style={[styles.accentRule, { backgroundColor: accent }]} />
             <Text style={styles.highlightHint}>
               Tap a word, then the last word of a line, to highlight and save it.
@@ -550,6 +552,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.paper,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xl,
+  },
+  // On iPad/Mac, keep the reading in a comfortable measure instead of a
+  // full-width wall of text.
+  bodyWide: {
+    maxWidth: 720,
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: spacing.xxl,
   },
   accentRule: {
     width: 44,

@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
+import { useWide } from '../src/components/Bounded';
 import { useEntitlement } from '../src/purchases/Entitlements';
 
 const BENEFITS: { icon: keyof typeof Ionicons.glyphMap; title: string; sub: string }[] = [
@@ -43,6 +44,7 @@ export default function Paywall() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { packages, purchase, restore, configured, mustSubscribe } = useEntitlement();
+  const wide = useWide();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [chosen, setChosen] = useState(0);
@@ -89,6 +91,9 @@ export default function Paywall() {
         contentContainerStyle={{
           paddingHorizontal: spacing.lg,
           paddingTop: insets.top + spacing.md,
+          width: '100%',
+          maxWidth: wide ? 620 : undefined,
+          alignSelf: 'center',
           // The pinned footer (CTA + restore + legal + links) is tall; the
           // scroll content needs enough clearance that the plan picker can
           // scroll fully above it.
@@ -165,7 +170,7 @@ export default function Paywall() {
           onPress={onSubscribe}
           disabled={busy}
           accessibilityRole="button"
-          style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}
+          style={({ pressed }) => [styles.cta, wide && { maxWidth: 560 }, pressed && { opacity: 0.9 }]}
         >
           {busy ? (
             <ActivityIndicator color={colors.ink} />

@@ -22,6 +22,7 @@ import { useAccount } from '../src/lib/account';
 import { scheduleDailyReminder, formatTime } from '../src/lib/reminders';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import AppleSignInButton from '../src/components/AppleSignInButton';
+import { useWide } from '../src/components/Bounded';
 import { fonts, radius } from '../src/theme/theme';
 
 // A warm, dark palette for onboarding — bridges the cream app and the dark
@@ -66,6 +67,7 @@ export default function Onboarding() {
   const { packages } = useEntitlement();
   const { available: appleAvailable, user: account } = useAccount();
   const skipAccount = !appleAvailable || account != null;
+  const wide = useWide();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [interests, setInterests] = useState<CategoryId[]>([]);
@@ -170,7 +172,7 @@ export default function Onboarding() {
       <TopBar />
 
       {step === 'welcome' && (
-        <View style={styles.welcomeWrap}>
+        <View style={[styles.welcomeWrap, wide && styles.centerWrapWide]}>
           <View style={{ flex: 1 }} />
           <Text style={styles.wordmark}>FOUNDED</Text>
           <Text style={styles.verse}>“Be still, and know that I am God.”</Text>
@@ -189,7 +191,13 @@ export default function Onboarding() {
       {/* INTERESTS */}
       {step === 'interests' && (
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 22, paddingBottom: insets.bottom + 120 }}
+          contentContainerStyle={{
+            paddingHorizontal: 22,
+            paddingBottom: insets.bottom + 120,
+            width: '100%',
+            maxWidth: wide ? 660 : undefined,
+            alignSelf: 'center',
+          }}
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.h1}>What are you carrying right now?</Text>
@@ -201,7 +209,7 @@ export default function Onboarding() {
                 <Pressable
                   key={c.id}
                   onPress={() => toggleInterest(c.id)}
-                  style={styles.tile}
+                  style={[styles.tile, wide && styles.tileWide]}
                   accessibilityRole="button"
                   accessibilityLabel={c.label}
                 >
@@ -243,7 +251,7 @@ export default function Onboarding() {
 
       {/* VALUE */}
       {step === 'value' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <Text style={styles.h1}>Five quiet minutes for the work.</Text>
           <Text style={styles.sub}>No feeds, no metrics, no noise. Here’s what you’ll find.</Text>
           <View style={{ height: 28 }} />
@@ -258,7 +266,7 @@ export default function Onboarding() {
 
       {/* RHYTHM */}
       {step === 'rhythm' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <Text style={styles.h1}>When do you want your quiet minutes?</Text>
           <Text style={styles.sub}>We’ll set a gentle daily reminder — nothing more.</Text>
           <View style={{ height: 20 }} />
@@ -289,7 +297,7 @@ export default function Onboarding() {
 
       {/* REMIND TIME */}
       {step === 'remindTime' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <View style={styles.bell}>
             <Ionicons name="notifications" size={30} color={C.accent} />
           </View>
@@ -338,7 +346,7 @@ export default function Onboarding() {
                 style={StyleSheet.absoluteFill}
               />
             </ImageBackground>
-            <View style={{ paddingHorizontal: 24, marginTop: -8 }}>
+            <View style={{ paddingHorizontal: 24, marginTop: -8, width: '100%', maxWidth: wide ? 560 : undefined, alignSelf: 'center' }}>
               <Text style={styles.h1}>How your free trial works</Text>
               <Text style={styles.sub}>
                 {trial && price
@@ -359,7 +367,7 @@ export default function Onboarding() {
 
       {/* ACCOUNT — optional Sign in with Apple */}
       {step === 'account' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <View style={styles.bell}>
             <Ionicons name="cloud-outline" size={30} color={C.accent} />
           </View>
@@ -380,7 +388,7 @@ export default function Onboarding() {
 
       {/* READY — drop into the first reading */}
       {step === 'ready' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <View style={{ flex: 1 }} />
           <View style={styles.readyCard}>
             <ImageBackground
@@ -421,10 +429,15 @@ export default function Onboarding() {
 // ---- small building blocks ---------------------------------------------
 
 function Primary({ label, onPress }: { label: string; onPress: () => void }) {
+  const wide = useWide();
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}
+      style={({ pressed }) => [
+        styles.cta,
+        wide && { maxWidth: 460, alignSelf: 'center', width: '100%' },
+        pressed && { opacity: 0.9 },
+      ]}
       accessibilityRole="button"
     >
       <Text style={styles.ctaText}>{label}</Text>
@@ -521,6 +534,7 @@ const styles = StyleSheet.create({
 
   // Generic layout
   centerWrap: { flex: 1, paddingHorizontal: 24, paddingTop: 8 },
+  centerWrapWide: { maxWidth: 560, width: '100%', alignSelf: 'center' },
   h1: {
     fontFamily: fonts.display,
     fontSize: 27,
@@ -572,6 +586,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   tile: { width: '48%', aspectRatio: 1.35 },
+  tileWide: { width: '31.5%' },
   tileImg: { width: '100%', height: '100%' },
   tileImgRadius: { borderRadius: radius.md },
   tileOverlay: {
