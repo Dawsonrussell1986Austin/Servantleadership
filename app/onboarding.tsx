@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,6 @@ import {
   ScrollView,
   ImageBackground,
   StyleSheet,
-  Animated,
-  Easing,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -57,7 +55,7 @@ const EVENING_TIMES = [
 
 // The ordered list of steps. 'remindTime' is skipped when the rhythm is
 // "later"; 'account' is skipped when Sign in with Apple isn't available.
-const STEPS = ['welcome', 'interests', 'value', 'rhythm', 'remindTime', 'commit', 'trial', 'account', 'ready'] as const;
+const STEPS = ['welcome', 'interests', 'value', 'rhythm', 'remindTime', 'trial', 'account', 'ready'] as const;
 type Step = (typeof STEPS)[number];
 
 export default function Onboarding() {
@@ -326,26 +324,36 @@ export default function Onboarding() {
         </View>
       )}
 
-      {/* COMMIT */}
-      {step === 'commit' && <Commit onDone={advance} insets={insets} />}
-
       {/* TRIAL EXPLAINER */}
       {step === 'trial' && (
-        <View style={styles.centerWrap}>
-          <Text style={styles.h1}>How your free trial works</Text>
-          <Text style={styles.sub}>
-            {trial && price
-              ? `Start with ${trial}, then ${price}. Cancel anytime.`
-              : 'Start free, then one simple plan. Cancel anytime.'}
-          </Text>
-          <View style={{ height: 24 }} />
-          <TrialStep icon="lock-open-outline" title="Today — full access" body="Every devotional, the whole library, and audio narration." first />
-          <TrialStep icon="notifications-outline" title="Before it renews" body="We’ll remind you the trial is ending — no surprises." />
-          <TrialStep icon="star-outline" title="Cancel anytime" body="Manage or cancel in your App Store settings whenever you like." last />
-          <View style={{ flex: 1 }} />
-          <Text style={styles.finePrint}>On the next screen you can start your trial.</Text>
-          <Primary label="Continue" onPress={advance} />
-          <View style={{ height: insets.bottom + 8 }} />
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: insets.bottom + 130 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <ImageBackground source={coverFor(firstId)} style={styles.trialHero} resizeMode="cover">
+              <LinearGradient
+                colors={['rgba(23,19,14,0.15)', 'rgba(23,19,14,0.65)', C.bg]}
+                locations={[0, 0.6, 1]}
+                style={StyleSheet.absoluteFill}
+              />
+            </ImageBackground>
+            <View style={{ paddingHorizontal: 24, marginTop: -8 }}>
+              <Text style={styles.h1}>How your free trial works</Text>
+              <Text style={styles.sub}>
+                {trial && price
+                  ? `Start with ${trial}, then ${price}. Cancel anytime.`
+                  : 'Start free, then one simple plan. Cancel anytime.'}
+              </Text>
+              <View style={{ height: 24 }} />
+              <TrialStep icon="lock-open-outline" title="Today — full access" body="Every devotional, the whole library, and audio narration." />
+              <TrialStep icon="notifications-outline" title="Before it renews" body="We’ll remind you the trial is ending — no surprises." />
+              <TrialStep icon="star-outline" title="Cancel anytime" body="Manage or cancel in your App Store settings whenever you like." last />
+            </View>
+          </ScrollView>
+          <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
+            <Primary label="Continue" onPress={advance} />
+          </View>
         </View>
       )}
 
@@ -446,85 +454,25 @@ function TrialStep({
   icon,
   title,
   body,
-  first,
   last,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   body: string;
-  first?: boolean;
   last?: boolean;
 }) {
   return (
     <View style={styles.trialRow}>
       <View style={styles.trialRail}>
-        {!first && <View style={styles.trailLineTop} />}
         <View style={styles.trialDot}>
-          <Ionicons name={icon} size={16} color={C.accent} />
+          <Ionicons name={icon} size={18} color={C.accent} />
         </View>
         {!last && <View style={styles.trailLineBottom} />}
       </View>
-      <View style={{ flex: 1, paddingBottom: 18 }}>
+      <View style={{ flex: 1, paddingBottom: 22, paddingLeft: 6 }}>
         <Text style={styles.featureTitle}>{title}</Text>
         <Text style={styles.featureBody}>{body}</Text>
       </View>
-    </View>
-  );
-}
-
-function Commit({
-  onDone,
-  insets,
-}: {
-  onDone: () => void;
-  insets: { bottom: number };
-}) {
-  const fill = useRef(new Animated.Value(0)).current;
-  const anim = useRef<Animated.CompositeAnimation | null>(null);
-
-  const start = () => {
-    anim.current = Animated.timing(fill, {
-      toValue: 1,
-      duration: 1400,
-      easing: Easing.linear,
-      useNativeDriver: true,
-    });
-    anim.current.start(({ finished }) => {
-      if (finished) onDone();
-    });
-  };
-  const stop = () => {
-    anim.current?.stop();
-    Animated.timing(fill, { toValue: 0, duration: 220, useNativeDriver: true }).start();
-  };
-
-  return (
-    <View style={[styles.centerWrap, { alignItems: 'flex-start' }]}>
-      <Text style={styles.h1}>Be still, and know that He is with you.</Text>
-      <Text style={styles.commitBody}>
-        For the next few days, I’ll take five quiet minutes to read, pray, and
-        listen — and let my work be steadied by it.
-      </Text>
-      <View style={{ flex: 1 }} />
-      <Pressable
-        onPressIn={start}
-        onPressOut={stop}
-        style={styles.commitCircleWrap}
-        accessibilityRole="button"
-        accessibilityLabel="Press and hold to commit"
-      >
-        <View style={styles.commitRing}>
-          <Animated.View
-            style={[
-              styles.commitFill,
-              { transform: [{ scale: fill }], opacity: fill.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) },
-            ]}
-          />
-        </View>
-      </Pressable>
-      <Text style={styles.commitHint}>Press and hold to commit</Text>
-      <View style={{ flex: 1 }} />
-      <View style={{ height: insets.bottom + 8 }} />
     </View>
   );
 }
@@ -699,8 +647,9 @@ const styles = StyleSheet.create({
   timeChipTextActive: { color: C.paper },
 
   // Trial timeline
+  trialHero: { width: '100%', height: 200, backgroundColor: C.card },
   trialRow: { flexDirection: 'row' },
-  trialRail: { width: 40, alignItems: 'center' },
+  trialRail: { width: 52, alignItems: 'center' },
   trialDot: {
     width: 40,
     height: 40,
