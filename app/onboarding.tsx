@@ -172,8 +172,8 @@ export default function Onboarding() {
       <TopBar />
 
       {step === 'welcome' && (
-        <View style={[styles.welcomeWrap, wide && styles.centerWrapWide]}>
-          <View style={{ flex: 1 }} />
+        <View style={[styles.welcomeWrap, wide && styles.welcomeWrapWide]}>
+          <View style={styles.grow} />
           <Text style={styles.wordmark}>FOUNDED</Text>
           <Text style={styles.verse}>“Be still, and know that I am God.”</Text>
           <Text style={styles.verseRef}>PSALM 46:10</Text>
@@ -258,7 +258,7 @@ export default function Onboarding() {
           <Feature icon="sunny-outline" title="A daily devotional" body="A short, steadying word on faith and work, waiting each day." />
           <Feature icon="library-outline" title="A library for the real moments" body="Payroll, a hard client, a launch, letting someone go — search what you’re in." />
           <Feature icon="headset-outline" title="Listen to any reading" body="Narrated, for the drive or the walk before the team arrives." />
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label="Continue" onPress={advance} />
           <View style={{ height: insets.bottom + 8 }} />
         </View>
@@ -289,7 +289,7 @@ export default function Onboarding() {
               {rhythm === o.key && <Ionicons name="checkmark-circle" size={22} color={C.accent} />}
             </Pressable>
           ))}
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label="Continue" onPress={advance} />
           <View style={{ height: insets.bottom + 8 }} />
         </View>
@@ -323,7 +323,7 @@ export default function Onboarding() {
               );
             })}
           </View>
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label={`Turn on reminders · ${formatTime(time.hour, time.minute)}`} onPress={enableReminder} />
           <Pressable onPress={advance} hitSlop={8} style={{ marginTop: 14, alignSelf: 'center' }}>
             <Text style={styles.textLink}>Not now</Text>
@@ -339,7 +339,7 @@ export default function Onboarding() {
             contentContainerStyle={{ paddingBottom: insets.bottom + 130 }}
             showsVerticalScrollIndicator={false}
           >
-            <ImageBackground source={coverFor(firstId)} style={styles.trialHero} resizeMode="cover">
+            <ImageBackground source={coverFor(firstId)} style={[styles.trialHero, wide && { height: 380 }]} resizeMode="cover">
               <LinearGradient
                 colors={['rgba(23,19,14,0.15)', 'rgba(23,19,14,0.65)', C.bg]}
                 locations={[0, 0.6, 1]}
@@ -377,7 +377,7 @@ export default function Onboarding() {
             new phone or iPad. Founded stores nothing but an anonymous Apple ID —
             no email list, no password.
           </Text>
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <AppleSignInButton variant="dark" onSignedIn={advance} />
           <Pressable onPress={advance} hitSlop={8} style={{ marginTop: 16, alignSelf: 'center' }}>
             <Text style={styles.textLink}>Maybe later</Text>
@@ -389,7 +389,7 @@ export default function Onboarding() {
       {/* READY — drop into the first reading */}
       {step === 'ready' && (
         <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <View style={styles.readyCard}>
             <ImageBackground
               source={coverFor(firstId)}
@@ -414,7 +414,7 @@ export default function Onboarding() {
               ? 'Chosen for what you said you’re carrying.'
               : 'Today’s devotional, ready for you.'}
           </Text>
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label="Start reading" onPress={() => finish(true)} />
           <Pressable onPress={() => finish(false)} hitSlop={8} style={{ marginTop: 14, alignSelf: 'center' }}>
             <Text style={styles.textLink}>Maybe later</Text>
@@ -534,7 +534,11 @@ const styles = StyleSheet.create({
 
   // Generic layout
   centerWrap: { flex: 1, paddingHorizontal: 24, paddingTop: 8 },
-  centerWrapWide: { maxWidth: 560, width: '100%', alignSelf: 'center' },
+  // On wide screens the spacers collapse, so center the whole block vertically
+  // instead of stranding content at the top with the button far below.
+  centerWrapWide: { maxWidth: 560, width: '100%', alignSelf: 'center', justifyContent: 'center' },
+  welcomeWrapWide: { maxWidth: 560, width: '100%', alignSelf: 'center' },
+  grow: { flex: 1 },
   h1: {
     fontFamily: fonts.display,
     fontSize: 27,
