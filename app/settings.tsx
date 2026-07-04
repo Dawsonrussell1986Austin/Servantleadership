@@ -26,6 +26,7 @@ import {
 } from '../src/lib/reminders';
 import AppleSignInButton from '../src/components/AppleSignInButton';
 import { useAccount } from '../src/lib/account';
+import { useOnboarding } from '../src/lib/onboarding';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import { VOICES, useSelectedVoiceId, setSelectedVoice, type Voice } from '../src/audio/voices';
 import { previewUrl } from '../src/audio/audioUrl';
@@ -50,6 +51,7 @@ export default function Settings() {
 
   const { isPremium, configured } = useEntitlement();
   const { user: account, deleteAccount } = useAccount();
+  const { reset: resetOnboarding } = useOnboarding();
   const voiceId = useSelectedVoiceId();
   const bgId = useBackgroundSoundId();
   const [prefs, setPrefs] = useState<ReminderPrefs>(DEFAULT_PREFS);
@@ -478,6 +480,16 @@ export default function Settings() {
             style={({ pressed }) => [styles.privacyRow, pressed && { opacity: 0.6 }]}
           >
             <Text style={styles.privacyLink}>Privacy Policy</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.inkFaint} />
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              resetOnboarding();
+              router.replace('/');
+            }}
+            style={({ pressed }) => [styles.privacyRow, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={styles.privacyLink}>Replay the intro</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.inkFaint} />
           </Pressable>
         </View>
