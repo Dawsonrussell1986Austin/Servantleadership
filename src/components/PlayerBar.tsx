@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAudio, formatMillis } from '../audio/AudioProvider';
+import { listenSeconds } from '../content/lengths';
 import { colors, spacing, fonts, type } from '../theme/theme';
 
 const SCRUB_COLORS = [colors.accent, colors.accent] as const;
@@ -38,6 +39,12 @@ export default function PlayerBar({
     isActive && audio.durationMillis > 0
       ? audio.positionMillis / audio.durationMillis
       : 0;
+
+  // Total time to show on the right. Once playing we know it exactly; before
+  // then, fall back to the pre-measured narration length so the user can see
+  // how long the reading is before pressing play.
+  const knownMs = (listenSeconds(readingId) ?? 0) * 1000;
+  const totalMs = isActive && audio.durationMillis ? audio.durationMillis : knownMs;
 
   // --- Draggable scrubbing. While the finger is down, `scrub` previews the
   // target position (bar, thumb, and time label all follow live); the actual
@@ -146,7 +153,7 @@ export default function PlayerBar({
         </Pressable>
 
         <Text style={styles.time}>
-          {isActive && audio.durationMillis ? formatMillis(audio.durationMillis) : '—:—'}
+          {totalMs ? formatMillis(totalMs) : '—:—'}
         </Text>
       </View>
 

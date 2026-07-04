@@ -10,5 +10,9 @@ module.exports = {
     ink: '#211D16',
     inkSoft: '#5C554A',
   },
+  // App logo, available in SwiftUI as Image("logo").
+  images: {
+    logo: '../../assets/icon.png',
+  },
   deploymentTarget: '17.0',
 };

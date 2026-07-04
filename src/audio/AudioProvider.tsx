@@ -421,6 +421,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           (sound as any).unloadAsync().catch(() => {});
           return;
         }
+        // isLooping is unreliable for streamed files (the bed can cut out after
+        // one pass) — restart it ourselves the moment it reports finished, so
+        // the ambient sound stays continuous under the narration.
+        (sound as any).setOnPlaybackStatusUpdate((st: any) => {
+          if (st?.isLoaded && st.didJustFinish && bgRef.current === sound) {
+            (sound as any).replayAsync?.().catch(() => {});
+          }
+        });
         bgRef.current = sound;
         bgSlugRef.current = want;
       } catch {
