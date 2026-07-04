@@ -27,6 +27,7 @@ import SearchBar from '../src/components/SearchBar';
 import WelcomeEmail from '../src/components/WelcomeEmail';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import { usePersonal } from '../src/lib/personal';
+import { useOnboarding } from '../src/lib/onboarding';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
 
 // Optional personalization: only appended if a name is configured for this
@@ -60,6 +61,7 @@ export default function Home() {
   const router = useRouter();
   const { mustSubscribe } = useEntitlement();
   const { resurfacedPrayer } = usePersonal();
+  const { ready: onboardingReady, onboarded } = useOnboarding();
   const { resolveId, swapToday } = useSchedule();
   const now = new Date();
   const [todayId, setTodayId] = useState<string | null>(null);
@@ -129,6 +131,12 @@ export default function Home() {
     Keyboard.dismiss();
     router.push(`/liturgy/${id}`);
   };
+
+  // First run: send new users through onboarding before anything else (it
+  // shows value before the paywall). Wait until the flag has loaded so we
+  // don't flash the home screen.
+  if (!onboardingReady) return <View style={styles.screen} />;
+  if (!onboarded) return <Redirect href="/onboarding" />;
 
   // Subscription-only app: without an active (or trial) subscription, the
   // paywall IS the front door.
