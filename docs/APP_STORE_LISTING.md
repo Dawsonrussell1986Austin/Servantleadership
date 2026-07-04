@@ -82,17 +82,28 @@ the moments that come with building something.
 ---
 
 ## App Privacy ("nutrition label") answers
-In App Store Connect → App Privacy, declare:
+v1 ships with the subscription live (RevenueCat) and optional Sign in with
+Apple, so the app **does** collect a little data. In App Store Connect → App
+Privacy, declare exactly:
 
-- **Data collection:** For v1 (no RevenueCat key, no Apple Sign In used), you can
-  select **"Data Not Collected."**
-- When you enable subscriptions (v1.1) you’ll add **Purchases** and a developer
-  identifier via RevenueCat — at that point declare *Purchases* (not linked to
-  identity, used for App Functionality). Reminders and Sign in with Apple stay
-  on-device and don’t require declarations beyond an optional anonymous
-  identifier for Sign in with Apple.
+- **Identifiers → User ID**
+  - Collected: **Yes**
+  - Linked to the user: **Yes** (Sign in with Apple ties the id to a person)
+  - Used for tracking: **No**
+  - Purpose: **App Functionality** (restore access across devices)
+  - Covers both the Apple user identifier and the RevenueCat app user id.
+- **Purchases → Purchase History**
+  - Collected: **Yes**
+  - Linked to the user: **Yes** (aliased to the Apple id when signed in)
+  - Used for tracking: **No**
+  - Purpose: **App Functionality** (verify and restore the subscription)
 
-This mirrors `app/privacy.tsx` (the hosted policy).
+Do **not** declare name, email, contacts, location, or usage/analytics — the app
+collects none of those. Payment details are handled entirely by Apple and never
+reach us. This mirrors `app/privacy.tsx` (the in-app / hosted policy).
+
+> If you ever ship the "free, paywall off" variant with Sign in with Apple also
+> removed, then — and only then — could you select "Data Not Collected."
 
 ---
 
