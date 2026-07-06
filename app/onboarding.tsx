@@ -22,6 +22,7 @@ import { useAccount } from '../src/lib/account';
 import { scheduleDailyReminder, formatTime } from '../src/lib/reminders';
 import { useEntitlement } from '../src/purchases/Entitlements';
 import AppleSignInButton from '../src/components/AppleSignInButton';
+import { useWide } from '../src/components/Bounded';
 import { fonts, radius } from '../src/theme/theme';
 
 // A warm, dark palette for onboarding — bridges the cream app and the dark
@@ -66,6 +67,7 @@ export default function Onboarding() {
   const { packages } = useEntitlement();
   const { available: appleAvailable, user: account } = useAccount();
   const skipAccount = !appleAvailable || account != null;
+  const wide = useWide();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [interests, setInterests] = useState<CategoryId[]>([]);
@@ -170,8 +172,8 @@ export default function Onboarding() {
       <TopBar />
 
       {step === 'welcome' && (
-        <View style={styles.welcomeWrap}>
-          <View style={{ flex: 1 }} />
+        <View style={[styles.welcomeWrap, wide && styles.welcomeWrapWide]}>
+          <View style={styles.grow} />
           <Text style={styles.wordmark}>FOUNDED</Text>
           <Text style={styles.verse}>“Be still, and know that I am God.”</Text>
           <Text style={styles.verseRef}>PSALM 46:10</Text>
@@ -189,7 +191,13 @@ export default function Onboarding() {
       {/* INTERESTS */}
       {step === 'interests' && (
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 22, paddingBottom: insets.bottom + 120 }}
+          contentContainerStyle={{
+            paddingHorizontal: 22,
+            paddingBottom: insets.bottom + 120,
+            width: '100%',
+            maxWidth: wide ? 660 : undefined,
+            alignSelf: 'center',
+          }}
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.h1}>What are you carrying right now?</Text>
@@ -201,7 +209,7 @@ export default function Onboarding() {
                 <Pressable
                   key={c.id}
                   onPress={() => toggleInterest(c.id)}
-                  style={styles.tile}
+                  style={[styles.tile, wide && styles.tileWide]}
                   accessibilityRole="button"
                   accessibilityLabel={c.label}
                 >
@@ -243,14 +251,14 @@ export default function Onboarding() {
 
       {/* VALUE */}
       {step === 'value' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <Text style={styles.h1}>Five quiet minutes for the work.</Text>
           <Text style={styles.sub}>No feeds, no metrics, no noise. Here’s what you’ll find.</Text>
           <View style={{ height: 28 }} />
           <Feature icon="sunny-outline" title="A daily devotional" body="A short, steadying word on faith and work, waiting each day." />
           <Feature icon="library-outline" title="A library for the real moments" body="Payroll, a hard client, a launch, letting someone go — search what you’re in." />
           <Feature icon="headset-outline" title="Listen to any reading" body="Narrated, for the drive or the walk before the team arrives." />
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label="Continue" onPress={advance} />
           <View style={{ height: insets.bottom + 8 }} />
         </View>
@@ -258,7 +266,7 @@ export default function Onboarding() {
 
       {/* RHYTHM */}
       {step === 'rhythm' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <Text style={styles.h1}>When do you want your quiet minutes?</Text>
           <Text style={styles.sub}>We’ll set a gentle daily reminder — nothing more.</Text>
           <View style={{ height: 20 }} />
@@ -281,7 +289,7 @@ export default function Onboarding() {
               {rhythm === o.key && <Ionicons name="checkmark-circle" size={22} color={C.accent} />}
             </Pressable>
           ))}
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label="Continue" onPress={advance} />
           <View style={{ height: insets.bottom + 8 }} />
         </View>
@@ -289,7 +297,7 @@ export default function Onboarding() {
 
       {/* REMIND TIME */}
       {step === 'remindTime' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <View style={styles.bell}>
             <Ionicons name="notifications" size={30} color={C.accent} />
           </View>
@@ -315,7 +323,7 @@ export default function Onboarding() {
               );
             })}
           </View>
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label={`Turn on reminders · ${formatTime(time.hour, time.minute)}`} onPress={enableReminder} />
           <Pressable onPress={advance} hitSlop={8} style={{ marginTop: 14, alignSelf: 'center' }}>
             <Text style={styles.textLink}>Not now</Text>
@@ -331,14 +339,14 @@ export default function Onboarding() {
             contentContainerStyle={{ paddingBottom: insets.bottom + 130 }}
             showsVerticalScrollIndicator={false}
           >
-            <ImageBackground source={coverFor(firstId)} style={styles.trialHero} resizeMode="cover">
+            <ImageBackground source={coverFor(firstId)} style={[styles.trialHero, wide && { height: 380 }]} resizeMode="cover">
               <LinearGradient
                 colors={['rgba(23,19,14,0.15)', 'rgba(23,19,14,0.65)', C.bg]}
                 locations={[0, 0.6, 1]}
                 style={StyleSheet.absoluteFill}
               />
             </ImageBackground>
-            <View style={{ paddingHorizontal: 24, marginTop: -8 }}>
+            <View style={{ paddingHorizontal: 24, marginTop: -8, width: '100%', maxWidth: wide ? 560 : undefined, alignSelf: 'center' }}>
               <Text style={styles.h1}>How your free trial works</Text>
               <Text style={styles.sub}>
                 {trial && price
@@ -359,7 +367,7 @@ export default function Onboarding() {
 
       {/* ACCOUNT — optional Sign in with Apple */}
       {step === 'account' && (
-        <View style={styles.centerWrap}>
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
           <View style={styles.bell}>
             <Ionicons name="cloud-outline" size={30} color={C.accent} />
           </View>
@@ -369,7 +377,7 @@ export default function Onboarding() {
             new phone or iPad. Founded stores nothing but an anonymous Apple ID —
             no email list, no password.
           </Text>
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <AppleSignInButton variant="dark" onSignedIn={advance} />
           <Pressable onPress={advance} hitSlop={8} style={{ marginTop: 16, alignSelf: 'center' }}>
             <Text style={styles.textLink}>Maybe later</Text>
@@ -380,8 +388,8 @@ export default function Onboarding() {
 
       {/* READY — drop into the first reading */}
       {step === 'ready' && (
-        <View style={styles.centerWrap}>
-          <View style={{ flex: 1 }} />
+        <View style={[styles.centerWrap, wide && styles.centerWrapWide]}>
+          <View style={wide ? undefined : styles.grow} />
           <View style={styles.readyCard}>
             <ImageBackground
               source={coverFor(firstId)}
@@ -406,7 +414,7 @@ export default function Onboarding() {
               ? 'Chosen for what you said you’re carrying.'
               : 'Today’s devotional, ready for you.'}
           </Text>
-          <View style={{ flex: 1 }} />
+          <View style={wide ? undefined : styles.grow} />
           <Primary label="Start reading" onPress={() => finish(true)} />
           <Pressable onPress={() => finish(false)} hitSlop={8} style={{ marginTop: 14, alignSelf: 'center' }}>
             <Text style={styles.textLink}>Maybe later</Text>
@@ -421,10 +429,15 @@ export default function Onboarding() {
 // ---- small building blocks ---------------------------------------------
 
 function Primary({ label, onPress }: { label: string; onPress: () => void }) {
+  const wide = useWide();
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}
+      style={({ pressed }) => [
+        styles.cta,
+        wide && { maxWidth: 460, alignSelf: 'center', width: '100%' },
+        pressed && { opacity: 0.9 },
+      ]}
       accessibilityRole="button"
     >
       <Text style={styles.ctaText}>{label}</Text>
@@ -521,6 +534,11 @@ const styles = StyleSheet.create({
 
   // Generic layout
   centerWrap: { flex: 1, paddingHorizontal: 24, paddingTop: 8 },
+  // On wide screens the spacers collapse, so center the whole block vertically
+  // instead of stranding content at the top with the button far below.
+  centerWrapWide: { maxWidth: 560, width: '100%', alignSelf: 'center', justifyContent: 'center' },
+  welcomeWrapWide: { maxWidth: 560, width: '100%', alignSelf: 'center' },
+  grow: { flex: 1 },
   h1: {
     fontFamily: fonts.display,
     fontSize: 27,
@@ -572,6 +590,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   tile: { width: '48%', aspectRatio: 1.35 },
+  tileWide: { width: '31.5%' },
   tileImg: { width: '100%', height: '100%' },
   tileImgRadius: { borderRadius: radius.md },
   tileOverlay: {

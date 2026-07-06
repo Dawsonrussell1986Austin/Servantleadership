@@ -80,7 +80,12 @@ struct Provider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<ServantEntry>) -> Void) {
         // Fetch today's devotional; fall back to the bundled verse rotation
         // offline. Refresh again in a few hours (and at the next request).
-        let url = URL(string: "https://app.foundedapp.com/api/today")!
+        // Send the device's LOCAL date so the reading rolls at local midnight,
+        // matching the app (the API otherwise defaults to UTC).
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        let today = df.string(from: Date())
+        let url = URL(string: "https://app.foundedapp.com/api/today?date=\(today)")!
         let task = URLSession.shared.dataTask(with: url) { data, _, _ in
             var devotional: TodayDevotional? = nil
             if let data = data {

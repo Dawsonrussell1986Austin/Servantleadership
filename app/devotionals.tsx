@@ -17,6 +17,7 @@ import { coverFor } from '../src/content/covers';
 import LiturgyCover from '../src/components/LiturgyCover';
 import { useProgress } from '../src/lib/progress';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
+import { useWide } from '../src/components/Bounded';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -33,6 +34,7 @@ export default function Devotionals() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { hasRead, hasListened, read, listened } = useProgress();
+  const wide = useWide();
 
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [monthOffset, setMonthOffset] = useState(0);
@@ -109,6 +111,9 @@ export default function Devotionals() {
           contentContainerStyle={{
             paddingHorizontal: spacing.lg,
             paddingBottom: insets.bottom + spacing.xxl,
+            width: '100%',
+            maxWidth: wide ? 640 : undefined,
+            alignSelf: 'center',
           }}
           showsVerticalScrollIndicator={false}
         >
@@ -176,6 +181,9 @@ export default function Devotionals() {
             paddingHorizontal: spacing.lg,
             paddingTop: spacing.sm,
             paddingBottom: insets.bottom + spacing.xxl,
+            width: '100%',
+            maxWidth: wide ? 640 : undefined,
+            alignSelf: 'center',
           }}
           renderItem={({ item, index }) => {
             const r = hasRead(item.id);

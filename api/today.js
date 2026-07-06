@@ -23,8 +23,26 @@ function scheduledId(date) {
   return DATA.calendar[(doy - 1) % DATA.calendar.length];
 }
 
+// The client sends its LOCAL date as ?date=YYYY-MM-DD so the reading rolls over
+// at the user's local midnight, not UTC midnight. We build the date at UTC noon
+// so the UTC-based scheduledId reads back the exact calendar day requested
+// (avoids any off-by-one from timezone parsing). Falls back to server time.
+function requestedDate(req) {
+  try {
+    const url = new URL(req.url, 'http://localhost');
+    const d = url.searchParams.get('date');
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+      const dt = new Date(`${d}T12:00:00Z`);
+      if (!Number.isNaN(dt.getTime())) return dt;
+    }
+  } catch {
+    /* fall through */
+  }
+  return new Date();
+}
+
 module.exports = function handler(req, res) {
-  const id = scheduledId(new Date());
+  const id = scheduledId(requestedDate(req));
   const reading = DATA.content[id];
   res.statusCode = reading ? 200 : 500;
   res.setHeader('Content-Type', 'application/json');

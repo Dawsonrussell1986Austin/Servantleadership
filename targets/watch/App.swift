@@ -67,7 +67,12 @@ final class TodayModel: ObservableObject {
 
     func load() async {
         defer { loading = false }
-        guard let url = URL(string: "https://app.foundedapp.com/api/today") else { return }
+        // Send the device's LOCAL date so the reading rolls at local midnight,
+        // matching the app (the API otherwise defaults to UTC).
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        let today = df.string(from: Date())
+        guard let url = URL(string: "https://app.foundedapp.com/api/today?date=\(today)") else { return }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             today = try JSONDecoder().decode(Today.self, from: data)
