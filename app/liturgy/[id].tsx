@@ -346,6 +346,20 @@ export default function LiturgyScreen() {
               <Text style={styles.amen}>Amen.</Text>
             </View>
 
+            {/* A clear close to the reading: mark it done and return home. */}
+            <Pressable
+              onPress={() => {
+                markRead(reading.id);
+                router.replace('/');
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Mark complete and return home"
+              style={({ pressed }) => [styles.completeBtn, pressed && { opacity: 0.9 }]}
+            >
+              <Ionicons name="checkmark-circle" size={20} color={colors.white} />
+              <Text style={styles.completeText}>Mark as complete</Text>
+            </Pressable>
+
             <Text style={styles.credit}>
               Scripture quotations are from the Holy Bible, New International
               Version (NIV). Photography via Pexels.
@@ -571,6 +585,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: spacing.lg,
   },
+  completeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.ink,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md + 2,
+    marginTop: spacing.xl,
+  },
+  completeText: { fontFamily: fonts.sansBold, fontSize: 16, color: colors.white },
   amen: {
     ...type.title,
     color: colors.inkFaint,
