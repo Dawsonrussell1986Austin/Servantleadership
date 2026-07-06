@@ -33,6 +33,8 @@ type PackageLike = {
     title: string;
     /** e.g. "7 days free" when the store offers an introductory free trial. */
     trialLabel?: string;
+    /** Billing length, e.g. "month" / "year" — required on the paywall (3.1.2). */
+    period?: string;
   };
 };
 
@@ -67,6 +69,20 @@ const EntitlementContext = createContext<EntitlementState>({
   restore: async () => false,
   purchase: async () => false,
 });
+
+/** Human billing length from a RevenueCat package's type — "month", "year", … */
+function periodLabel(pkg: any): string | undefined {
+  switch (pkg?.packageType) {
+    case 'MONTHLY': return 'month';
+    case 'ANNUAL': return 'year';
+    case 'WEEKLY': return 'week';
+    case 'SIX_MONTH': return '6 months';
+    case 'THREE_MONTH': return '3 months';
+    case 'TWO_MONTH': return '2 months';
+    case 'LIFETIME': return undefined;
+    default: return undefined;
+  }
+}
 
 /** "7 days free" from a store product's introductory free-trial offer, if any. */
 function trialLabel(product: any): string | undefined {
@@ -120,6 +136,7 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
                 priceString: p.product.priceString,
                 title: p.product.title,
                 trialLabel: trialLabel(p.product),
+                period: periodLabel(p),
               },
             })),
           );

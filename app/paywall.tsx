@@ -52,6 +52,10 @@ export default function Paywall() {
   const primary = packages[Math.min(chosen, Math.max(0, packages.length - 1))];
   const priceLabel = primary ? primary.product.priceString : '';
   const trial = primary?.product.trialLabel;
+  const period = primary?.product.period;
+  // Price + length together, e.g. "$4.99/month" — required on the paywall (3.1.2).
+  const priceEvery = priceLabel ? `${priceLabel}${period ? `/${period}` : ''}` : '';
+  const planTitle = primary?.product.title;
 
   // When the subscription IS the front door there is nowhere to go "back" to.
   const done = () => {
@@ -177,9 +181,9 @@ export default function Paywall() {
           ) : (
             <Text style={styles.ctaText}>
               {trial
-                ? `Start free trial · then ${priceLabel}`
-                : priceLabel
-                  ? `Subscribe · ${priceLabel}`
+                ? `Start free trial · then ${priceEvery}`
+                : priceEvery
+                  ? `Subscribe · ${priceEvery}`
                   : 'Subscribe'}
             </Text>
           )}
@@ -191,11 +195,20 @@ export default function Paywall() {
 
         {Platform.OS !== 'web' && (
           <>
+            {priceEvery !== '' && (
+              <Text style={styles.planSummary}>
+                {planTitle ? `${planTitle} — ` : 'Full Access — '}
+                {trial ? `${trial}, then ${priceEvery}` : priceEvery}
+              </Text>
+            )}
             <Text style={styles.legal}>
-              {priceLabel ? `${priceLabel} per period. ` : ''}Payment is charged to
-              your Apple ID at confirmation. The subscription renews automatically
-              unless canceled at least 24 hours before the end of the current
-              period. Manage or cancel anytime in your App Store account settings.
+              {priceLabel
+                ? `${priceLabel}${period ? ` per ${period}` : ''}. `
+                : ''}
+              Payment is charged to your Apple ID at confirmation. The
+              subscription renews automatically unless canceled at least 24 hours
+              before the end of the current period. Manage or cancel anytime in
+              your App Store account settings.
             </Text>
             <View style={styles.legalLinks}>
               <Pressable
@@ -345,12 +358,20 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     textAlign: 'center',
   },
+  planSummary: {
+    ...type.caption,
+    fontSize: 13,
+    color: 'rgba(251,250,247,0.85)',
+    fontFamily: fonts.sansSemibold,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
   legal: {
     ...type.caption,
     fontSize: 11,
     lineHeight: 16,
     color: 'rgba(251,250,247,0.4)',
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
     textAlign: 'center',
   },
   legalLinks: {
