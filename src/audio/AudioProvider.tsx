@@ -112,7 +112,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const audioModuleRef = useRef<typeof import('expo-av') | null>(null);
   const speechModuleRef = useRef<typeof import('expo-speech') | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const endFadingRef = useRef(false); // guards the one-shot fade near the end
 
   const patch = useCallback((p: Partial<AudioState>) => {
     setState((s) => ({ ...s, ...p }));
@@ -208,26 +207,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isLoading: false,
       });
 
-      // Ease the narration out over its final moments instead of clicking off.
-      const pos = status.positionMillis ?? 0;
-      const dur = status.durationMillis ?? 0;
-      if (status.isPlaying && dur > 2000 && pos >= dur - FADE_MS - 80 && !endFadingRef.current) {
-        endFadingRef.current = true;
-        const sound = soundRef.current;
-        if (sound) void fadeVolume(sound, 1, 0, FADE_MS);
-      } else if (pos < dur - 1200) {
-        endFadingRef.current = false; // user scrubbed back — allow fading again
-      }
-
+      // Let the narration play all the way to its natural end (the spoken
+      // "amen") — NO anticipatory fade, or it clips the final word. The
+      // smoothing lives in pause/resume and the background bed instead.
       if (status.didJustFinish) {
         patch({
           isPlaying: false,
           positionMillis: 0,
           finishedId: stateRef.current.currentId,
         });
-        endFadingRef.current = false;
         soundRef.current?.setPositionAsync(0).catch(() => {});
-        soundRef.current?.setVolumeAsync(1).catch(() => {}); // restore for next play
+        soundRef.current?.setVolumeAsync(1).catch(() => {}); // in case a pause-fade was mid-flight
       }
     },
     [patch],
