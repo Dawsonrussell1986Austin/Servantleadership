@@ -19,17 +19,27 @@ for the real moments: payroll, hard clients, launches, and the wins.
 ```
 
 ## Description
+> NOTE (Apple 2.3.2): because the app is subscription-gated, the description must
+> state clearly that a subscription is required to access the content. The first
+> two paragraphs and the "WHAT YOUR SUBSCRIPTION INCLUDES" header do that — don't
+> remove them, or review will bounce for referencing paid content without labeling it.
 ```
 Founded is a daily devotional and prayer book for Christian entrepreneurs.
 
+Founded is a subscription app. A subscription — with a free trial for new
+members — is required to access the daily devotionals, the full library of
+liturgies, and audio narration.
+
 Building something is heavy work. Founded gives you a quiet five minutes for it —
 no feeds, no metrics, no noise. Just Scripture-rooted readings for the founder’s
-ordinary day, and a library of liturgies for the specific moments that actually
-happen in business.
+ordinary day, and liturgies for the specific moments that actually happen in
+business.
+
+WHAT YOUR SUBSCRIPTION INCLUDES
 
 A DAILY DEVOTIONAL
-Open the app and today’s reading is waiting — a short, steadying word on faith
-and work to begin the day well.
+Today’s reading is waiting when you open the app — a short, steadying word on
+faith and work to begin the day well.
 
 A LIBRARY OF LITURGIES
 For the moments a generic devotional never speaks to:
@@ -40,20 +50,25 @@ For the moments a generic devotional never speaks to:
 • Launching something new
 • Letting someone go
 • Burnout, boredom, and the grind
-…and many more. Search the moment you’re in, and Founded finds the liturgy that
+…and many more. Search the moment you’re in, and Founded finds the reading that
 meets it.
 
-LISTEN ANYWHERE
+AUDIO NARRATION
 Every reading can be narrated, so you can pray through it driving, walking, or
 before the team arrives.
 
 QUIET BY DESIGN
-No accounts required. No personal data collected. No streaks to maintain or
-notifications begging for your attention — just an optional daily reminder if you
+No feeds, no streaks, no attention games — just an optional daily reminder if you
 want one.
 
-Founded is for the builder who wants to keep their soul while they keep their
-company.
+SUBSCRIPTION
+Full Access — [$X.XX] per [month/year], with a free trial for new members.
+Payment is charged to your Apple ID at confirmation. The subscription renews
+automatically unless canceled at least 24 hours before the end of the current
+period. Manage or cancel anytime in your App Store settings.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy Policy: https://foundedapp.com/privacy
 ```
 
 ## Keywords (100 char max, comma-separated, no spaces)
