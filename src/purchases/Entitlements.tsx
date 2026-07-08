@@ -35,6 +35,9 @@ type PackageLike = {
     trialLabel?: string;
     /** Billing length, e.g. "month" / "year" — required on the paywall (3.1.2). */
     period?: string;
+    /** Raw numeric price + currency, for per-day framing on the paywall. */
+    price?: number;
+    currencyCode?: string;
   };
 };
 
@@ -137,6 +140,8 @@ export function EntitlementProvider({ children }: { children: React.ReactNode })
                 title: p.product.title,
                 trialLabel: trialLabel(p.product),
                 period: periodLabel(p),
+                price: typeof p.product.price === 'number' ? p.product.price : undefined,
+                currencyCode: p.product.currencyCode,
               },
             })),
           );

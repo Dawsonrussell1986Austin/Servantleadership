@@ -12,33 +12,48 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, type, radius, fonts } from '../src/theme/theme';
 import { useWide } from '../src/components/Bounded';
 import { useEntitlement } from '../src/purchases/Entitlements';
 
-const BENEFITS: { icon: keyof typeof Ionicons.glyphMap; title: string; sub: string }[] = [
-  {
-    icon: 'library-outline',
-    title: 'The full library',
-    sub: 'Every devotional — for payroll, hard clients, launches, partners, and more.',
-  },
-  {
-    icon: 'headset-outline',
-    title: 'Audio narration',
-    sub: 'Listen to any reading, narrated, when you can’t look at a screen.',
-  },
-  {
-    icon: 'search-outline',
-    title: 'Find your moment',
-    sub: 'Describe what you’re walking through and get the devotional that meets it.',
-  },
-  {
-    icon: 'infinite-outline',
-    title: 'New readings, always',
-    sub: 'Everything added over time, included.',
-  },
-];
+// Warm palette to match the SwiftUI donation design.
+const CREAM = '#FBF0E4';
+const BROWN = '#8B3A0F';
+const INK = '#211D16';
+const INK_SOFT = 'rgba(33,29,22,0.55)';
+
+// ⚠️ "Donation" framing on an auto-renewable subscription is risky with Apple
+// (3.1.1/3.1.2) unless you're a registered nonprofit — consider "Support".
+const FOUNDERS_NOTE =
+  'Founded is built by a small team who believe the founder’s day deserves a ' +
+  'quiet, Scripture-rooted pause. Your gift keeps it ad-free and growing — new ' +
+  'readings, better audio, and room for the next person who needs it. However ' +
+  'you give, thank you for holding this up with us.';
+const SCRIPTURE =
+  '“Remember this: Whoever sows sparingly will also reap sparingly, and whoever ' +
+  'sows generously will also reap generously.” — 2 Corinthians 9:6';
+
+/** Per-day amount from the real price, correct across currencies. */
+function perDay(price: number | undefined, period: string | undefined): number | null {
+  if (price == null) return null;
+  const div = period === 'year' ? 365 : period === 'week' ? 7 : period === 'month' ? 30 : 1;
+  return price / div;
+}
+function fmtCurrency(amount: number, currencyCode?: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: currencyCode || 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `$${amount.toFixed(2)}`;
+  }
+}
+function cadence(period?: string): string {
+  return period === 'year' ? 'yearly' : period === 'week' ? 'weekly' : period === 'month' ? 'monthly' : '';
+}
 
 export default function Paywall() {
   const insets = useSafeAreaInsets();
@@ -47,17 +62,16 @@ export default function Paywall() {
   const wide = useWide();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [chosen, setChosen] = useState(0);
+  // Default to the annual plan (best value) if present, else the first.
+  const annualIndex = packages.findIndex((p) => p.product.period === 'year');
+  const [chosen, setChosen] = useState(annualIndex >= 0 ? annualIndex : 0);
 
   const primary = packages[Math.min(chosen, Math.max(0, packages.length - 1))];
-  const priceLabel = primary ? primary.product.priceString : '';
-  const trial = primary?.product.trialLabel;
+  const priceLabel = primary?.product.priceString ?? '';
   const period = primary?.product.period;
-  // Price + length together, e.g. "$4.99/month" — required on the paywall (3.1.2).
+  const trial = primary?.product.trialLabel;
   const priceEvery = priceLabel ? `${priceLabel}${period ? `/${period}` : ''}` : '';
-  const planTitle = primary?.product.title;
 
-  // When the subscription IS the front door there is nowhere to go "back" to.
   const done = () => {
     if (mustSubscribe || !router.canGoBack()) router.replace('/');
     else router.back();
@@ -87,21 +101,14 @@ export default function Paywall() {
 
   return (
     <View style={styles.screen}>
-      <LinearGradient
-        colors={['#26211B', '#0F0C09']}
-        style={StyleSheet.absoluteFill}
-      />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: spacing.lg,
           paddingTop: insets.top + spacing.md,
           width: '100%',
-          maxWidth: wide ? 620 : undefined,
+          maxWidth: wide ? 600 : undefined,
           alignSelf: 'center',
-          // The pinned footer (CTA + restore + legal + links) is tall; the
-          // scroll content needs enough clearance that the plan picker can
-          // scroll fully above it.
-          paddingBottom: insets.bottom + 340,
+          paddingBottom: insets.bottom + 260,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -111,104 +118,106 @@ export default function Paywall() {
             hitSlop={12}
             accessibilityRole="button"
             accessibilityLabel="Close"
-            style={({ pressed }) => [styles.close, pressed && { opacity: 0.6 }]}
+            style={({ pressed }) => [styles.close, pressed && { opacity: 0.5 }]}
           >
-            <Ionicons name="close" size={26} color="rgba(255,255,255,0.7)" />
+            <Ionicons name="close" size={26} color={INK_SOFT} />
           </Pressable>
         )}
 
-        <Text style={styles.kicker}>FOUNDED · FULL ACCESS</Text>
-        <Text style={styles.title}>Every devotional,{'\n'}for every moment of the work.</Text>
-        <Text style={styles.lede}>
-          {trial
-            ? `Start free — ${trial}. Then one simple plan for everything: the daily devotional, the full library, and audio.`
-            : 'One simple plan for everything: the daily devotional, the full library, and audio.'}
-        </Text>
+        <Text style={styles.title}>Choose your Donation Gift 🎁</Text>
 
-        {packages.length > 1 && (
-          <View style={styles.plans}>
-            {packages.map((p, i) => {
-              const active = i === chosen;
-              return (
-                <Pressable
-                  key={p.identifier}
-                  onPress={() => setChosen(i)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Choose ${p.product.title}`}
-                  style={[styles.plan, active && styles.planActive]}
-                >
-                  <Text style={[styles.planTitle, active && styles.planTitleActive]}>
-                    {p.product.title}
+        {/* Plan cards */}
+        <View style={styles.cards}>
+          {packages.map((p, i) => {
+            const selected = i === chosen;
+            const pd = perDay(p.product.price, p.product.period);
+            const pdText = pd != null ? fmtCurrency(pd, p.product.currencyCode) : null;
+            const isYear = p.product.period === 'year';
+            return (
+              <Pressable
+                key={p.identifier}
+                onPress={() => setChosen(i)}
+                accessibilityRole="button"
+                accessibilityLabel={`Choose ${p.product.title}`}
+                style={[
+                  styles.card,
+                  !isYear && styles.cardBordered,
+                  selected && styles.cardSelected,
+                  isYear && { marginTop: 14 },
+                ]}
+              >
+                {isYear && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>MOST POPULAR</Text>
+                  </View>
+                )}
+                <View style={styles.cardLeft}>
+                  <Text style={styles.cardTitle}>
+                    {isYear ? 'Annual Donation' : 'Weekly Donation'}
                   </Text>
-                  <Text style={[styles.planPrice, active && styles.planTitleActive]}>
+                  <Text style={styles.cardSub}>
                     {p.product.priceString}
+                    {cadence(p.product.period) ? ` billed ${cadence(p.product.period)}` : ''}
                   </Text>
-                  {p.product.trialLabel && (
-                    <Text style={styles.planTrial}>{p.product.trialLabel}</Text>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
-        )}
+                </View>
+                {pdText && (
+                  <Text style={styles.perDay}>
+                    {pdText}
+                    <Text style={styles.perDaySuffix}>/day</Text>
+                  </Text>
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
 
-        <View style={styles.benefits}>
-          {BENEFITS.map((b) => (
-            <View key={b.title} style={styles.benefitRow}>
-              <View style={styles.benefitIcon}>
-                <Ionicons name={b.icon} size={20} color={colors.accentSoft} />
-              </View>
-              <View style={styles.benefitText}>
-                <Text style={styles.benefitTitle}>{b.title}</Text>
-                <Text style={styles.benefitSub}>{b.sub}</Text>
-              </View>
-            </View>
-          ))}
+        {/* A Note from the Founders */}
+        <View style={styles.note}>
+          <Text style={styles.noteHead}>A Note from the Founders</Text>
+          <Text style={styles.noteBody}>{FOUNDERS_NOTE}</Text>
+          <Text style={styles.noteQuote}>{SCRIPTURE}</Text>
         </View>
 
         {message && <Text style={styles.message}>{message}</Text>}
       </ScrollView>
 
+      {/* Sticky bottom bar */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
+        <View style={styles.cancelRow}>
+          <Ionicons name="checkmark" size={14} color={INK_SOFT} />
+          <Text style={styles.cancelText}>Cancel anytime</Text>
+        </View>
+
         <Pressable
           onPress={onSubscribe}
           disabled={busy}
           accessibilityRole="button"
-          style={({ pressed }) => [styles.cta, wide && { maxWidth: 560 }, pressed && { opacity: 0.9 }]}
+          style={({ pressed }) => [
+            styles.cta,
+            wide && { maxWidth: 520 },
+            (pressed || busy) && { opacity: 0.9 },
+          ]}
         >
           {busy ? (
-            <ActivityIndicator color={colors.ink} />
+            <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={styles.ctaText}>
-              {trial
-                ? `Start free trial · then ${priceEvery}`
-                : priceEvery
-                  ? `Subscribe · ${priceEvery}`
-                  : 'Subscribe'}
-            </Text>
+            <Text style={styles.ctaText}>Continue</Text>
           )}
         </Pressable>
 
         <Pressable onPress={onRestore} disabled={busy} hitSlop={8}>
-          <Text style={styles.restore}>Restore purchase</Text>
+          <Text style={styles.restore}>Restore Purchases</Text>
         </Pressable>
 
-        {Platform.OS !== 'web' && (
+        {Platform.OS !== 'web' && priceEvery !== '' && (
           <>
-            {priceEvery !== '' && (
-              <Text style={styles.planSummary}>
-                {planTitle ? `${planTitle} — ` : 'Full Access — '}
-                {trial ? `${trial}, then ${priceEvery}` : priceEvery}
-              </Text>
-            )}
             <Text style={styles.legal}>
-              {priceLabel
-                ? `${priceLabel}${period ? ` per ${period}` : ''}. `
-                : ''}
-              Payment is charged to your Apple ID at confirmation. The
-              subscription renews automatically unless canceled at least 24 hours
-              before the end of the current period. Manage or cancel anytime in
-              your App Store account settings.
+              {priceLabel}
+              {period ? ` per ${period}` : ''}
+              {trial ? `, after your ${trial} trial.` : '.'} Payment is charged to
+              your Apple ID at confirmation. The subscription renews automatically
+              unless canceled at least 24 hours before the end of the current
+              period. Manage or cancel anytime in your App Store settings.
             </Text>
             <View style={styles.legalLinks}>
               <Pressable
@@ -230,9 +239,7 @@ export default function Paywall() {
         )}
 
         {Platform.OS === 'web' && (
-          <Text style={styles.webNote}>
-            Subscriptions are available in the iOS app.
-          </Text>
+          <Text style={styles.webNote}>Donations are available in the iOS app.</Text>
         )}
         {Platform.OS !== 'web' && !configured && (
           <Text style={styles.webNote}>
@@ -245,85 +252,73 @@ export default function Paywall() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#0F0C09' },
+  screen: { flex: 1, backgroundColor: CREAM },
   close: { alignSelf: 'flex-end', padding: 4, marginBottom: spacing.sm },
-  kicker: {
-    ...type.label,
-    color: colors.accentSoft,
-    fontWeight: '700',
-    marginBottom: spacing.md,
-  },
   title: {
     fontFamily: fonts.displayExtra,
-    fontSize: 30,
-    lineHeight: 37,
-    color: '#FBFAF7',
+    fontSize: 28,
+    lineHeight: 35,
+    color: BROWN,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xl,
   },
-  lede: {
-    ...type.body,
-    fontSize: 16,
-    lineHeight: 25,
-    color: 'rgba(251,250,247,0.72)',
+
+  cards: { gap: spacing.md },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
+  cardBordered: { borderColor: 'rgba(0,0,0,0.85)' },
+  cardSelected: { borderColor: INK },
+  badge: {
+    position: 'absolute',
+    top: -12,
+    left: 18,
+    backgroundColor: INK,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  badgeText: {
+    fontFamily: fonts.sansBold,
+    fontSize: 11,
+    letterSpacing: 0.8,
+    color: '#FFFFFF',
+  },
+  cardLeft: { flex: 1, paddingRight: spacing.sm },
+  cardTitle: { fontFamily: fonts.sansBold, fontSize: 18, color: INK },
+  cardSub: { ...type.caption, fontSize: 13, color: INK_SOFT, marginTop: 3 },
+  perDay: { fontFamily: fonts.sansExtra, fontSize: 26, color: INK },
+  perDaySuffix: { fontFamily: fonts.sansMedium, fontSize: 15, color: INK_SOFT },
+
+  note: { marginTop: spacing.xxl },
+  noteHead: { fontFamily: fonts.sansBold, fontSize: 16, color: INK, marginBottom: spacing.sm },
+  noteBody: {
+    fontFamily: fonts.serif,
+    fontSize: 15,
+    lineHeight: 24,
+    color: 'rgba(33,29,22,0.85)',
+  },
+  noteQuote: {
+    fontFamily: fonts.serifItalic,
+    fontSize: 15,
+    lineHeight: 24,
+    color: 'rgba(33,29,22,0.65)',
     marginTop: spacing.md,
   },
-  benefits: { marginTop: spacing.xl, gap: spacing.lg },
-  benefitRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  benefitIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(201,167,126,0.14)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-  },
-  benefitText: { flex: 1, paddingTop: 2 },
-  benefitTitle: {
-    fontFamily: fonts.sansSemibold,
-    fontSize: 16,
-    color: '#FBFAF7',
-  },
-  benefitSub: {
-    ...type.caption,
-    color: 'rgba(251,250,247,0.6)',
-    marginTop: 3,
-  },
-  message: {
-    ...type.caption,
-    color: colors.accentSoft,
-    marginTop: spacing.lg,
-    textAlign: 'center',
-  },
-  plans: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xl },
-  plan: {
-    flex: 1,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.18)',
-    padding: spacing.md,
-  },
-  planActive: {
-    borderColor: colors.accentSoft,
-    backgroundColor: 'rgba(201,167,126,0.10)',
-  },
-  planTitle: {
-    fontFamily: fonts.sansSemibold,
-    fontSize: 14,
-    color: 'rgba(251,250,247,0.75)',
-  },
-  planPrice: {
-    fontFamily: fonts.sansBold,
-    fontSize: 17,
-    color: 'rgba(251,250,247,0.75)',
-    marginTop: 2,
-  },
-  planTitleActive: { color: '#FBFAF7' },
-  planTrial: {
-    ...type.caption,
-    fontSize: 12,
-    color: colors.accentSoft,
-    marginTop: 4,
-  },
+  message: { ...type.caption, color: BROWN, marginTop: spacing.lg, textAlign: 'center' },
+
   footer: {
     position: 'absolute',
     left: 0,
@@ -331,47 +326,31 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    backgroundColor: 'rgba(15,12,9,0.92)',
+    backgroundColor: CREAM,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
+    borderTopColor: 'rgba(0,0,0,0.06)',
     alignItems: 'center',
   },
+  cancelRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: spacing.sm },
+  cancelText: { ...type.caption, fontSize: 13, color: INK_SOFT, fontFamily: fonts.sansMedium },
   cta: {
-    backgroundColor: '#FBFAF7',
-    borderRadius: radius.lg,
-    paddingVertical: spacing.md,
+    backgroundColor: BROWN,
+    borderRadius: 16,
+    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    minHeight: 52,
+    minHeight: 54,
   },
-  ctaText: { fontFamily: fonts.sansBold, fontSize: 16, color: colors.ink },
-  restore: {
-    ...type.caption,
-    color: 'rgba(251,250,247,0.6)',
-    marginTop: spacing.md,
-  },
-  webNote: {
-    ...type.caption,
-    fontSize: 12,
-    color: 'rgba(251,250,247,0.4)',
-    marginTop: spacing.sm,
-    textAlign: 'center',
-  },
-  planSummary: {
-    ...type.caption,
-    fontSize: 13,
-    color: 'rgba(251,250,247,0.85)',
-    fontFamily: fonts.sansSemibold,
-    marginTop: spacing.md,
-    textAlign: 'center',
-  },
+  ctaText: { fontFamily: fonts.sansBold, fontSize: 17, color: '#FFFFFF' },
+  restore: { ...type.caption, color: INK_SOFT, fontFamily: fonts.sansSemibold, marginTop: spacing.md },
+  webNote: { ...type.caption, fontSize: 12, color: INK_SOFT, marginTop: spacing.sm, textAlign: 'center' },
   legal: {
     ...type.caption,
     fontSize: 11,
     lineHeight: 16,
-    color: 'rgba(251,250,247,0.4)',
-    marginTop: spacing.sm,
+    color: 'rgba(33,29,22,0.45)',
+    marginTop: spacing.md,
     textAlign: 'center',
   },
   legalLinks: {
@@ -384,8 +363,8 @@ const styles = StyleSheet.create({
   legalLink: {
     ...type.caption,
     fontSize: 12,
-    color: 'rgba(251,250,247,0.65)',
+    color: 'rgba(33,29,22,0.7)',
     textDecorationLine: 'underline',
   },
-  legalDot: { color: 'rgba(251,250,247,0.35)' },
+  legalDot: { color: 'rgba(33,29,22,0.35)' },
 });
