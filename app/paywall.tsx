@@ -22,13 +22,14 @@ const BROWN = '#8B3A0F';
 const INK = '#211D16';
 const INK_SOFT = 'rgba(33,29,22,0.55)';
 
-// ⚠️ "Donation" framing on an auto-renewable subscription is risky with Apple
-// (3.1.1/3.1.2) unless you're a registered nonprofit — consider "Support".
+// "Support" framing (not "donation") — an auto-renewable subscription that
+// unlocks content isn't a donation, and donation wording risks App Store
+// rejection under 3.1.1/3.1.2.
 const FOUNDERS_NOTE =
   'Founded is built by a small team who believe the founder’s day deserves a ' +
-  'quiet, Scripture-rooted pause. Your gift keeps it ad-free and growing — new ' +
-  'readings, better audio, and room for the next person who needs it. However ' +
-  'you give, thank you for holding this up with us.';
+  'quiet, Scripture-rooted pause. Your support keeps it ad-free and growing — ' +
+  'new readings, better audio, and room for the next person who needs it. ' +
+  'Thank you for holding this up with us.';
 const SCRIPTURE =
   '“Remember this: Whoever sows sparingly will also reap sparingly, and whoever ' +
   'sows generously will also reap generously.” — 2 Corinthians 9:6';
@@ -124,7 +125,11 @@ export default function Paywall() {
           </Pressable>
         )}
 
-        <Text style={styles.title}>Choose your Donation Gift 🎁</Text>
+        <Text style={styles.title}>Support Founded</Text>
+        <Text style={styles.subtitle}>
+          A subscription unlocks every devotional, the full library, and audio —
+          and keeps Founded going.
+        </Text>
 
         {/* Plan cards */}
         <View style={styles.cards}>
@@ -153,7 +158,7 @@ export default function Paywall() {
                 )}
                 <View style={styles.cardLeft}>
                   <Text style={styles.cardTitle}>
-                    {isYear ? 'Annual Donation' : 'Weekly Donation'}
+                    {isYear ? 'Annual' : 'Weekly'}
                   </Text>
                   <Text style={styles.cardSub}>
                     {p.product.priceString}
@@ -239,7 +244,7 @@ export default function Paywall() {
         )}
 
         {Platform.OS === 'web' && (
-          <Text style={styles.webNote}>Donations are available in the iOS app.</Text>
+          <Text style={styles.webNote}>Subscriptions are available in the iOS app.</Text>
         )}
         {Platform.OS !== 'web' && !configured && (
           <Text style={styles.webNote}>
@@ -256,10 +261,17 @@ const styles = StyleSheet.create({
   close: { alignSelf: 'flex-end', padding: 4, marginBottom: spacing.sm },
   title: {
     fontFamily: fonts.displayExtra,
-    fontSize: 28,
-    lineHeight: 35,
+    fontSize: 30,
+    lineHeight: 36,
     color: BROWN,
     marginTop: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  subtitle: {
+    ...type.body,
+    fontSize: 15,
+    lineHeight: 22,
+    color: INK_SOFT,
     marginBottom: spacing.xl,
   },
 
